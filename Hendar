@@ -307,6 +307,13 @@ for i, v in ipairs({"Local","Main","Auto","Shop","Setting"}) do
     createTab(v, i)
 end
 
+task.defer(function()
+    local localTab = sidebar:FindFirstChild("Local")
+    if localTab then
+        localTab:MouseButton1Click():Connect() -- chọn tab Local mặc định
+    end
+end)
+
 -- Auto update CanvasSize theo số tab
 listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
