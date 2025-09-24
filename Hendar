@@ -402,16 +402,18 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
-local localTabFrame = content:FindFirstChild("Local_Content")
+-- Label tab đã có sẵn, không động tới
+-- local label = Instance.new("TextLabel", page)
+-- ...
 
--- ScrollFrame dọc
+-- ScrollFrame chỉ chứa nội dung cuộn, bắt đầu dưới label
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1,0,1,0)
-scrollFrame.Position = UDim2.new(0,0,0,0)
+scrollFrame.Size = UDim2.new(1,0,1, -60)  -- giảm chiều cao trừ label
+scrollFrame.Position = UDim2.new(0,0,0,50) -- bắt đầu ngay dưới label (label cao 50)
 scrollFrame.BackgroundTransparency = 1
-scrollFrame.ScrollBarThickness = 0 -- ẩn thanh cuộn
+scrollFrame.ScrollBarThickness = 0
 scrollFrame.CanvasSize = UDim2.new(0,0,0,0)
-scrollFrame.Parent = localTabFrame
+scrollFrame.Parent = page
 
 local listLayout = Instance.new("UIListLayout")
 listLayout.Parent = scrollFrame
