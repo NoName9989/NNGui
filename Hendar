@@ -464,3 +464,91 @@ createButtonWithLabel(localTabFrame, "LINK DISCORD", "Copy Discord Link", 50, fu
     setclipboard("https://discord.gg/abcdef")
     print("DISCORD LINK COPIED!")
 end)
+
+local localTabFrame = content:FindFirstChild("Local_Content")
+
+-- Hàm tạo nút bật/tắt
+local function createToggleButton(parent, buttonText, posY, initialState, onToggle)
+    local state = initialState or false
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, posY)
+    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    button.BackgroundTransparency = 0.6
+    button.TextColor3 = Color3.fromRGB(230, 230, 230)
+    button.Font = Enum.Font.GothamSemibold
+    button.TextSize = 14
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Parent = parent
+    button.Text = "    "..string.upper(buttonText).." ["..(state and "ON" or "OFF").."]"
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,6)
+    corner.Parent = button
+
+    button.MouseEnter:Connect(function()
+        button.BackgroundTransparency = 0.3
+    end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundTransparency = 0.6
+    end)
+
+    button.MouseButton1Click:Connect(function()
+        state = not state
+        button.Text = "    "..string.upper(buttonText).." ["..(state and "ON" or "OFF").."]"
+        onToggle(state)
+    end)
+end
+
+-- Hàm tạo Input Box
+local function createInputBox(parent, placeholderText, posY, onChange)
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(1, -20, 0, 40)
+    box.Position = UDim2.new(0, 10, 0, posY)
+    box.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    box.BackgroundTransparency = 0.6
+    box.TextColor3 = Color3.fromRGB(230,230,230)
+    box.Font = Enum.Font.GothamSemibold
+    box.TextSize = 14
+    box.PlaceholderText = placeholderText
+    box.TextXAlignment = Enum.TextXAlignment.Left
+    box.ClearTextOnFocus = false
+    box.Parent = parent
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,6)
+    corner.Parent = box
+
+    box.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            onChange(box.Text)
+        end
+    end)
+end
+
+-- Ví dụ sử dụng các chức năng Local
+
+-- Input tốc độ
+createInputBox(localTabFrame, "SPEED", 10, function(value)
+    print("Speed set to:", value)
+end)
+
+-- Toggle chạy nhanh
+createToggleButton(localTabFrame, "SPEED HACK", 60, false, function(state)
+    print("Speed Hack:", state)
+end)
+
+-- Toggle ấn vào đâu dịch chuyển
+createToggleButton(localTabFrame, "CLICK TP", 110, false, function(state)
+    print("Click TP:", state)
+end)
+
+-- Toggle No Clip
+createToggleButton(localTabFrame, "NO CLIP", 160, false, function(state)
+    print("No Clip:", state)
+end)
+
+-- Toggle nhảy vô hạn
+createToggleButton(localTabFrame, "INFINITE JUMP", 210, false, function(state)
+    print("Infinite Jump:", state)
+end)
