@@ -402,10 +402,62 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
-local localTabFrame = content:FindFirstChild("Local_Content")
+local activePopups = {} -- để quản lý popup stacked
 
--- Bảng popup đã có sẵn
--- Giả sử bạn đã có hàm showPopup(message, duration) trước đó
+function showPopup(message, duration)
+    duration = duration or 2
+
+    -- Tạo frame popup
+    local popup = Instance.new("Frame")
+    popup.Size = UDim2.new(0, 220, 0, 40)
+    popup.AnchorPoint = Vector2.new(1, 1)
+    popup.Position = UDim2.new(1, -10, 1, -10 - (#activePopups * 50)) -- xếp chồng lên nhau
+    popup.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    popup.BackgroundTransparency = 0.6
+    popup.BorderSizePixel = 0
+    popup.Parent = playerGui
+
+    -- Bo góc
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = popup
+
+    -- Viền mờ
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Transparency = 0.5
+    stroke.Thickness = 1
+    stroke.Parent = popup
+
+    -- Label bên trong
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -10, 1, -10)
+    label.Position = UDim2.new(0, 5, 0, 5)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper(message)
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.Arcade
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextYAlignment = Enum.TextYAlignment.Center
+    label.Parent = popup
+
+    table.insert(activePopups, popup)
+
+    -- Fade out
+    task.spawn(function()
+        task.wait(duration)
+        for i = 1, 10 do
+            popup.BackgroundTransparency = popup.BackgroundTransparency + 0.06
+            label.TextTransparency = label.TextTransparency + 0.1
+            task.wait(0.03)
+        end
+        popup:Destroy()
+        table.remove(activePopups, 1)
+    end)
+end
+
+local localTabFrame = content:FindFirstChild("Local_Content")
 
 -- Hàm tạo nút kèm chú thích đặc biệt, tích hợp popup cũ
 local function createButtonWithLabel(parent, labelText, buttonText, posY, onClick)
