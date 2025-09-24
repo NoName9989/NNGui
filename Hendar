@@ -234,6 +234,7 @@ local closeBtn = Instance.new("TextButton", header)
     closeBtn.TextSize = 14
     closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
     Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,5)
+    closeBtn.Parent = header
 
 -- Sidebar Tabs (ScrollingFrame)
 local sidebar = Instance.new("ScrollingFrame", main)
@@ -324,18 +325,6 @@ listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 end)
 
 -- Nút Close & Minimize
--- Nút X (Close) trên header
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0,24,0,24)
-closeBtn.Position = UDim2.new(1,-30,0.5,-12)
-closeBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
-closeBtn.Text = "X"
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 18
-closeBtn.TextColor3 = Color3.fromRGB(220,220,220)
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,5)
-closeBtn.Parent = header
-
 -- Popup confirm
 local confirmFrame = Instance.new("Frame")
 confirmFrame.Size = UDim2.new(0,300,0,150)
