@@ -404,7 +404,7 @@ end)
 
 local localTabFrame = content:FindFirstChild("Local_Content")
 
--- Chuyển thành ScrollingFrame nếu chưa
+-- Nếu chưa phải ScrollingFrame → chuyển
 if not localTabFrame:IsA("ScrollingFrame") then
     local sf = Instance.new("ScrollingFrame")
     sf.Name = "Local_Content"
@@ -421,33 +421,20 @@ end
 
 -- Layout tự động
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 6)
+layout.Padding = UDim.new(0,6)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = localTabFrame
 
--- Padding trong frame
 local padding = Instance.new("UIPadding")
-padding.PaddingTop = UDim.new(0, 10)
-padding.PaddingLeft = UDim.new(0, 10)
-padding.PaddingRight = UDim.new(0, 10)
+padding.PaddingTop = UDim.new(0,10)
+padding.PaddingLeft = UDim.new(0,10)
+padding.PaddingRight = UDim.new(0,10)
 padding.Parent = localTabFrame
 
--- Label tab trên cùng
-local tabLabel = Instance.new("TextLabel")
-tabLabel.Size = UDim2.new(1, 0, 0, 30)
-tabLabel.BackgroundTransparency = 1
-tabLabel.Text = string.upper("LOCAL")
-tabLabel.TextColor3 = Color3.fromRGB(255,255,255)
-tabLabel.Font = Enum.Font.Arcade
-tabLabel.TextSize = 30
-tabLabel.TextXAlignment = Enum.TextXAlignment.Left
-tabLabel.LayoutOrder = 0
-tabLabel.Parent = localTabFrame
-
--- Hàm tạo nút
+-- Hàm tạo nút xịn
 local function createButton(parent, text, callback)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Size = UDim2.new(1,0,0,40)
     btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
     btn.BackgroundTransparency = 0.6
     btn.TextColor3 = Color3.fromRGB(230,230,230)
@@ -463,8 +450,8 @@ local function createButton(parent, text, callback)
     corner.Parent = btn
 
     local arrow = Instance.new("TextLabel")
-    arrow.Size = UDim2.new(0, 20, 1, 0)
-    arrow.Position = UDim2.new(1, -22, 0, 0)
+    arrow.Size = UDim2.new(0,20,1,0)
+    arrow.Position = UDim2.new(1,-22,0,0)
     arrow.BackgroundTransparency = 1
     arrow.Text = ">"
     arrow.TextColor3 = Color3.fromRGB(255,255,255)
@@ -478,17 +465,70 @@ local function createButton(parent, text, callback)
     btn.MouseButton1Click:Connect(callback)
 end
 
--- Hàm tạo Toggle
+-- Toggle trượt xịn
 local function createToggle(parent, text, callback)
     local state = false
-    createButton(parent, text.." [OFF]", function()
-        state = not state
-        parent[#parent:GetChildren()].Text = "    "..string.upper(text).." ["..(state and "ON" or "OFF").."]"
-        callback(state)
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1,0,0,40)
+    frame.BackgroundTransparency = 0.6
+    frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    frame.LayoutOrder = #parent:GetChildren() + 1
+    frame.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,6)
+    corner.Parent = frame
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.7,0,1,0)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper(text)
+    label.TextColor3 = Color3.fromRGB(255,255,255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = frame
+
+    local switch = Instance.new("Frame")
+    switch.Size = UDim2.new(0,40,0,20)
+    switch.Position = UDim2.new(0.75,0,0.5,-10)
+    switch.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    switch.Parent = frame
+    local switchCorner = Instance.new("UICorner")
+    switchCorner.CornerRadius = UDim.new(1,0)
+    switchCorner.Parent = switch
+
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.new(0,18,0,18)
+    knob.Position = UDim2.new(0,1,0,1)
+    knob.BackgroundColor3 = Color3.fromRGB(200,200,200)
+    knob.Parent = switch
+    local knobCorner = Instance.new("UICorner")
+    knobCorner.CornerRadius = UDim.new(1,0)
+    knobCorner.Parent = knob
+
+    local function update()
+        if state then
+            knob:TweenPosition(UDim2.new(1,-19,0,1),"Out","Quad",0.2,true)
+            switch.BackgroundColor3 = Color3.fromRGB(0,170,255)
+        else
+            knob:TweenPosition(UDim2.new(0,1,0,1),"Out","Quad",0.2,true)
+            switch.BackgroundColor3 = Color3.fromRGB(50,50,50)
+        end
+    end
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            state = not state
+            update()
+            callback(state)
+        end
     end)
+    update()
 end
 
--- Hàm tạo Input Box
+-- Input box xịn
 local function createInput(parent, labelText, callback)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1,0,0,40)
@@ -502,7 +542,7 @@ local function createInput(parent, labelText, callback)
     corner.Parent = frame
 
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0.4,0,1,0)
+    label.Size = UDim2.new(0.3,0,1,0)
     label.BackgroundTransparency = 1
     label.Text = string.upper(labelText)
     label.TextColor3 = Color3.fromRGB(255,255,255)
@@ -512,15 +552,15 @@ local function createInput(parent, labelText, callback)
     label.Parent = frame
 
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(0.55,0,1,0)
-    box.Position = UDim2.new(0.45,0,0,0)
+    box.Size = UDim2.new(0.65,0,0.8,0)
+    box.Position = UDim2.new(0.35,0,0.1,0)
     box.BackgroundColor3 = Color3.fromRGB(30,30,30)
     box.TextColor3 = Color3.fromRGB(230,230,230)
     box.Font = Enum.Font.GothamSemibold
     box.TextSize = 14
     box.TextXAlignment = Enum.TextXAlignment.Left
-    box.ClearTextOnFocus = false
     box.PlaceholderText = "0"
+    box.ClearTextOnFocus = false
     box.Parent = frame
 
     box.FocusLost:Connect(function(enter)
@@ -530,7 +570,7 @@ local function createInput(parent, labelText, callback)
     end)
 end
 
--- Tạo nội dung tab Local
+-- Tạo nội dung Local
 createButton(localTabFrame, "COPY DISCORD LINK", function()
     setclipboard("https://discord.gg/abcdef")
     print("DISCORD LINK COPIED!")
@@ -556,7 +596,7 @@ createToggle(localTabFrame, "INFINITE JUMP", function(state)
     print("Infinite Jump:", state)
 end)
 
--- Auto update CanvasSize cho Scroll
+-- Auto update CanvasSize cho scroll
 local layout = localTabFrame:FindFirstChildOfClass("UIListLayout")
 if layout then
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
