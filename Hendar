@@ -137,20 +137,20 @@ minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
 Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
 
 -- Ô vuông nhỏ rainbow
-local miniIcon = Instance.new("TextButton")
-miniIcon.Size = UDim2.new(0, 100, 0, 40)
-miniIcon.Position = UDim2.new(0, 20, 1, -60) -- góc trái dưới
-miniIcon.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-miniIcon.Text = "HendarHub"
-miniIcon.Font = Enum.Font.GothamBold
-miniIcon.TextSize = 14
-miniIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-miniIcon.Visible = false
-miniIcon.Parent = gui
-Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(0, 8)
+local miniSquare = Instance.new("TextButton")
+miniSquare.Size = UDim2.new(0, 100, 0, 40)
+miniSquare.Position = UDim2.new(0, 20, 1, -60) -- mặc định ở góc trái dưới
+miniSquare.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+miniSquare.Text = "HendarHub"
+miniSquare.Font = Enum.Font.GothamBold
+miniSquare.TextSize = 14
+miniSquare.TextColor3 = Color3.fromRGB(255, 255, 255)
+miniSquare.Visible = false
+miniSquare.Parent = gui
+Instance.new("UICorner", miniSquare).CornerRadius = UDim.new(0, 8)
 
 -- Gradient rainbow nền icon
-local uiGradient = Instance.new("UIGradient", miniIcon)
+local uiGradient = Instance.new("UIGradient", miniSquare)
 uiGradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
     ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 165, 0)),
@@ -161,7 +161,7 @@ uiGradient.Color = ColorSequence.new{
 }
 uiGradient.Rotation = 45
 
--- Animation rainbow chạy
+-- Animation rainbow chạy xoay
 task.spawn(function()
     while task.wait(0.05) do
         uiGradient.Rotation = (uiGradient.Rotation + 1) % 360
@@ -173,14 +173,56 @@ local minimized = false
 minimize.MouseButton1Click:Connect(function()
     minimized = not minimized
     main.Visible = not minimized
-    miniIcon.Visible = minimized
+    miniSquare.Visible = minimized
 end)
 
--- Bấm icon hiện lại GUI
-miniIcon.MouseButton1Click:Connect(function()
+-- Bấm ô vuông hiện lại GUI
+miniSquare.MouseButton1Click:Connect(function()
     minimized = false
     main.Visible = true
-    miniIcon.Visible = false
+    miniSquare.Visible = false
+end)
+
+-- Kéo thả ô vuông (hỗ trợ điện thoại)
+local UserInputService = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    miniSquare.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+miniSquare.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = miniSquare.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+miniSquare.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement 
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
 end)
 -- Nút Đóng
 local closeBtn = Instance.new("TextButton", header)
