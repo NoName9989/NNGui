@@ -402,10 +402,6 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
-
 -- Hàm popup mini kiểu glass
 local function showMiniPopup(message, duration)
     duration = duration or 2
