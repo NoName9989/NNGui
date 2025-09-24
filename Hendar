@@ -403,28 +403,28 @@ end)
 
 local localTabFrame = content:FindFirstChild("Local_Content")
 
--- Container cho 1 mục nút
+-- Hàm tạo nút kèm chú thích đặc biệt
 local function createButtonWithLabel(parent, labelText, buttonText, posY, onClick)
-    -- Label chú thích
+    -- Label chú thích đặc biệt
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Size = UDim2.new(1, -20, 0, 24) -- cao hơn nút
     label.Position = UDim2.new(0, 10, 0, posY)
     label.BackgroundTransparency = 1
-    label.Text = labelText
-    label.TextColor3 = Color3.fromRGB(255, 255, 255) -- chữ nổi bật
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 16
+    label.Text = "> " .. string.upper(labelText) .. " <"
+    label.TextColor3 = Color3.fromRGB(255, 255, 255) -- trắng nổi bật
+    label.Font = Enum.Font.GothamBlack -- font cực đậm
+    label.TextSize = 18 -- lớn hơn nút
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = parent
 
-    -- Nút
+    -- Nút chính
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, -20, 0, 40)
-    button.Position = UDim2.new(0, 10, 0, posY + 22) -- cách label 2px
-    button.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    button.Position = UDim2.new(0, 10, 0, posY + 26) -- cách label 2px
+    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     button.BackgroundTransparency = 0.6
-    button.Text = buttonText
-    button.TextColor3 = Color3.fromRGB(230,230,230) -- chữ nhỏ hơn label
+    button.Text = "    " .. string.upper(buttonText) -- chữ lùi vào
+    button.TextColor3 = Color3.fromRGB(230, 230, 230)
     button.Font = Enum.Font.GothamSemibold
     button.TextSize = 14
     button.TextXAlignment = Enum.TextXAlignment.Left
@@ -432,10 +432,10 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
 
     -- Bo góc
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0,6)
+    corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = button
 
-    -- Hover nhẹ
+    -- Hover sáng nhẹ
     button.MouseEnter:Connect(function()
         button.BackgroundTransparency = 0.3
     end)
@@ -443,23 +443,23 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
         button.BackgroundTransparency = 0.6
     end)
 
-    -- Mũi tên > ở cuối
+    -- Mũi tên > cuối nút
     local arrow = Instance.new("TextLabel")
-    arrow.Size = UDim2.new(0,20,1,0)
-    arrow.Position = UDim2.new(1,-20,0,0)
+    arrow.Size = UDim2.new(0, 20, 1, 0)
+    arrow.Position = UDim2.new(1, -22, 0, 0)
     arrow.BackgroundTransparency = 1
     arrow.Text = ">"
-    arrow.TextColor3 = Color3.fromRGB(255,255,255)
+    arrow.TextColor3 = Color3.fromRGB(255, 255, 255)
     arrow.Font = Enum.Font.GothamBold
     arrow.TextSize = 18
     arrow.Parent = button
 
-    -- Click action
+    -- Action khi click
     button.MouseButton1Click:Connect(onClick)
 end
 
--- Ví dụ: tạo nút copy link Discord
-createButtonWithLabel(localTabFrame, "Link Discord", "Copy Discord Link", 50, function()
+-- Ví dụ: tạo nút copy Discord
+createButtonWithLabel(localTabFrame, "LINK DISCORD", "Copy Discord Link", 50, function()
     setclipboard("https://discord.gg/abcdef")
-    print("Link Discord đã được copy!")
+    print("DISCORD LINK COPIED!")
 end)
