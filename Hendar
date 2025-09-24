@@ -404,28 +404,27 @@ end)
 
 local localTabFrame = content:FindFirstChild("Local_Content")
 
--- ScrollFrame chứa các nút/input
-local scroll = Instance.new("ScrollingFrame")
-scroll.Size = UDim2.new(1,0,1,-60) -- trừ label tab
-scroll.Position = UDim2.new(0,0,0,50)
-scroll.BackgroundTransparency = 1
-scroll.CanvasSize = UDim2.new(0,0,0,0)
-scroll.ScrollBarThickness = 6
-scroll.Parent = localTabFrame
+-- ScrollFrame dọc
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1,0,1,0)
+scrollFrame.Position = UDim2.new(0,0,0,0)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.ScrollBarThickness = 0 -- ẩn thanh cuộn
+scrollFrame.CanvasSize = UDim2.new(0,0,0,0)
+scrollFrame.Parent = localTabFrame
 
 local listLayout = Instance.new("UIListLayout")
+listLayout.Parent = scrollFrame
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.Padding = UDim.new(0,10)
-listLayout.Parent = scroll
 
--- Auto update CanvasSize
-listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    scroll.CanvasSize = UDim2.new(0,0,0,listLayout.AbsoluteContentSize.Y + 10)
-end)
+scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
--- Hàm tạo nút kiểu glass
-local function createButton(text, onClick)
+-- Hàm tạo nút chuẩn
+local function createButton(parent, text, order, onClick)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1,-20,0,40)
+    btn.Position = UDim2.new(0,10,0,0)
     btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
     btn.BackgroundTransparency = 0.6
     btn.Text = "    " .. string.upper(text)
@@ -433,13 +432,12 @@ local function createButton(text, onClick)
     btn.Font = Enum.Font.GothamSemibold
     btn.TextSize = 14
     btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.Parent = scroll
+    btn.LayoutOrder = order
+    btn.Parent = parent
 
-    local corner = Instance.new("UICorner")
+    local corner = Instance.new("UICorner", btn)
     corner.CornerRadius = UDim.new(0,6)
-    corner.Parent = btn
 
-    -- Mũi tên >
     local arrow = Instance.new("TextLabel")
     arrow.Size = UDim2.new(0,20,1,0)
     arrow.Position = UDim2.new(1,-22,0,0)
@@ -450,68 +448,74 @@ local function createButton(text, onClick)
     arrow.TextSize = 18
     arrow.Parent = btn
 
-    -- Hover
-    btn.MouseEnter:Connect(function()
-        btn.BackgroundTransparency = 0.3
-    end)
-    btn.MouseLeave:Connect(function()
-        btn.BackgroundTransparency = 0.6
-    end)
+    btn.MouseEnter:Connect(function() btn.BackgroundTransparency = 0.3 end)
+    btn.MouseLeave:Connect(function() btn.BackgroundTransparency = 0.6 end)
 
     btn.MouseButton1Click:Connect(onClick)
 end
 
--- Hàm tạo toggle
-local function createToggle(text, default, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1,-20,0,40)
-    btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    btn.BackgroundTransparency = 0.6
-    btn.Text = "    " .. string.upper(text) .. " ["..(default and "ON" or "OFF").."]"
-    btn.TextColor3 = Color3.fromRGB(230,230,230)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 14
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.Parent = scroll
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0,6)
-    corner.Parent = btn
-
-    btn.MouseEnter:Connect(function() btn.BackgroundTransparency = 0.3 end)
-    btn.MouseLeave:Connect(function() btn.BackgroundTransparency = 0.6 end)
-
-    local state = default
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        btn.Text = "    " .. string.upper(text) .. " ["..(state and "ON" or "OFF").."]"
-        callback(state)
-    end)
-end
-
--- Tạo nút copy Discord
-createButton("Copy Discord Link", function()
+-- Copy Discord
+createButton(scrollFrame, "Copy Discord Link", 1, function()
     setclipboard("https://discord.gg/abcdef")
     print("DISCORD LINK COPIED!")
 end)
 
--- Input tốc độ
+-- Speed row (label + textbox)
+local speedRow = Instance.new("Frame")
+speedRow.Size = UDim2.new(1,-20,0,40)
+speedRow.BackgroundTransparency = 1
+speedRow.LayoutOrder = 2
+speedRow.Parent = scrollFrame
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(0.4,0,1,0)
+speedLabel.Position = UDim2.new(0,0,0,0)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "SPEED"
+speedLabel.TextColor3 = Color3.fromRGB(255,255,255)
+speedLabel.Font = Enum.Font.GothamBlack
+speedLabel.TextSize = 18
+speedLabel.TextXAlignment = Enum.TextXAlignment.Left
+speedLabel.Parent = speedRow
+
 local speedInput = Instance.new("TextBox")
-speedInput.Size = UDim2.new(1,-20,0,40)
-speedInput.Position = UDim2.new(0,10,0,0) -- UIListLayout tự sắp xếp
-speedInput.PlaceholderText = "SPEED"
-speedInput.TextColor3 = Color3.fromRGB(230,230,230)
+speedInput.Size = UDim2.new(0.55,0,1,0)
+speedInput.Position = UDim2.new(0.45,0,0,0)
 speedInput.BackgroundColor3 = Color3.fromRGB(0,0,0)
 speedInput.BackgroundTransparency = 0.6
+speedInput.TextColor3 = Color3.fromRGB(230,230,230)
+speedInput.PlaceholderText = "0"
 speedInput.Font = Enum.Font.GothamSemibold
 speedInput.TextSize = 14
 speedInput.TextXAlignment = Enum.TextXAlignment.Left
-speedInput.Parent = scroll
-local corner = Instance.new("UICorner", speedInput)
-corner.CornerRadius = UDim.new(0,6)
+speedInput.Parent = speedRow
+Instance.new("UICorner", speedInput).CornerRadius = UDim.new(0,6)
 
 -- Toggles
-createToggle("Speed Hack", false, function(v) print("Speed Hack:", v) end)
-createToggle("Click Teleport", false, function(v) print("Click Teleport:", v) end)
-createToggle("No Clip", false, function(v) print("No Clip:", v) end)
-createToggle("Infinite Jump", false, function(v) print("Infinite Jump:", v) end)
+local toggles = {"SPEED HACK","CLICK TELEPORT","NO CLIP","INFINITE JUMP"}
+
+for i,tName in ipairs(toggles) do
+    local toggleBtn = Instance.new("TextButton")
+    toggleBtn.Size = UDim2.new(1,-20,0,40)
+    toggleBtn.Position = UDim2.new(0,10,0,0)
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    toggleBtn.BackgroundTransparency = 0.6
+    toggleBtn.Text = "    " .. tName .. " [OFF]"
+    toggleBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    toggleBtn.Font = Enum.Font.GothamSemibold
+    toggleBtn.TextSize = 14
+    toggleBtn.TextXAlignment = Enum.TextXAlignment.Left
+    toggleBtn.LayoutOrder = i+2
+    toggleBtn.Parent = scrollFrame
+    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0,6)
+
+    toggleBtn.MouseEnter:Connect(function() toggleBtn.BackgroundTransparency = 0.3 end)
+    toggleBtn.MouseLeave:Connect(function() toggleBtn.BackgroundTransparency = 0.6 end)
+
+    local state = false
+    toggleBtn.MouseButton1Click:Connect(function()
+        state = not state
+        toggleBtn.Text = "    " .. tName .. " [" .. (state and "ON" or "OFF") .. "]"
+        print(tName, state)
+    end)
+end
