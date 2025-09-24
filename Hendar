@@ -402,41 +402,44 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
+
 local localTabFrame = content:FindFirstChild("Local_Content")
 
--- Hàm tạo nút kèm chú thích đặc biệt, không dùng popup
-local function createButtonWithLabel(parent, labelText, buttonText, posY, onClick)
-    -- Label chú thích
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -20, 0, 24)
-    label.Position = UDim2.new(0, 10, 0, posY)
-    label.BackgroundTransparency = 1
-    label.Text = "> " .. string.upper(labelText) .. " <"
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamBlack
-    label.TextSize = 18
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = parent
+-- Hàm tính posY tiếp theo
+local function getNextPosY()
+    local lastY = 0
+    for _, child in ipairs(localTabFrame:GetChildren()) do
+        if child:IsA("TextButton") or child:IsA("Frame") then
+            local bottom = child.Position.Y.Offset + child.Size.Y.Offset
+            if bottom > lastY then
+                lastY = bottom
+            end
+        end
+    end
+    return lastY + 10 -- cách 10px
+end
 
-    -- Nút chính
+-- Hàm tạo nút (Copy Discord)
+local function createButton(parent, buttonText, onClick)
+    local posY = getNextPosY()
+
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, -20, 0, 40)
-    button.Position = UDim2.new(0, 10, 0, posY + 26)
-    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    button.Position = UDim2.new(0, 10, 0, posY)
+    button.BackgroundColor3 = Color3.fromRGB(0,0,0)
     button.BackgroundTransparency = 0.6
-    button.Text = "    " .. string.upper(buttonText)
-    button.TextColor3 = Color3.fromRGB(230, 230, 230)
+    button.TextColor3 = Color3.fromRGB(230,230,230)
     button.Font = Enum.Font.GothamSemibold
     button.TextSize = 14
     button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Text = "    "..string.upper(buttonText)
     button.Parent = parent
 
-    -- Bo góc
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
+    corner.CornerRadius = UDim.new(0,6)
     corner.Parent = button
 
-    -- Hover nhẹ
+    -- Hover sáng nhẹ
     button.MouseEnter:Connect(function()
         button.BackgroundTransparency = 0.3
     end)
@@ -450,41 +453,67 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
     arrow.Position = UDim2.new(1, -22, 0, 0)
     arrow.BackgroundTransparency = 1
     arrow.Text = ">"
-    arrow.TextColor3 = Color3.fromRGB(255, 255, 255)
+    arrow.TextColor3 = Color3.fromRGB(255,255,255)
     arrow.Font = Enum.Font.GothamBold
     arrow.TextSize = 18
     arrow.Parent = button
 
-    -- Click button chỉ chạy action gốc
     button.MouseButton1Click:Connect(onClick)
 end
 
--- Tạo nút copy Discord (không popup)
-createButtonWithLabel(localTabFrame, "LINK DISCORD", "Copy Discord Link", 50, function()
-    setclipboard("https://discord.gg/abcdef")
-    print("DISCORD LINK COPIED!")
-end)
+-- Hàm tạo Input Box kiểu "LABEL [TextBox]"
+local function createInputWithLabel(parent, labelText, onChange)
+    local posY = getNextPosY()
 
-local localTabFrame = content:FindFirstChild("Local_Content")
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, 40)
+    frame.Position = UDim2.new(0, 10, 0, posY)
+    frame.BackgroundTransparency = 0.6
+    frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    frame.Parent = parent
 
--- Lấy vị trí Y cuối cùng để xếp nút tiếp theo
-local function getNextPosY()
-    local lastY = 0
-    for _, child in ipairs(localTabFrame:GetChildren()) do
-        if child:IsA("TextButton") or child:IsA("TextLabel") then
-            local bottom = child.Position.Y.Offset + child.Size.Y.Offset
-            if bottom > lastY then
-                lastY = bottom
-            end
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,6)
+    corner.Parent = frame
+
+    -- Label trái
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.4, -10, 1, 0)
+    label.Position = UDim2.new(0, 5, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper(labelText)
+    label.TextColor3 = Color3.fromRGB(255,255,255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = frame
+
+    -- TextBox phải
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0.55, -10, 1, 0)
+    box.Position = UDim2.new(0.45, 5, 0, 0)
+    box.BackgroundTransparency = 0
+    box.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    box.TextColor3 = Color3.fromRGB(230,230,230)
+    box.Font = Enum.Font.GothamSemibold
+    box.TextSize = 14
+    box.PlaceholderText = "0"
+    box.TextXAlignment = Enum.TextXAlignment.Left
+    box.ClearTextOnFocus = false
+    box.Parent = frame
+
+    box.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            onChange(box.Text)
         end
-    end
-    return lastY + 10 -- cách 10px so với nút/label trước
+    end)
 end
 
--- Hàm tạo nút bật/tắt
+-- Hàm tạo Toggle Button
 local function createToggleButton(parent, buttonText, onToggle)
     local posY = getNextPosY()
     local state = false
+
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, -20, 0, 40)
     button.Position = UDim2.new(0, 10, 0, posY)
@@ -515,35 +544,13 @@ local function createToggleButton(parent, buttonText, onToggle)
     end)
 end
 
--- Hàm tạo input
-local function createInputBox(parent, placeholderText, onChange)
-    local posY = getNextPosY()
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -20, 0, 40)
-    box.Position = UDim2.new(0, 10, 0, posY)
-    box.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    box.BackgroundTransparency = 0.6
-    box.TextColor3 = Color3.fromRGB(230,230,230)
-    box.Font = Enum.Font.GothamSemibold
-    box.TextSize = 14
-    box.PlaceholderText = placeholderText
-    box.TextXAlignment = Enum.TextXAlignment.Left
-    box.ClearTextOnFocus = false
-    box.Parent = parent
+-- === TẠO NÚT & INPUT TRONG TAB LOCAL ===
+createButton(localTabFrame, "Copy Discord Link", function()
+    setclipboard("https://discord.gg/abcdef")
+    print("DISCORD LINK COPIED!")
+end)
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0,6)
-    corner.Parent = box
-
-    box.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            onChange(box.Text)
-        end
-    end)
-end
-
--- Tạo các chức năng Local, xuất hiện ngay dưới nút Copy Discord
-createInputBox(localTabFrame, "SPEED", function(value)
+createInputWithLabel(localTabFrame, "SPEED", function(value)
     print("Speed set to:", value)
 end)
 
@@ -561,4 +568,16 @@ end)
 
 createToggleButton(localTabFrame, "INFINITE JUMP", function(state)
     print("Infinite Jump:", state)
+end)
+
+-- === AUTO SCROLL SIDEBAR ===
+local listLayout = sidebar:FindFirstChildOfClass("UIListLayout")
+if not listLayout then
+    listLayout = Instance.new("UIListLayout")
+    listLayout.Padding = UDim.new(0,4)
+    listLayout.Parent = sidebar
+end
+
+listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    sidebar.CanvasSize = UDim2.new(0,0,0, listLayout.AbsoluteContentSize.Y + 10)
 end)
