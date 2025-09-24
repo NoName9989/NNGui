@@ -1,100 +1,97 @@
---By HenGi
--- Hendar Loading UI
-local player = game:GetService("Players").LocalPlayer
-local TweenService = game:GetService("TweenService")
-
-local gui = Instance.new("ScreenGui")
-gui.Name = "HendarLoading"
-gui.IgnoreGuiInset = true
-gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
-
--- Background
-local bg = Instance.new("Frame", gui)
-bg.Size = UDim2.new(1,0,1,0)
-bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-
--- Cloud Image
-local cloud = Instance.new("ImageLabel", bg)
-cloud.Size = UDim2.new(0,300,0,200)
-cloud.Position = UDim2.new(0.5,-150,0.3,-100)
-cloud.BackgroundTransparency = 1
-cloud.Image = "rbxassetid://0000000" -- thay id ảnh bạn thích
-
--- Loading Text
-local loadingText = Instance.new("TextLabel", bg)
-loadingText.Size = UDim2.new(1,0,0,50)
-loadingText.Position = UDim2.new(0,0,0.65,0)
-loadingText.BackgroundTransparency = 1
-loadingText.Text = "LOADING"
-loadingText.Font = Enum.Font.Arcade
-loadingText.TextSize = 40
-loadingText.TextColor3 = Color3.fromRGB(255,100,180)
-
--- Progress Bar BG
-local barBG = Instance.new("Frame", bg)
-barBG.Size = UDim2.new(0,300,0,20)
-barBG.Position = UDim2.new(0.5,-150,0.75,0)
-barBG.BackgroundColor3 = Color3.fromRGB(50,50,50)
-Instance.new("UICorner", barBG).CornerRadius = UDim.new(0,10)
-
--- Progress Fill
-local barFill = Instance.new("Frame", barBG)
-barFill.Size = UDim2.new(0,0,1,0)
-barFill.BackgroundColor3 = Color3.fromRGB(255,0,255)
-Instance.new("UICorner", barFill).CornerRadius = UDim.new(0,10)
-
--- Gradient
-local gradient = Instance.new("UIGradient", barFill)
-gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,180)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150,255,200)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(100,200,255))
-}
-
--- % Text
-local percentText = Instance.new("TextLabel", bg)
-percentText.Size = UDim2.new(1,0,0,40)
-percentText.Position = UDim2.new(0,0,0.8,0)
-percentText.BackgroundTransparency = 1
-percentText.Text = "0%"
-percentText.Font = Enum.Font.Arcade
-percentText.TextSize = 30
-percentText.TextColor3 = Color3.fromRGB(255,100,180)
-
--- Animate Loading
-for i = 0, 100 do
-    barFill.Size = UDim2.new(i/100,0,1,0)
-    percentText.Text = i .. "%"
-    task.wait(0.02)
-end
-
--- Fade Out Function (fix)
-local function fadeOut(obj)
-    if obj:IsA("TextLabel") then
-        TweenService:Create(obj, TweenInfo.new(1), {TextTransparency = 1}):Play()
-    elseif obj:IsA("ImageLabel") then
-        TweenService:Create(obj, TweenInfo.new(1), {ImageTransparency = 1}):Play()
-    elseif obj:IsA("Frame") then
-        TweenService:Create(obj, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-    end
-end
-
-for _,v in pairs(bg:GetDescendants()) do
-    fadeOut(v)
-end
-fadeOut(bg)
-
-task.wait(1.5)
-gui:Destroy()
+-- Hendar GUI Library + Loading tích hợp
 
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
 local player = Players.LocalPlayer
 
 local Library = {}
 
+-- Hàm show loading khi gọi library (nếu muốn)
+function Library:ShowLoading(cloudImageId)
+    -- Loading UI
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "HendarLoading"
+    gui.IgnoreGuiInset = true
+    gui.ResetOnSpawn = false
+    gui.Parent = player:WaitForChild("PlayerGui")
+
+    local bg = Instance.new("Frame", gui)
+    bg.Size = UDim2.new(1,0,1,0)
+    bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+
+    local cloud = Instance.new("ImageLabel", bg)
+    cloud.Size = UDim2.new(0,300,0,200)
+    cloud.Position = UDim2.new(0.5,-150,0.3,-100)
+    cloud.BackgroundTransparency = 1
+    if cloudImageId then
+        cloud.Image = "rbxassetid://" .. tostring(cloudImageId)
+    end
+
+    local loadingText = Instance.new("TextLabel", bg)
+    loadingText.Size = UDim2.new(1,0,0,50)
+    loadingText.Position = UDim2.new(0,0,0.65,0)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Text = "LOADING"
+    loadingText.Font = Enum.Font.Arcade
+    loadingText.TextSize = 40
+    loadingText.TextColor3 = Color3.fromRGB(255,100,180)
+
+    local barBG = Instance.new("Frame", bg)
+    barBG.Size = UDim2.new(0,300,0,20)
+    barBG.Position = UDim2.new(0.5,-150,0.75,0)
+    barBG.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    Instance.new("UICorner", barBG).CornerRadius = UDim.new(0,10)
+
+    local barFill = Instance.new("Frame", barBG)
+    barFill.Size = UDim2.new(0,0,1,0)
+    barFill.BackgroundColor3 = Color3.fromRGB(255,0,255)
+    Instance.new("UICorner", barFill).CornerRadius = UDim.new(0,10)
+
+    local gradient = Instance.new("UIGradient", barFill)
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,180)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150,255,200)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(100,200,255))
+    }
+
+    local percentText = Instance.new("TextLabel", bg)
+    percentText.Size = UDim2.new(1,0,0,40)
+    percentText.Position = UDim2.new(0,0,0.8,0)
+    percentText.BackgroundTransparency = 1
+    percentText.Text = "0%"
+    percentText.Font = Enum.Font.Arcade
+    percentText.TextSize = 30
+    percentText.TextColor3 = Color3.fromRGB(255,100,180)
+
+    for i = 0, 100 do
+        barFill.Size = UDim2.new(i/100,0,1,0)
+        percentText.Text = tostring(i) .. "%"
+        task.wait(0.02)
+    end
+
+    local function fadeOut(obj)
+        if obj:IsA("TextLabel") then
+            TweenService:Create(obj, TweenInfo.new(1), {TextTransparency = 1}):Play()
+        elseif obj:IsA("ImageLabel") then
+            TweenService:Create(obj, TweenInfo.new(1), {ImageTransparency = 1}):Play()
+        elseif obj:IsA("Frame") then
+            TweenService:Create(obj, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+        end
+    end
+
+    for _, v in pairs(bg:GetDescendants()) do
+        fadeOut(v)
+    end
+    fadeOut(bg)
+
+    task.wait(1.5)
+    gui:Destroy()
+end
+
+-- Tạo cửa sổ chính
 function Library:CreateWindow(titleText, subtitleText)
-    -- GUI gốc
+    -- GUI
     local gui = Instance.new("ScreenGui")
     gui.Name = "CustomHub"
     gui.ResetOnSpawn = false
@@ -105,59 +102,56 @@ function Library:CreateWindow(titleText, subtitleText)
     local main = Instance.new("Frame", gui)
     main.Size = UDim2.new(0, 450, 0, 300)
     main.Position = UDim2.new(0.5, -225, 0.5, -150)
-    main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    main.BackgroundColor3 = Color3.fromRGB(20,20,20)
     main.BorderSizePixel = 0
     main.Active = true
     main.Draggable = true
-    Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
 
     -- Header
     local header = Instance.new("Frame", main)
-    header.Size = UDim2.new(1, 0, 0, 32)
-    header.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    header.Size = UDim2.new(1,0,0,32)
+    header.BackgroundColor3 = Color3.fromRGB(30,30,30)
     header.BorderSizePixel = 0
-    Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", header).CornerRadius = UDim.new(0,10)
 
-    -- Tên Hub
     local title = Instance.new("TextLabel", header)
-    title.Text = "✨ " .. (titleText or "Name Hub") .. "  |  " .. (subtitleText or "") .. " ✨"
+    title.Text = "✨ " .. (titleText or "Hub") .. (subtitleText and (" | " .. subtitleText) or "")
     title.Size = UDim2.new(1, -80, 1, 0)
     title.Position = UDim2.new(0, 12, 0, 0)
     title.BackgroundTransparency = 1
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Font = Enum.Font.GothamSemibold
     title.TextSize = 15
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextColor3 = Color3.fromRGB(255,255,255)
 
-    -- Nút Thu Nhỏ
     local minimize = Instance.new("TextButton", header)
-    minimize.Size = UDim2.new(0, 24, 0, 24)
+    minimize.Size = UDim2.new(0,24,0,24)
     minimize.Position = UDim2.new(1, -60, 0.5, -12)
-    minimize.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    minimize.BackgroundColor3 = Color3.fromRGB(50,50,50)
     minimize.Text = "-"
     minimize.Font = Enum.Font.GothamBold
     minimize.TextSize = 18
-    minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
-    Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
+    minimize.TextColor3 = Color3.fromRGB(220,220,220)
+    Instance.new("UICorner", minimize).CornerRadius = UDim.new(0,5)
 
-    -- Nút Đóng
     local closeBtn = Instance.new("TextButton", header)
-    closeBtn.Size = UDim2.new(0, 24, 0, 24)
+    closeBtn.Size = UDim2.new(0,24,0,24)
     closeBtn.Position = UDim2.new(1, -30, 0.5, -12)
-    closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
     closeBtn.Text = "X"
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.TextSize = 14
-    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 5)
+    closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,5)
 
     -- Sidebar (scrolling)
     local sidebar = Instance.new("ScrollingFrame", main)
     sidebar.Size = UDim2.new(0, 110, 1, -32)
-    sidebar.Position = UDim2.new(0, 0, 0, 32)
-    sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    sidebar.Position = UDim2.new(0,0,0,32)
+    sidebar.BackgroundColor3 = Color3.fromRGB(25,25,25)
     sidebar.BorderSizePixel = 0
-    sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    sidebar.CanvasSize = UDim2.new(0,0,0,0)
     sidebar.ScrollBarThickness = 4
     sidebar.ScrollBarImageTransparency = 1
     sidebar.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -166,51 +160,87 @@ function Library:CreateWindow(titleText, subtitleText)
     listLayout.Padding = UDim.new(0, 6)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    local padding = Instance.new("UIPadding", sidebar)
-    padding.PaddingTop = UDim.new(0, 8)
+    local pad = Instance.new("UIPadding", sidebar)
+    pad.PaddingTop = UDim.new(0, 8)
 
     -- Content
     local content = Instance.new("Frame", main)
     content.Size = UDim2.new(1, -110, 1, -32)
     content.Position = UDim2.new(0, 110, 0, 32)
-    content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    content.BackgroundColor3 = Color3.fromRGB(35,35,35)
     content.BorderSizePixel = 0
 
-    -- Tab system
     local activeTab
 
-    local function createTab(name, order)
+    local Window = {}
+
+    function Window:CreateTab(tabName)
         local tabBtn = Instance.new("TextButton", sidebar)
         tabBtn.Size = UDim2.new(1, -16, 0, 32)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        tabBtn.Text = name
-        tabBtn.LayoutOrder = order
+        tabBtn.BackgroundColor3 = Color3.fromRGB(45,45,45)
+        tabBtn.Text = tabName
         tabBtn.Font = Enum.Font.GothamSemibold
         tabBtn.TextSize = 13
-        tabBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
-        Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 6)
+        tabBtn.TextColor3 = Color3.fromRGB(230,230,230)
+        Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0,6)
 
         local page = Instance.new("Frame", content)
-        page.Name = name
-        page.Size = UDim2.new(1, 0, 1, 0)
+        page.Name = tabName
+        page.Size = UDim2.new(1,0,1,0)
         page.BackgroundTransparency = 1
         page.Visible = false
 
+        local Tab = {}
+
+        function Tab:CreateLabel(text)
+            local lbl = Instance.new("TextLabel", page)
+            lbl.Size = UDim2.new(1, -10, 0, 25)
+            lbl.Position = UDim2.new(0, 5, 0, (#page:GetChildren()-1)*30)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = text
+            lbl.TextColor3 = Color3.fromRGB(255,255,255)
+            lbl.Font = Enum.Font.GothamSemibold
+            lbl.TextSize = 14
+            return lbl
+        end
+
+        function Tab:CreateButton(text, callback)
+            local btn = Instance.new("TextButton", page)
+            btn.Size = UDim2.new(1, -10, 0, 30)
+            btn.Position = UDim2.new(0, 5, 0, (#page:GetChildren()-1)*35)
+            btn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+            btn.Text = text
+            btn.Font = Enum.Font.GothamSemibold
+            btn.TextSize = 14
+            btn.TextColor3 = Color3.fromRGB(255,255,255)
+            Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+            if callback then
+                btn.MouseButton1Click:Connect(callback)
+            end
+            return btn
+        end
+
         tabBtn.MouseButton1Click:Connect(function()
             if activeTab then
-                activeTab.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                activeTab.BackgroundColor3 = Color3.fromRGB(45,45,45)
                 content[activeTab.Text].Visible = false
             end
-            tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+            tabBtn.BackgroundColor3 = Color3.fromRGB(70,130,180)
             page.Visible = true
             activeTab = tabBtn
         end)
 
-        return page
+        -- tự kích hoạt tab đầu tiên nếu chưa có active
+        if not activeTab then
+            tabBtn.MouseButton1Click:Fire()
+        end
+
+        return Tab
     end
 
+    -- cập nhật sidebar scroll khi có tab mới
     listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
+        sidebar.CanvasSize = UDim2.new(0,0,0, listLayout.AbsoluteContentSize.Y + 16)
     end)
 
     closeBtn.MouseButton1Click:Connect(function()
@@ -223,17 +253,11 @@ function Library:CreateWindow(titleText, subtitleText)
         content.Visible = not minimized
         sidebar.Visible = not minimized
         if minimized then
-            main.Size = UDim2.new(0, 200, 0, 50)
+            main.Size = UDim2.new(0,200,0,50)
         else
-            main.Size = UDim2.new(0, 450, 0, 300)
+            main.Size = UDim2.new(0,450,0,300)
         end
     end)
-
-    -- Trả API Window
-    local Window = {}
-    function Window:CreateTab(tabName)
-        return createTab(tabName, #sidebar:GetChildren())
-    end
 
     return Window
 end
