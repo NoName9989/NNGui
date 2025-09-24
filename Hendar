@@ -402,12 +402,17 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
-local function showMiniPopup(message, duration)
+-- Bảng lưu các popup đang hiển thị
+local activePopups = {}
+
+local function showStackedPopup(message, duration)
     duration = duration or 2
 
     local popup = Instance.new("Frame")
     popup.Size = UDim2.new(0, 200, 0, 35)
-    popup.Position = UDim2.new(1, -210, 1, -50)
+    -- Vị trí: dựa vào số popup hiện tại
+    local offset = #activePopups * 40
+    popup.Position = UDim2.new(1, -210, 1, -50 - offset)
     popup.BackgroundColor3 = Color3.fromRGB(0,0,0)
     popup.BackgroundTransparency = 0.7
     popup.BorderSizePixel = 0
@@ -436,6 +441,10 @@ local function showMiniPopup(message, duration)
     label.TextYAlignment = Enum.TextYAlignment.Center
     label.Parent = popup
 
+    -- Thêm popup vào danh sách
+    table.insert(activePopups, popup)
+
+    -- Tự động fade out
     task.delay(duration, function()
         for i=1,10 do
             task.wait(0.03)
@@ -444,41 +453,15 @@ local function showMiniPopup(message, duration)
             stroke.Transparency = stroke.Transparency + 0.03
         end
         popup:Destroy()
+        -- Xóa khỏi danh sách và cập nhật vị trí các popup còn lại
+        for i,p in ipairs(activePopups) do
+            if p == popup then
+                table.remove(activePopups, i)
+                break
+            end
+        end
+        for i,p in ipairs(activePopups) do
+            p.Position = UDim2.new(1, -210, 1, -50 - (i-1)*40)
+        end
     end)
 end
-
--- Hàm tạo nút kèm label, tích hợp popup
-function createButtonWithLabel(parent, labelText, buttonText, yPos, callback)
-    -- Chú thích
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -20, 0, 20)
-    label.Position = UDim2.new(0, 10, 0, yPos)
-    label.BackgroundTransparency = 1
-    label.Text = string.upper("> " .. labelText .. " <")
-    label.TextColor3 = Color3.fromRGB(255,255,255)
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 14
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = parent
-
-    -- Nút
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 150, 0, 35)
-    button.Position = UDim2.new(0, 20, 0, yPos + 25)
-    button.BackgroundColor3 = Color3.fromRGB(30,30,30)
-    button.Text = string.upper(buttonText)
-    button.TextColor3 = Color3.fromRGB(255,255,255)
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 14
-    button.Parent = parent
-
-    button.MouseButton1Click:Connect(function()
-        callback()
-        showMiniPopup(buttonText, 2) -- hiển thị popup khi click
-    end)
-end
-
--- Ví dụ tạo nút copy Discord trong tab Local
-createButtonWithLabel(localTabFrame, "LINK DISCORD", "Copy Discord Link", 50, function()
-    setclipboard("https://discord.gg/abcdef")
-end)
