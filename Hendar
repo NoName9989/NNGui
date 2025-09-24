@@ -224,16 +224,7 @@ UserInputService.InputChanged:Connect(function(input)
         update(input)
     end
 end)
--- Nút Đóng
-local closeBtn = Instance.new("TextButton", header)
-closeBtn.Size = UDim2.new(0, 24, 0, 24)
-closeBtn.Position = UDim2.new(1, -30, 0.5, -12)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeBtn.Text = "X"
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 14
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 5)
+
 
 -- Sidebar Tabs (ScrollingFrame)
 local sidebar = Instance.new("ScrollingFrame", main)
@@ -262,57 +253,65 @@ content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 content.BorderSizePixel = 0
 
 -- Tab system
+-- Sidebar và content đã có
+local sidebar = main:WaitForChild("Sidebar")
+local content = main:WaitForChild("Content")
+
+-- Lưu tab hiện tại
 local activeTab
 
+-- Hàm tạo tab
 local function createTab(name, order)
-    local tabBtn = Instance.new("TextButton", sidebar)
-    tabBtn.Size = UDim2.new(1, -16, 0, 32) -- chuẩn khung, đều 2 bên
+    -- Nút tab
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Size = UDim2.new(1, -16, 0, 32)
+    tabBtn.Position = UDim2.new(0, 8, 0, 34 * (order-1))
     tabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     tabBtn.Text = name
-    tabBtn.LayoutOrder = order
     tabBtn.Font = Enum.Font.GothamSemibold
     tabBtn.TextSize = 13
     tabBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
-    Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0,6)
+    tabBtn.Parent = sidebar
 
-    -- Nội dung tab
-    local page = Instance.new("Frame", content)
-    page.Name = name
-    page.Size = UDim2.new(1, 0, 1, 0)
+    -- Frame nội dung tab
+    local page = Instance.new("Frame")
+    page.Name = name .. "_Content"
+    page.Size = UDim2.new(1,0,1,0)
     page.BackgroundTransparency = 1
     page.Visible = false
+    page.Parent = content
 
+    -- Ví dụ: label nội dung tab
     local label = Instance.new("TextLabel", page)
-    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Size = UDim2.new(1,0,0,30)
+    label.Position = UDim2.new(0,0,0,0)
     label.BackgroundTransparency = 1
-    label.Text = "📌 Nội dung của " .. name
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Text = "📌 Nội dung của tab " .. name
+    label.TextColor3 = Color3.fromRGB(255,255,255)
     label.Font = Enum.Font.GothamSemibold
     label.TextSize = 16
 
-    -- Click tab
+    -- Xử lý click tab
     tabBtn.MouseButton1Click:Connect(function()
         if activeTab then
-            activeTab.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            content[activeTab.Text].Visible = false
+            activeTab.BackgroundColor3 = Color3.fromRGB(45,45,45)
+            content[activeTab.Text .. "_Content"].Visible = false
         end
-        tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(70,130,180)
         page.Visible = true
         activeTab = tabBtn
     end)
 end
 
--- Tạo nhiều tab mẫu
-for i, v in ipairs({"Local","Main","Auto","Shop","Setting"}) do
-    createTab(v, i)
-end
+-- Tạo tab Local đầu tiên
+createTab("Local",1)
 
-task.defer(function()
-    local localTab = sidebar:FindFirstChild("Local")
-    if localTab then
-        localTab:MouseButton1Click():Connect() -- chọn tab Local mặc định
-    end
-end)
+-- Chọn tab Local mặc định khi GUI load
+local localTab = sidebar:FindFirstChild("Local")
+if localTab then
+    localTab:MouseButton1Click():Connect()
+end
 
 -- Auto update CanvasSize theo số tab
 listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
