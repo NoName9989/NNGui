@@ -403,46 +403,63 @@ end)
 
 local localTabFrame = content:FindFirstChild("Local_Content")
 
--- Nút copy link Discord full-width
-local copyButton = Instance.new("TextButton")
-copyButton.Size = UDim2.new(1, -20, 0, 40) -- rộng bằng tab
-copyButton.Position = UDim2.new(0, 10, 0, 50)
-copyButton.BackgroundColor3 = Color3.fromRGB(0,0,0) -- màu nền đen
-copyButton.BackgroundTransparency = 0.6 -- trong suốt nhẹ
-copyButton.Text = "Copy Discord Link"
-copyButton.TextColor3 = Color3.fromRGB(255,255,255)
-copyButton.Font = Enum.Font.GothamSemibold
-copyButton.TextSize = 16
-copyButton.TextXAlignment = Enum.TextXAlignment.Left
-copyButton.Parent = localTabFrame
+-- Container cho 1 mục nút
+local function createButtonWithLabel(parent, labelText, buttonText, posY, onClick)
+    -- Label chú thích
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Position = UDim2.new(0, 10, 0, posY)
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255) -- chữ nổi bật
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 16
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = parent
 
--- Bo góc
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0,6)
-corner.Parent = copyButton
+    -- Nút
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, posY + 22) -- cách label 2px
+    button.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    button.BackgroundTransparency = 0.6
+    button.Text = buttonText
+    button.TextColor3 = Color3.fromRGB(230,230,230) -- chữ nhỏ hơn label
+    button.Font = Enum.Font.GothamSemibold
+    button.TextSize = 14
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Parent = parent
 
--- Hiệu ứng hover: sáng hơn 1 chút
-copyButton.MouseEnter:Connect(function()
-    copyButton.BackgroundTransparency = 0.3
-end)
-copyButton.MouseLeave:Connect(function()
-    copyButton.BackgroundTransparency = 0.6
-end)
+    -- Bo góc
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,6)
+    corner.Parent = button
 
--- Thêm mũi tên > ở cuối
-local arrow = Instance.new("TextLabel")
-arrow.Size = UDim2.new(0,20,1,0)
-arrow.Position = UDim2.new(1,-20,0,0)
-arrow.BackgroundTransparency = 1
-arrow.Text = ">"
-arrow.TextColor3 = Color3.fromRGB(255,255,255)
-arrow.Font = Enum.Font.GothamBold
-arrow.TextSize = 18
-arrow.Parent = copyButton
+    -- Hover nhẹ
+    button.MouseEnter:Connect(function()
+        button.BackgroundTransparency = 0.3
+    end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundTransparency = 0.6
+    end)
 
--- Click copy link
-copyButton.MouseButton1Click:Connect(function()
-    local discordLink = "https://discord.gg/abcdef"
-    setclipboard(discordLink)
+    -- Mũi tên > ở cuối
+    local arrow = Instance.new("TextLabel")
+    arrow.Size = UDim2.new(0,20,1,0)
+    arrow.Position = UDim2.new(1,-20,0,0)
+    arrow.BackgroundTransparency = 1
+    arrow.Text = ">"
+    arrow.TextColor3 = Color3.fromRGB(255,255,255)
+    arrow.Font = Enum.Font.GothamBold
+    arrow.TextSize = 18
+    arrow.Parent = button
+
+    -- Click action
+    button.MouseButton1Click:Connect(onClick)
+end
+
+-- Ví dụ: tạo nút copy link Discord
+createButtonWithLabel(localTabFrame, "Link Discord", "Copy Discord Link", 50, function()
+    setclipboard("https://discord.gg/abcdef")
     print("Link Discord đã được copy!")
 end)
