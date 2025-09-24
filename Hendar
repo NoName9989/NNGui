@@ -136,16 +136,16 @@ minimize.TextSize = 18
 minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
 Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
 
--- Icon thu nhỏ
+-- Icon thu nhỏ (luôn nằm ngoài main để không bị ẩn)
 local miniIcon = Instance.new("ImageButton")
 miniIcon.Size = UDim2.new(0, 40, 0, 40)
-miniIcon.Position = UDim2.new(0, 20, 0.5, -20) -- mặc định bên trái màn hình
+miniIcon.Position = UDim2.new(0, 20, 0, 100) -- góc trái màn hình
 miniIcon.BackgroundTransparency = 1
 miniIcon.Image = "rbxassetid://6421296794"
 miniIcon.Visible = false
 miniIcon.Active = true
 miniIcon.Draggable = true
-miniIcon.Parent = gui
+miniIcon.Parent = gui -- để trong gui chứ KHÔNG để trong main
 
 -- Biến trạng thái
 local minimized = false
