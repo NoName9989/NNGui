@@ -136,36 +136,40 @@ minimize.TextSize = 18
 minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
 Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
 
--- Icon thu nhỏ (luôn nằm ngoài main để không bị ẩn)
+-- Tạo icon thu nhỏ
 local miniIcon = Instance.new("ImageButton")
+miniIcon.Name = "MiniIcon"
 miniIcon.Size = UDim2.new(0, 40, 0, 40)
-miniIcon.Position = UDim2.new(0, 20, 0, 100) -- góc trái màn hình
+miniIcon.Position = UDim2.new(0, 12, 0, 80) -- vị trí góc trái
 miniIcon.BackgroundTransparency = 1
+miniIcon.BorderSizePixel = 0
 miniIcon.Image = "rbxassetid://6421296794"
 miniIcon.Visible = false
-miniIcon.Active = true
-miniIcon.Draggable = true
-miniIcon.Parent = gui -- để trong gui chứ KHÔNG để trong main
+miniIcon.Parent = gui
 
--- Biến trạng thái
+-- Nút thu nhỏ
 local minimized = false
-
--- Sự kiện bấm nút thu nhỏ
 minimize.MouseButton1Click:Connect(function()
     minimized = not minimized
     if minimized then
         main.Visible = false
+        sidebar.Visible = false
+        content.Visible = false
         miniIcon.Visible = true
     else
         main.Visible = true
+        sidebar.Visible = true
+        content.Visible = true
         miniIcon.Visible = false
     end
 end)
 
--- Khi bấm icon thì mở lại GUI
+-- Khi bấm vào icon thì mở lại GUI
 miniIcon.MouseButton1Click:Connect(function()
     minimized = false
     main.Visible = true
+    sidebar.Visible = true
+    content.Visible = true
     miniIcon.Visible = false
 end)
 -- Nút Đóng
