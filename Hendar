@@ -515,5 +515,3 @@ createToggle("Speed Hack", false, function(v) print("Speed Hack:", v) end)
 createToggle("Click Teleport", false, function(v) print("Click Teleport:", v) end)
 createToggle("No Clip", false, function(v) print("No Clip:", v) end)
 createToggle("Infinite Jump", false, function(v) print("Infinite Jump:", v) end)
-    end)
-end
