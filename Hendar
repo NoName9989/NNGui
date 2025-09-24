@@ -303,7 +303,7 @@ local function createTab(name, order)
 end
 
 -- Tạo nhiều tab mẫu
-for i, v in ipairs({"Main","Settings","Credits","Extra","Debug","More","Test1","Test2"}) do
+for i, v in ipairs({"Local","Main","Auto","Shop","Setting"}) do
     createTab(v, i)
 end
 
