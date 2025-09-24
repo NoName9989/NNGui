@@ -273,7 +273,7 @@ local function createTab(name, order)
     tabBtn.Size = UDim2.new(1, -16, 0, 32)
     tabBtn.Position = UDim2.new(0, 8, 0, 34 * (order-1))
     tabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    tabBtn.Text = name
+    tabBtn.Text = string.upper(name) -- in hoa
     tabBtn.Font = Enum.Font.GothamSemibold
     tabBtn.TextSize = 13
     tabBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
@@ -288,15 +288,16 @@ local function createTab(name, order)
     page.Visible = false
     page.Parent = content
 
-    -- Ví dụ: label nội dung tab
+    -- Label nội dung tab chuẩn style dark hub
     local label = Instance.new("TextLabel", page)
-    label.Size = UDim2.new(1,0,0,30)
-    label.Position = UDim2.new(0,0,0,0)
+    label.Size = UDim2.new(1, -20, 0, 30) -- rộng full, trừ margin
+    label.Position = UDim2.new(0, 10, 0, 0) -- cách trái 10px
     label.BackgroundTransparency = 1
-    label.Text = "📌  TAB " .. name
+    label.Text = "TAB " .. string.upper(name) -- in hoa, bỏ icon
     label.TextColor3 = Color3.fromRGB(255,255,255)
     label.Font = Enum.Font.GothamSemibold
-    label.TextSize = 16
+    label.TextSize = 18 -- to hơn
+    label.TextXAlignment = Enum.TextXAlignment.Left -- căn trái
 
     -- Xử lý click tab
     tabBtn.MouseButton1Click:Connect(function()
