@@ -116,7 +116,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
 
 -- Tên Hub
 local title = Instance.new("TextLabel", header)
-title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.3 ✨"
+title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.4 ✨"
 title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 12, 0, 0)
 title.BackgroundTransparency = 1
@@ -401,8 +401,6 @@ miniSquare.MouseButton1Click:Connect(function()
     main.Visible = true
     miniSquare.Visible = false
 end)
-
-local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
 -- Quản lý popup stacked
 local activePopups = {}
