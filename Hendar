@@ -126,17 +126,31 @@ title.TextSize = 15
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 -- Nút Thu Nhỏ
--- Tạo nút Icon nhỏ khi thu gọn
+local minimize = Instance.new("TextButton", header)
+minimize.Size = UDim2.new(0, 24, 0, 24)
+minimize.Position = UDim2.new(1, -60, 0.5, -12)
+minimize.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+minimize.Text = "-"
+minimize.Font = Enum.Font.GothamBold
+minimize.TextSize = 18
+minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
+Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
+
+-- Icon thu nhỏ
 local miniIcon = Instance.new("ImageButton")
 miniIcon.Size = UDim2.new(0, 40, 0, 40)
 miniIcon.Position = UDim2.new(0, 20, 0.5, -20) -- mặc định bên trái màn hình
 miniIcon.BackgroundTransparency = 1
 miniIcon.Image = "rbxassetid://6421296794"
 miniIcon.Visible = false
+miniIcon.Active = true
+miniIcon.Draggable = true
 miniIcon.Parent = gui
 
--- Sửa sự kiện nút minimize
+-- Biến trạng thái
 local minimized = false
+
+-- Sự kiện bấm nút thu nhỏ
 minimize.MouseButton1Click:Connect(function()
     minimized = not minimized
     if minimized then
@@ -148,13 +162,12 @@ minimize.MouseButton1Click:Connect(function()
     end
 end)
 
--- Khi bấm vào icon nhỏ thì mở lại
+-- Khi bấm icon thì mở lại GUI
 miniIcon.MouseButton1Click:Connect(function()
     minimized = false
     main.Visible = true
     miniIcon.Visible = false
 end)
-
 -- Nút Đóng
 local closeBtn = Instance.new("TextButton", header)
 closeBtn.Size = UDim2.new(0, 24, 0, 24)
