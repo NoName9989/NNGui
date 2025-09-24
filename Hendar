@@ -1,0 +1,81 @@
+--By HenGi
+-- Hendar Loading UI
+local player = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "HendarLoading"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+
+-- Background
+local bg = Instance.new("Frame", gui)
+bg.Size = UDim2.new(1,0,1,0)
+bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+
+-- Cloud Image (thay ID bằng ảnh mây cute)
+local cloud = Instance.new("ImageLabel", bg)
+cloud.Size = UDim2.new(0,300,0,200)
+cloud.Position = UDim2.new(0.5,-150,0.3,-100)
+cloud.BackgroundTransparency = 1
+cloud.Image = "rbxassetid://0000000" -- << thay id ảnh bạn thích
+
+-- Loading Text
+local loadingText = Instance.new("TextLabel", bg)
+loadingText.Size = UDim2.new(1,0,0,50)
+loadingText.Position = UDim2.new(0,0,0.65,0)
+loadingText.BackgroundTransparency = 1
+loadingText.Text = "LOADING"
+loadingText.Font = Enum.Font.Arcade
+loadingText.TextSize = 40
+loadingText.TextColor3 = Color3.fromRGB(255,100,180)
+
+-- Progress Bar Background
+local barBG = Instance.new("Frame", bg)
+barBG.Size = UDim2.new(0,300,0,20)
+barBG.Position = UDim2.new(0.5,-150,0.75,0)
+barBG.BackgroundColor3 = Color3.fromRGB(50,50,50)
+Instance.new("UICorner", barBG).CornerRadius = UDim.new(0,10)
+
+-- Progress Fill
+local barFill = Instance.new("Frame", barBG)
+barFill.Size = UDim2.new(0,0,1,0)
+barFill.BackgroundColor3 = Color3.fromRGB(255,0,255)
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(0,10)
+
+-- Gradient
+local gradient = Instance.new("UIGradient", barFill)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,100,180)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150,255,200)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(100,200,255))
+}
+
+-- % Text
+local percentText = Instance.new("TextLabel", bg)
+percentText.Size = UDim2.new(1,0,0,40)
+percentText.Position = UDim2.new(0,0,0.8,0)
+percentText.BackgroundTransparency = 1
+percentText.Text = "0%"
+percentText.Font = Enum.Font.Arcade
+percentText.TextSize = 30
+percentText.TextColor3 = Color3.fromRGB(255,100,180)
+
+-- Animate Loading
+for i = 0, 100 do
+    barFill.Size = UDim2.new(i/100,0,1,0)
+    percentText.Text = i .. "%"
+    task.wait(0.02) -- tốc độ chạy
+end
+
+-- Fade Out
+local TweenService = game:GetService("TweenService")
+local function fadeOut(obj)
+    if obj:IsA("TextLabel") or obj:IsA("ImageLabel") or obj:IsA("Frame") then
+        TweenService:Create(obj, TweenInfo.new(1), {BackgroundTransparency = 1, TextTransparency = 1, ImageTransparency = 1}):Play()
+    end
+end
+
+for _,v in pairs(bg:GetDescendants()) do fadeOut(v) end
+TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+
+task.wait(1.5)
+gui:Destroy()
