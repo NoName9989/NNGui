@@ -402,7 +402,6 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
-
 local localTabFrame = content:FindFirstChild("Local_Content")
 
 -- Hàm tính posY tiếp theo
@@ -580,4 +579,5 @@ end
 
 listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     sidebar.CanvasSize = UDim2.new(0,0,0, listLayout.AbsoluteContentSize.Y + 10)
+end)
 end)
