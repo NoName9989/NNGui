@@ -225,6 +225,15 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
+local closeBtn = Instance.new("TextButton", header)
+    closeBtn.Size = UDim2.new(0,24,0,24)
+    closeBtn.Position = UDim2.new(1, -30, 0.5, -12)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+    closeBtn.Text = "X"
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 14
+    closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,5)
 
 -- Sidebar Tabs (ScrollingFrame)
 local sidebar = Instance.new("ScrollingFrame", main)
