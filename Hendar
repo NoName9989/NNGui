@@ -262,10 +262,6 @@ content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 content.BorderSizePixel = 0
 
 -- Tab system
--- Sidebar và content đã có
-local sidebar = main:WaitForChild("Sidebar")
-local content = main:WaitForChild("Content")
-
 -- Lưu tab hiện tại
 local activeTab
 
