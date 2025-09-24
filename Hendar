@@ -402,34 +402,34 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
-local activePopups = {} -- để quản lý popup stacked
+local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
-function showPopup(message, duration)
+-- Quản lý popup stacked
+local activePopups = {}
+
+-- Hàm tạo popup glass
+local function showPopup(message, duration)
     duration = duration or 2
 
-    -- Tạo frame popup
     local popup = Instance.new("Frame")
     popup.Size = UDim2.new(0, 220, 0, 40)
     popup.AnchorPoint = Vector2.new(1, 1)
-    popup.Position = UDim2.new(1, -10, 1, -10 - (#activePopups * 50)) -- xếp chồng lên nhau
+    popup.Position = UDim2.new(1, -10, 1, -10 - (#activePopups * 50))
     popup.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     popup.BackgroundTransparency = 0.6
     popup.BorderSizePixel = 0
     popup.Parent = playerGui
 
-    -- Bo góc
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = popup
 
-    -- Viền mờ
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.fromRGB(255, 255, 255)
     stroke.Transparency = 0.5
     stroke.Thickness = 1
     stroke.Parent = popup
 
-    -- Label bên trong
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -10, 1, -10)
     label.Position = UDim2.new(0, 5, 0, 5)
@@ -444,7 +444,7 @@ function showPopup(message, duration)
 
     table.insert(activePopups, popup)
 
-    -- Fade out
+    -- Fade out và update vị trí popup còn lại
     task.spawn(function()
         task.wait(duration)
         for i = 1, 10 do
@@ -454,14 +454,16 @@ function showPopup(message, duration)
         end
         popup:Destroy()
         table.remove(activePopups, 1)
+
+        -- Cập nhật vị trí các popup còn lại
+        for idx, p in ipairs(activePopups) do
+            p.Position = UDim2.new(1, -10, 1, -10 - ((idx-1) * 50))
+        end
     end)
 end
 
-local localTabFrame = content:FindFirstChild("Local_Content")
-
--- Hàm tạo nút kèm chú thích đặc biệt, tích hợp popup cũ
+-- Hàm tạo nút + label đặc biệt, tích hợp popup
 local function createButtonWithLabel(parent, labelText, buttonText, posY, onClick)
-    -- Label chú thích đặc biệt
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -20, 0, 24)
     label.Position = UDim2.new(0, 10, 0, posY)
@@ -473,7 +475,6 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = parent
 
-    -- Nút chính
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, -20, 0, 40)
     button.Position = UDim2.new(0, 10, 0, posY + 26)
@@ -490,7 +491,6 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
     corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = button
 
-    -- Hover sáng nhẹ
     button.MouseEnter:Connect(function()
         button.BackgroundTransparency = 0.3
     end)
@@ -498,7 +498,6 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
         button.BackgroundTransparency = 0.6
     end)
 
-    -- Mũi tên > cuối nút
     local arrow = Instance.new("TextLabel")
     arrow.Size = UDim2.new(0, 20, 1, 0)
     arrow.Position = UDim2.new(1, -22, 0, 0)
@@ -509,17 +508,14 @@ local function createButtonWithLabel(parent, labelText, buttonText, posY, onClic
     arrow.TextSize = 18
     arrow.Parent = button
 
-    -- Click button
     button.MouseButton1Click:Connect(function()
         onClick()
-        -- Gọi popup glass đã có sẵn
-        if showPopup then
-            showPopup(string.upper(buttonText).." DONE!", 2)
-        end
+        showPopup(string.upper(buttonText) .. " DONE!", 2)
     end)
 end
 
--- Tạo nút copy Discord
+-- Ví dụ sử dụng
+local localTabFrame = content:FindFirstChild("Local_Content")
 createButtonWithLabel(localTabFrame, "LINK DISCORD", "Copy Discord Link", 50, function()
     setclipboard("https://discord.gg/abcdef")
 end)
