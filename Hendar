@@ -405,36 +405,28 @@ local localTabFrame = content:FindFirstChild("Local_Content")
 
 -- Nút copy link Discord full-width
 local copyButton = Instance.new("TextButton")
-copyButton.Size = UDim2.new(1, -20, 0, 40) -- rộng bằng tab, trừ margin
+copyButton.Size = UDim2.new(1, -20, 0, 40) -- rộng bằng tab
 copyButton.Position = UDim2.new(0, 10, 0, 50)
-copyButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+copyButton.BackgroundColor3 = Color3.fromRGB(0,0,0) -- màu nền đen
+copyButton.BackgroundTransparency = 0.6 -- trong suốt nhẹ
 copyButton.Text = "Copy Discord Link"
 copyButton.TextColor3 = Color3.fromRGB(255,255,255)
 copyButton.Font = Enum.Font.GothamSemibold
 copyButton.TextSize = 16
-copyButton.TextXAlignment = Enum.TextXAlignment.Left -- chữ căn trái
+copyButton.TextXAlignment = Enum.TextXAlignment.Left
 copyButton.Parent = localTabFrame
 
 -- Bo góc
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0,8)
+corner.CornerRadius = UDim.new(0,6)
 corner.Parent = copyButton
 
--- Gradient nhẹ
-local gradient = Instance.new("UIGradient")
-gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(70,130,180)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(90,170,220))
-}
-gradient.Rotation = 45
-gradient.Parent = copyButton
-
--- Hiệu ứng hover
+-- Hiệu ứng hover: sáng hơn 1 chút
 copyButton.MouseEnter:Connect(function()
-    copyButton.BackgroundColor3 = Color3.fromRGB(60,160,220)
+    copyButton.BackgroundTransparency = 0.3
 end)
 copyButton.MouseLeave:Connect(function()
-    copyButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    copyButton.BackgroundTransparency = 0.6
 end)
 
 -- Thêm mũi tên > ở cuối
