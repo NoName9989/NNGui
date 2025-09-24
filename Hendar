@@ -313,8 +313,76 @@ listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 end)
 
 -- Nút Close & Minimize
+-- Nút X (Close) trên header
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0,24,0,24)
+closeBtn.Position = UDim2.new(1,-30,0.5,-12)
+closeBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.fromRGB(220,220,220)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,5)
+closeBtn.Parent = header
+
+-- Popup confirm
+local confirmFrame = Instance.new("Frame")
+confirmFrame.Size = UDim2.new(0,300,0,150)
+confirmFrame.Position = UDim2.new(0.5,-150,0.5,-75)
+confirmFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+confirmFrame.Visible = false
+confirmFrame.Parent = gui
+Instance.new("UICorner", confirmFrame).CornerRadius = UDim.new(0,10)
+
+-- Label hỏi
+local confirmLabel = Instance.new("TextLabel")
+confirmLabel.Size = UDim2.new(1, -20, 0.6, 0)
+confirmLabel.Position = UDim2.new(0,10,0,10)
+confirmLabel.BackgroundTransparency = 1
+confirmLabel.Text = "Are you sure you want to close?"
+confirmLabel.TextColor3 = Color3.fromRGB(255,255,255)
+confirmLabel.Font = Enum.Font.GothamBold
+confirmLabel.TextSize = 18
+confirmLabel.TextWrapped = true
+confirmLabel.Parent = confirmFrame
+
+-- Nút Yes
+local yesBtn = Instance.new("TextButton")
+yesBtn.Size = UDim2.new(0.4,0,0.2,0)
+yesBtn.Position = UDim2.new(0.05,0,0.7,0)
+yesBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+yesBtn.Text = "Yes"
+yesBtn.TextColor3 = Color3.fromRGB(255,255,255)
+yesBtn.Font = Enum.Font.GothamBold
+yesBtn.TextSize = 16
+Instance.new("UICorner", yesBtn).CornerRadius = UDim.new(0,5)
+yesBtn.Parent = confirmFrame
+
+-- Nút No
+local noBtn = Instance.new("TextButton")
+noBtn.Size = UDim2.new(0.4,0,0.2,0)
+noBtn.Position = UDim2.new(0.55,0,0.7,0)
+noBtn.BackgroundColor3 = Color3.fromRGB(50,200,50)
+noBtn.Text = "No"
+noBtn.TextColor3 = Color3.fromRGB(255,255,255)
+noBtn.Font = Enum.Font.GothamBold
+noBtn.TextSize = 16
+Instance.new("UICorner", noBtn).CornerRadius = UDim.new(0,5)
+noBtn.Parent = confirmFrame
+
+-- Logic hiển thị popup khi ấn X
 closeBtn.MouseButton1Click:Connect(function()
-    gui:Destroy()
+    confirmFrame.Visible = true
+end)
+
+-- Logic Yes → đóng GUI
+yesBtn.MouseButton1Click:Connect(function()
+    gui.Enabled = false
+end)
+
+-- Logic No → ẩn popup
+noBtn.MouseButton1Click:Connect(function()
+    confirmFrame.Visible = false
 end)
 
 local minimized = false
