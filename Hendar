@@ -126,7 +126,7 @@ title.TextSize = 15
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 -- Nút Thu Nhỏ (thay thế code cũ)
-local minimize = Instance.new("TextButton", header)
+local minimize = Instance.new("TextButton")
 minimize.Size = UDim2.new(0, 24, 0, 24)
 minimize.Position = UDim2.new(1, -60, 0.5, -12)
 minimize.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -134,59 +134,92 @@ minimize.Text = "-"
 minimize.Font = Enum.Font.GothamBold
 minimize.TextSize = 18
 minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
-Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
+Instance.new("UICorner", minimize).CornerRadius = UDim.new(0,5)
+minimize.Parent = header
 
--- Ô vuông mini (ẩn mặc định, nằm ngoài GUI chính)
+-- Ô vuông nhỏ rainbow
 local miniSquare = Instance.new("TextButton")
-miniSquare.Size = UDim2.new(0, 60, 0, 60)
-miniSquare.Position = UDim2.new(0.5, -30, 0.5, -30) -- giữa màn hình
+miniSquare.Size = UDim2.new(0, 100, 0, 40)
+miniSquare.Position = UDim2.new(0, 20, 0, 20) -- mặc định góc trái trên
+miniSquare.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 miniSquare.Text = "HendarHub"
 miniSquare.Font = Enum.Font.GothamBold
-miniSquare.TextSize = 12
-miniSquare.TextColor3 = Color3.new(1, 1, 1)
-miniSquare.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+miniSquare.TextSize = 14
+miniSquare.TextColor3 = Color3.fromRGB(255,255,255)
 miniSquare.Visible = false
-miniSquare.Parent = player:WaitForChild("PlayerGui")
-Instance.new("UICorner", miniSquare).CornerRadius = UDim.new(0, 12)
+miniSquare.Parent = gui
+Instance.new("UICorner", miniSquare).CornerRadius = UDim.new(0,8)
 
--- Hiệu ứng Rainbow cho ô vuông
+-- Gradient rainbow nền
+local uiGradient = Instance.new("UIGradient", miniSquare)
+uiGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,0,0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255,165,0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255,255,0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0,255,0)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0,127,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(139,0,255))
+}
+uiGradient.Rotation = 45
+
+-- Animation xoay gradient
 task.spawn(function()
-    while task.wait(0.05) do
-        for i = 0, 1, 0.01 do
-            local color = Color3.fromHSV(i, 1, 1)
-            if miniSquare and miniSquare.Parent then
-                if miniSquare.Visible then
-                    miniSquare.BackgroundColor3 = color
-                    miniSquare.TextColor3 = Color3.new(1, 1, 1)
-                end
-            else
-                return
-            end
-            task.wait(0.05)
-        end
+    while true do
+        task.wait(0.05)
+        uiGradient.Rotation = (uiGradient.Rotation + 1) % 360
     end
 end)
 
--- Biến trạng thái
+-- Logic thu nhỏ / hiện lại
 local minimized = false
-
--- Sự kiện khi ấn nút thu nhỏ
 minimize.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    if minimized then
-        main.Visible = false
-        miniSquare.Visible = true
-    else
-        main.Visible = true
-        miniSquare.Visible = false
-    end
+    minimized = true
+    main.Visible = false
+    miniSquare.Visible = true
 end)
 
--- Khi ấn vào ô vuông → mở lại GUI
 miniSquare.MouseButton1Click:Connect(function()
     minimized = false
     main.Visible = true
     miniSquare.Visible = false
+end)
+
+-- Kéo thả ô vuông (PC + Touch)
+local UserInputService = game:GetService("UserInputService")
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    local newX = math.clamp(startPos.X.Offset + delta.X, 0, gui.AbsoluteSize.X - miniSquare.AbsoluteSize.X)
+    local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, gui.AbsoluteSize.Y - miniSquare.AbsoluteSize.Y)
+    miniSquare.Position = UDim2.new(0, newX, 0, newY)
+end
+
+miniSquare.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = miniSquare.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+miniSquare.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
 end)
 -- Nút Đóng
 local closeBtn = Instance.new("TextButton", header)
