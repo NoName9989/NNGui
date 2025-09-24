@@ -402,13 +402,12 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
--- Hàm popup mini kiểu glass
 local function showMiniPopup(message, duration)
     duration = duration or 2
 
     local popup = Instance.new("Frame")
     popup.Size = UDim2.new(0, 200, 0, 35)
-    popup.Position = UDim2.new(1, -210, 1, -50) -- góc dưới phải
+    popup.Position = UDim2.new(1, -210, 1, -50)
     popup.BackgroundColor3 = Color3.fromRGB(0,0,0)
     popup.BackgroundTransparency = 0.7
     popup.BorderSizePixel = 0
@@ -429,15 +428,14 @@ local function showMiniPopup(message, duration)
     label.Size = UDim2.new(1, -10, 1, -10)
     label.Position = UDim2.new(0,5,0,5)
     label.BackgroundTransparency = 1
-    label.Text = string.upper(message) -- in hoa
+    label.Text = string.upper(message)
     label.TextColor3 = Color3.fromRGB(255,255,255)
     label.Font = Enum.Font.Arcade
-    label.TextSize = 16 -- chữ nhỏ
+    label.TextSize = 16
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.TextYAlignment = Enum.TextYAlignment.Center
     label.Parent = popup
 
-    -- Tự động fade out
     task.delay(duration, function()
         for i=1,10 do
             task.wait(0.03)
@@ -449,18 +447,38 @@ local function showMiniPopup(message, duration)
     end)
 end
 
--- Nút copy Discord
-local copyButton = Instance.new("TextButton")
-copyButton.Size = UDim2.new(0,150,0,35)
-copyButton.Position = UDim2.new(0,20,0,50) -- tùy chỉnh
-copyButton.BackgroundColor3 = Color3.fromRGB(30,30,30)
-copyButton.Text = "COPY DISCORD LINK"
-copyButton.TextColor3 = Color3.fromRGB(255,255,255)
-copyButton.Font = Enum.Font.GothamBold
-copyButton.TextSize = 14
-copyButton.Parent = localTabFrame
+-- Hàm tạo nút kèm label, tích hợp popup
+function createButtonWithLabel(parent, labelText, buttonText, yPos, callback)
+    -- Chú thích
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Position = UDim2.new(0, 10, 0, yPos)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper("> " .. labelText .. " <")
+    label.TextColor3 = Color3.fromRGB(255,255,255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = parent
 
-copyButton.MouseButton1Click:Connect(function()
+    -- Nút
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 150, 0, 35)
+    button.Position = UDim2.new(0, 20, 0, yPos + 25)
+    button.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    button.Text = string.upper(buttonText)
+    button.TextColor3 = Color3.fromRGB(255,255,255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14
+    button.Parent = parent
+
+    button.MouseButton1Click:Connect(function()
+        callback()
+        showMiniPopup(buttonText, 2) -- hiển thị popup khi click
+    end)
+end
+
+-- Ví dụ tạo nút copy Discord trong tab Local
+createButtonWithLabel(localTabFrame, "LINK DISCORD", "Copy Discord Link", 50, function()
     setclipboard("https://discord.gg/abcdef")
-    showMiniPopup("DISCORD LINK COPIED!", 2) -- hiện popup
 end)
