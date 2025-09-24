@@ -116,7 +116,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
 
 -- Tên Hub
 local title = Instance.new("TextLabel", header)
-title.Text = "✨ Hendar Hub  |  Plants vs Brainrots ✨"
+title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.1 ✨"
 title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 12, 0, 0)
 title.BackgroundTransparency = 1
@@ -406,4 +406,24 @@ miniSquare.MouseButton1Click:Connect(function()
     minimized = false
     main.Visible = true
     miniSquare.Visible = false
+end)
+
+local localTabFrame = content:FindFirstChild("Local_Content")
+
+-- Nút copy link Discord
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0,150,0,40)
+copyButton.Position = UDim2.new(0,20,0,50)
+copyButton.BackgroundColor3 = Color3.fromRGB(70,130,180)
+copyButton.Text = "Copy Discord Link"
+copyButton.TextColor3 = Color3.fromRGB(255,255,255)
+copyButton.Font = Enum.Font.GothamSemibold
+copyButton.TextSize = 14
+copyButton.Parent = localTabFrame
+
+copyButton.MouseButton1Click:Connect(function()
+    -- Thay bằng link Discord của bạn
+    local discordLink = "https://discord.gg/abcdef"
+    setclipboard(discordLink)
+    print("Link Discord đã được copy!")
 end)
