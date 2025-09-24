@@ -125,7 +125,7 @@ title.Font = Enum.Font.GothamSemibold
 title.TextSize = 15
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- Nút Thu Nhỏ
+-- Nút Thu Nhỏ trên header
 local minimize = Instance.new("TextButton", header)
 minimize.Size = UDim2.new(0, 24, 0, 24)
 minimize.Position = UDim2.new(1, -60, 0.5, -12)
@@ -136,40 +136,50 @@ minimize.TextSize = 18
 minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
 Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
 
--- Tạo icon thu nhỏ
-local miniIcon = Instance.new("ImageButton")
-miniIcon.Name = "MiniIcon"
-miniIcon.Size = UDim2.new(0, 40, 0, 40)
-miniIcon.Position = UDim2.new(0, 12, 0, 80) -- vị trí góc trái
-miniIcon.BackgroundTransparency = 1
-miniIcon.BorderSizePixel = 0
-miniIcon.Image = "rbxassetid://6421296794"
+-- Ô vuông nhỏ rainbow
+local miniIcon = Instance.new("TextButton")
+miniIcon.Size = UDim2.new(0, 100, 0, 40)
+miniIcon.Position = UDim2.new(0, 20, 1, -60) -- góc trái dưới
+miniIcon.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+miniIcon.Text = "HendarHub"
+miniIcon.Font = Enum.Font.GothamBold
+miniIcon.TextSize = 14
+miniIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
 miniIcon.Visible = false
 miniIcon.Parent = gui
+Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(0, 8)
 
--- Nút thu nhỏ
-local minimized = false
-minimize.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    if minimized then
-        main.Visible = false
-        sidebar.Visible = false
-        content.Visible = false
-        miniIcon.Visible = true
-    else
-        main.Visible = true
-        sidebar.Visible = true
-        content.Visible = true
-        miniIcon.Visible = false
+-- Gradient rainbow nền icon
+local uiGradient = Instance.new("UIGradient", miniIcon)
+uiGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 165, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 127, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(139, 0, 255))
+}
+uiGradient.Rotation = 45
+
+-- Animation rainbow chạy
+task.spawn(function()
+    while task.wait(0.05) do
+        uiGradient.Rotation = (uiGradient.Rotation + 1) % 360
     end
 end)
 
--- Khi bấm vào icon thì mở lại GUI
+-- Logic thu nhỏ
+local minimized = false
+minimize.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    main.Visible = not minimized
+    miniIcon.Visible = minimized
+end)
+
+-- Bấm icon hiện lại GUI
 miniIcon.MouseButton1Click:Connect(function()
     minimized = false
     main.Visible = true
-    sidebar.Visible = true
-    content.Visible = true
     miniIcon.Visible = false
 end)
 -- Nút Đóng
