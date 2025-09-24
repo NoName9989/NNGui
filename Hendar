@@ -467,20 +467,35 @@ end)
 
 local localTabFrame = content:FindFirstChild("Local_Content")
 
+-- Lấy vị trí Y cuối cùng để xếp nút tiếp theo
+local function getNextPosY()
+    local lastY = 0
+    for _, child in ipairs(localTabFrame:GetChildren()) do
+        if child:IsA("TextButton") or child:IsA("TextLabel") then
+            local bottom = child.Position.Y.Offset + child.Size.Y.Offset
+            if bottom > lastY then
+                lastY = bottom
+            end
+        end
+    end
+    return lastY + 10 -- cách 10px so với nút/label trước
+end
+
 -- Hàm tạo nút bật/tắt
-local function createToggleButton(parent, buttonText, posY, initialState, onToggle)
-    local state = initialState or false
+local function createToggleButton(parent, buttonText, onToggle)
+    local posY = getNextPosY()
+    local state = false
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1, -20, 0, 40)
     button.Position = UDim2.new(0, 10, 0, posY)
-    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    button.BackgroundColor3 = Color3.fromRGB(0,0,0)
     button.BackgroundTransparency = 0.6
-    button.TextColor3 = Color3.fromRGB(230, 230, 230)
+    button.TextColor3 = Color3.fromRGB(230,230,230)
     button.Font = Enum.Font.GothamSemibold
     button.TextSize = 14
     button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Text = "    "..string.upper(buttonText).." [OFF]"
     button.Parent = parent
-    button.Text = "    "..string.upper(buttonText).." ["..(state and "ON" or "OFF").."]"
 
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0,6)
@@ -500,8 +515,9 @@ local function createToggleButton(parent, buttonText, posY, initialState, onTogg
     end)
 end
 
--- Hàm tạo Input Box
-local function createInputBox(parent, placeholderText, posY, onChange)
+-- Hàm tạo input
+local function createInputBox(parent, placeholderText, onChange)
+    local posY = getNextPosY()
     local box = Instance.new("TextBox")
     box.Size = UDim2.new(1, -20, 0, 40)
     box.Position = UDim2.new(0, 10, 0, posY)
@@ -526,29 +542,23 @@ local function createInputBox(parent, placeholderText, posY, onChange)
     end)
 end
 
--- Ví dụ sử dụng các chức năng Local
-
--- Input tốc độ
-createInputBox(localTabFrame, "SPEED", 10, function(value)
+-- Tạo các chức năng Local, xuất hiện ngay dưới nút Copy Discord
+createInputBox(localTabFrame, "SPEED", function(value)
     print("Speed set to:", value)
 end)
 
--- Toggle chạy nhanh
-createToggleButton(localTabFrame, "SPEED HACK", 60, false, function(state)
+createToggleButton(localTabFrame, "SPEED HACK", function(state)
     print("Speed Hack:", state)
 end)
 
--- Toggle ấn vào đâu dịch chuyển
-createToggleButton(localTabFrame, "CLICK TP", 110, false, function(state)
+createToggleButton(localTabFrame, "CLICK TP", function(state)
     print("Click TP:", state)
 end)
 
--- Toggle No Clip
-createToggleButton(localTabFrame, "NO CLIP", 160, false, function(state)
+createToggleButton(localTabFrame, "NO CLIP", function(state)
     print("No Clip:", state)
 end)
 
--- Toggle nhảy vô hạn
-createToggleButton(localTabFrame, "INFINITE JUMP", 210, false, function(state)
+createToggleButton(localTabFrame, "INFINITE JUMP", function(state)
     print("Infinite Jump:", state)
 end)
