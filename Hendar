@@ -87,3 +87,155 @@ fadeOut(bg)
 
 task.wait(1.5)
 gui:Destroy()
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local Library = {}
+
+function Library:CreateWindow(titleText, subtitleText)
+    -- GUI gốc
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "CustomHub"
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    gui.Parent = player:WaitForChild("PlayerGui")
+
+    -- Khung chính
+    local main = Instance.new("Frame", gui)
+    main.Size = UDim2.new(0, 450, 0, 300)
+    main.Position = UDim2.new(0.5, -225, 0.5, -150)
+    main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    main.BorderSizePixel = 0
+    main.Active = true
+    main.Draggable = true
+    Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+
+    -- Header
+    local header = Instance.new("Frame", main)
+    header.Size = UDim2.new(1, 0, 0, 32)
+    header.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    header.BorderSizePixel = 0
+    Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
+
+    -- Tên Hub
+    local title = Instance.new("TextLabel", header)
+    title.Text = "✨ " .. (titleText or "Name Hub") .. "  |  " .. (subtitleText or "") .. " ✨"
+    title.Size = UDim2.new(1, -80, 1, 0)
+    title.Position = UDim2.new(0, 12, 0, 0)
+    title.BackgroundTransparency = 1
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Font = Enum.Font.GothamSemibold
+    title.TextSize = 15
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+    -- Nút Thu Nhỏ
+    local minimize = Instance.new("TextButton", header)
+    minimize.Size = UDim2.new(0, 24, 0, 24)
+    minimize.Position = UDim2.new(1, -60, 0.5, -12)
+    minimize.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    minimize.Text = "-"
+    minimize.Font = Enum.Font.GothamBold
+    minimize.TextSize = 18
+    minimize.TextColor3 = Color3.fromRGB(220, 220, 220)
+    Instance.new("UICorner", minimize).CornerRadius = UDim.new(0, 5)
+
+    -- Nút Đóng
+    local closeBtn = Instance.new("TextButton", header)
+    closeBtn.Size = UDim2.new(0, 24, 0, 24)
+    closeBtn.Position = UDim2.new(1, -30, 0.5, -12)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    closeBtn.Text = "X"
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 14
+    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 5)
+
+    -- Sidebar (scrolling)
+    local sidebar = Instance.new("ScrollingFrame", main)
+    sidebar.Size = UDim2.new(0, 110, 1, -32)
+    sidebar.Position = UDim2.new(0, 0, 0, 32)
+    sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    sidebar.BorderSizePixel = 0
+    sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    sidebar.ScrollBarThickness = 4
+    sidebar.ScrollBarImageTransparency = 1
+    sidebar.ScrollingDirection = Enum.ScrollingDirection.Y
+
+    local listLayout = Instance.new("UIListLayout", sidebar)
+    listLayout.Padding = UDim.new(0, 6)
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    local padding = Instance.new("UIPadding", sidebar)
+    padding.PaddingTop = UDim.new(0, 8)
+
+    -- Content
+    local content = Instance.new("Frame", main)
+    content.Size = UDim2.new(1, -110, 1, -32)
+    content.Position = UDim2.new(0, 110, 0, 32)
+    content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    content.BorderSizePixel = 0
+
+    -- Tab system
+    local activeTab
+
+    local function createTab(name, order)
+        local tabBtn = Instance.new("TextButton", sidebar)
+        tabBtn.Size = UDim2.new(1, -16, 0, 32)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        tabBtn.Text = name
+        tabBtn.LayoutOrder = order
+        tabBtn.Font = Enum.Font.GothamSemibold
+        tabBtn.TextSize = 13
+        tabBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
+        Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 6)
+
+        local page = Instance.new("Frame", content)
+        page.Name = name
+        page.Size = UDim2.new(1, 0, 1, 0)
+        page.BackgroundTransparency = 1
+        page.Visible = false
+
+        tabBtn.MouseButton1Click:Connect(function()
+            if activeTab then
+                activeTab.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                content[activeTab.Text].Visible = false
+            end
+            tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+            page.Visible = true
+            activeTab = tabBtn
+        end)
+
+        return page
+    end
+
+    listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
+    end)
+
+    closeBtn.MouseButton1Click:Connect(function()
+        gui:Destroy()
+    end)
+
+    local minimized = false
+    minimize.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        content.Visible = not minimized
+        sidebar.Visible = not minimized
+        if minimized then
+            main.Size = UDim2.new(0, 200, 0, 50)
+        else
+            main.Size = UDim2.new(0, 450, 0, 300)
+        end
+    end)
+
+    -- Trả API Window
+    local Window = {}
+    function Window:CreateTab(tabName)
+        return createTab(tabName, #sidebar:GetChildren())
+    end
+
+    return Window
+end
+
+return Library
