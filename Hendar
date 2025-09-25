@@ -307,12 +307,6 @@ label.TextXAlignment = Enum.TextXAlignment.Left -- căn trái
     end)
 end
 
-
--- Auto update CanvasSize theo số tab
-listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
-end)
-
 -- Tạo tab Local đầu tiên
 createTab("Local",1)
 
@@ -321,6 +315,11 @@ local localTab = sidebar:FindFirstChild("Local")
 if localTab then
     localTab:MouseButton1Click():Connect()
 end
+
+-- Auto update CanvasSize theo số tab
+listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
+end)
 
 
 -- Nút Close & Minimize
