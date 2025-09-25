@@ -264,7 +264,6 @@ content.Position = UDim2.new(0, 110, 0, 32)
 content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 content.BorderSizePixel = 0
 
--- Tab system
 local activeTab
 
 local function createTab(name, order)
@@ -293,33 +292,37 @@ local function createTab(name, order)
     label.BackgroundTransparency = 1
     label.Text = string.upper(name)
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextStrokeTransparency = 0.5 -- viền chữ cho dễ thấy
     label.Font = Enum.Font.Arcade
     label.TextSize = 40
     label.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Click tab
-    tabBtn.MouseButton1Click:Connect(function()
+    -- Hàm mở tab
+    local function openTab()
         if activeTab then
             activeTab.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            activeTab.TextColor3 = Color3.fromRGB(230, 230, 230)
             activeTab.Page.Visible = false
         end
-        tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180) -- xanh đánh dấu
+        tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255) -- chữ sáng hơn
         page.Visible = true
         activeTab = tabBtn
-    end)
+    end
 
-    return tabBtn
+    -- Bấm tab để mở
+    tabBtn.MouseButton1Click:Connect(openTab)
+
+    return tabBtn, openTab
 end
 
 -- Tạo tab Local đầu tiên
-local localTab = createTab("Local", 1)
+local localTab, openLocal = createTab("Local", 1)
 
--- Auto chọn tab Local khi load
-localTab.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-localTab.Page.Visible = true
-activeTab = localTab
+-- Auto mở Local khi GUI load
+openLocal()
 
--- Auto update CanvasSize
+-- Auto update CanvasSize cho sidebar
 listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
 end)
