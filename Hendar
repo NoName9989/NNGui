@@ -574,18 +574,26 @@ local function createUIBuilder(parent, startY, spacing)
     return builder
 end
 
--- Input Speed ngay sau nút Discord
+-- Biến chung
 local speedValue = 16
+local speedEnabled = false
 
+-- Input Speed
 local inputBox = createInput(localTabFrame, "Input Speed", 110, speedValue, function(value)
     if value then
         speedValue = value
         print("New Speed =", speedValue)
+
+        -- Nếu toggle đang bật thì update luôn WalkSpeed
+        if speedEnabled then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+        end
     end
 end)
 
--- Toggle bật/tắt SpeedHack (nằm dưới ô input speed)
+-- Toggle SpeedHack
 createToggle(localTabFrame, "Enable SpeedHack", 160, false, function(enabled)
+    speedEnabled = enabled
     if enabled then
         print("SpeedHack ON -> WalkSpeed =", speedValue)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
