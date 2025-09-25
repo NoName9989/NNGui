@@ -288,17 +288,47 @@ local function createTab(name, order)
     page.Visible = false
     page.Parent = content
 
-   -- Label nội dung tab chuẩn 
+-- Label
 local label = Instance.new("TextLabel", page)
-label.Size = UDim2.new(1, -20, 0, 50) -- rộng full trừ margin
-label.Position = UDim2.new(0, 10, 0, 0) -- cách trái 10px
+label.Size = UDim2.new(1, -20, 0, 50)
+label.Position = UDim2.new(0, 10, 0, 0)
 label.BackgroundTransparency = 1
-label.Text = string.upper(name) -- in hoa, tên tab
+label.Text = string.upper(name)
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
-label.Font = Enum.Font.Arcade -- giống style Loading
-label.TextSize = 40 -- to nổi bật
-label.TextXAlignment = Enum.TextXAlignment.Left -- căn trái
+label.Font = Enum.Font.Arcade
+label.TextSize = 40
+label.TextXAlignment = Enum.TextXAlignment.Left
 
+-- ScrollingFrame chứa toàn bộ nội dung
+local scrolling = Instance.new("ScrollingFrame")
+scrolling.Size = UDim2.new(1, -20, 1, -60) -- trừ label
+scrolling.Position = UDim2.new(0, 10, 0, 60)
+scrolling.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrolling.ScrollBarThickness = 6
+scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
+scrolling.BackgroundTransparency = 1
+scrolling.Parent = page
+
+-- Layout + Padding
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 10)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = scrolling
+
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 10)
+padding.PaddingBottom = UDim.new(0, 10)
+padding.PaddingLeft = UDim.new(0, 10)
+padding.PaddingRight = UDim.new(0, 10)
+padding.Parent = scrolling
+
+-- Auto cập nhật CanvasSize
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrolling.CanvasSize = UDim2.new(
+        0, 0,
+        0, layout.AbsoluteContentSize.Y + padding.PaddingTop.Offset + padding.PaddingBottom.Offset
+    )
+end)
     -- Xử lý click tab
     tabBtn.MouseButton1Click:Connect(function()
         if activeTab then
