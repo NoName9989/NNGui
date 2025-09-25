@@ -116,7 +116,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
 
 -- Tên Hub
 local title = Instance.new("TextLabel", header)
-title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.8 ✨"
+title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.9 ✨"
 title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 12, 0, 0)
 title.BackgroundTransparency = 1
@@ -288,52 +288,58 @@ local function createTab(name, order)
     page.Visible = false
     page.Parent = content
 
--- Chiều cao label + margin
-local labelHeight = 50
-local margin = 10
+local function createPage(tabFolder, name)
+    local page = Instance.new("Frame")
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.Name = name
+    page.Parent = tabFolder
 
--- Label tiêu đề tab
-local label = Instance.new("TextLabel", page)
-label.Size = UDim2.new(1, -20, 0, labelHeight)
-label.Position = UDim2.new(0, 10, 0, 0)
-label.BackgroundTransparency = 1
-label.Text = string.upper(name) -- tên tab in hoa
-label.TextColor3 = Color3.fromRGB(255, 255, 255)
-label.Font = Enum.Font.Arcade
-label.TextSize = 40
-label.TextXAlignment = Enum.TextXAlignment.Left
+    -- Label (tiêu đề tab)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 50)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper(name)
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.Arcade
+    label.TextSize = 40
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = page
 
--- ScrollingFrame chứa toàn bộ nút/input
-local scrolling = Instance.new("ScrollingFrame")
-scrolling.Size = UDim2.new(1, -20, 1, -(labelHeight + margin))
-scrolling.Position = UDim2.new(0, 10, 0, labelHeight + margin)
-scrolling.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrolling.ScrollBarThickness = 6
-scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
-scrolling.BackgroundTransparency = 1
-scrolling.Parent = page
+    -- ScrollingFrame chứa toàn bộ nội dung
+    local scrolling = Instance.new("ScrollingFrame")
+    scrolling.Size = UDim2.new(1, -20, 1, -60) -- trừ chỗ label
+    scrolling.Position = UDim2.new(0, 10, 0, 60)
+    scrolling.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scrolling.ScrollBarThickness = 6
+    scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
+    scrolling.BackgroundTransparency = 1
+    scrolling.Parent = page
 
--- Layout để xếp dọc các nút
-local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 10) -- khoảng cách giữa các item
-layout.SortOrder = Enum.SortOrder.LayoutOrder
-layout.Parent = scrolling
+    -- Layout + Padding
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 10)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = scrolling
 
--- Padding để tạo lề trong ScrollingFrame
-local padding = Instance.new("UIPadding")
-padding.PaddingTop = UDim.new(0, 10)
-padding.PaddingBottom = UDim.new(0, 10)
-padding.PaddingLeft = UDim.new(0, 10)
-padding.PaddingRight = UDim.new(0, 10)
-padding.Parent = scrolling
+    local padding = Instance.new("UIPadding")
+    padding.PaddingTop = UDim.new(0, 10)
+    padding.PaddingBottom = UDim.new(0, 10)
+    padding.PaddingLeft = UDim.new(0, 10)
+    padding.PaddingRight = UDim.new(0, 10)
+    padding.Parent = scrolling
 
--- Tự động cập nhật CanvasSize theo nội dung
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    scrolling.CanvasSize = UDim2.new(
-        0, 0,
-        0, layout.AbsoluteContentSize.Y + padding.PaddingTop.Offset + padding.PaddingBottom.Offset
-    )
-end)
+    -- Auto cập nhật CanvasSize
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        scrolling.CanvasSize = UDim2.new(
+            0, 0,
+            0, layout.AbsoluteContentSize.Y + padding.PaddingTop.Offset + padding.PaddingBottom.Offset
+        )
+    end)
+
+    return page, scrolling
+end
     -- Xử lý click tab
     tabBtn.MouseButton1Click:Connect(function()
         if activeTab then
@@ -438,24 +444,20 @@ miniSquare.MouseButton1Click:Connect(function()
 end)
 local localTabFrame = content:FindFirstChild("Local_Content")
 
--- Hàm tạo nút chuẩn
-local function createButton(parent, text, posY, onClick)
+local function createButton(parent, text, onClick)
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, -20, 0, 40) -- full ngang, trừ margin
-    button.Position = UDim2.new(0, 10, 0, posY)
+    button.Size = UDim2.new(1, -20, 0, 40)
     button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     button.BackgroundTransparency = 0.6
-    button.Text = "    " .. string.upper(text) -- lùi chữ vào
+    button.Text = "    " .. string.upper(text)
     button.TextColor3 = Color3.fromRGB(230, 230, 230)
     button.Font = Enum.Font.GothamSemibold
     button.TextSize = 14
     button.TextXAlignment = Enum.TextXAlignment.Left
     button.Parent = parent
 
-    -- Bo góc
     Instance.new("UICorner", button).CornerRadius = UDim.new(0, 6)
 
-    -- Hover sáng nhẹ
     button.MouseEnter:Connect(function()
         button.BackgroundTransparency = 0.3
     end)
@@ -463,7 +465,6 @@ local function createButton(parent, text, posY, onClick)
         button.BackgroundTransparency = 0.6
     end)
 
-    -- Mũi tên > cuối nút
     local arrow = Instance.new("TextLabel")
     arrow.Size = UDim2.new(0, 20, 1, 0)
     arrow.Position = UDim2.new(1, -22, 0, 0)
@@ -479,85 +480,56 @@ local function createButton(parent, text, posY, onClick)
     return button
 end
 
--- Nút đầu tiên: Copy Discord Link
-createButton(localTabFrame, "Copy Discord Link", 60, function()
-    setclipboard("https://discord.gg/abcdef")
-    print("DISCORD LINK COPIED!")
-end)
--- ScrollingFrame chứa nội dung
-local scrolling = Instance.new("ScrollingFrame")
-scrolling.Size = UDim2.new(1, 0, 1, 0)
-scrolling.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrolling.ScrollBarThickness = 6
-scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
-scrolling.BackgroundTransparency = 1
-scrolling.Parent = localTabFrame
+--====================================================
+-- Hàm tạo Input + Label
+--====================================================
+local function createInput(parent, text, defaultValue, onChanged)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, 40)
+    frame.BackgroundTransparency = 1
+    frame.Parent = parent
 
--- Layout xếp dọc
-local layout = Instance.new("UIListLayout")
-layout.Parent = scrolling
-layout.Padding = UDim.new(0, 8)
-layout.SortOrder = Enum.SortOrder.LayoutOrder
-
--- Padding trong khung
-local padding = Instance.new("UIPadding")
-padding.PaddingTop = UDim.new(0, 10)
-padding.PaddingLeft = UDim.new(0, 10)
-padding.PaddingRight = UDim.new(0, 10)
-padding.Parent = scrolling
-
--- Auto cập nhật CanvasSize
-layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    scrolling.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
-end)
-
-----------------------------------------------------
--- Hàm tạo ô input
-local function createInput(parent, labelText, defaultValue, onEnter)
-    local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, 0, 0, 40)
-    container.BackgroundTransparency = 1
-    container.Parent = parent
-
-    -- Label
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 100, 1, 0)
+    label.Size = UDim2.new(0.5, -5, 1, 0)
+    label.Position = UDim2.new(0, 0, 0, 0)
     label.BackgroundTransparency = 1
-    label.Text = string.upper(labelText)
+    label.Text = text
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamBlack
-    label.TextSize = 16
-    label.TextXAlignment = Enum.TextXAlignment.Right
-    label.Parent = container
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = frame
 
-    -- Ô input
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -110, 1, 0)
-    box.Position = UDim2.new(0, 110, 0, 0)
-    box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    box.BackgroundTransparency = 0.5
-    box.Text = tostring(defaultValue or "")
-    box.TextColor3 = Color3.fromRGB(230, 230, 230)
-    box.Font = Enum.Font.GothamSemibold
-    box.TextSize = 14
-    box.ClearTextOnFocus = true
-    box.Parent = container
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(0.5, -5, 1, 0)
+    input.Position = UDim2.new(0.5, 5, 0, 0)
+    input.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    input.Text = tostring(defaultValue or "")
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.Font = Enum.Font.Gotham
+    input.TextSize = 14
+    input.Parent = frame
 
-    -- Enter để submit
-    box.FocusLost:Connect(function(enterPressed)
-        if enterPressed and onEnter then
-            onEnter(tonumber(box.Text))
+    Instance.new("UICorner", input).CornerRadius = UDim.new(0, 6)
+
+    input.FocusLost:Connect(function(enter)
+        if enter then
+            local val = tonumber(input.Text)
+            if val then
+                onChanged(val)
+            else
+                input.Text = tostring(defaultValue or "")
+            end
         end
     end)
 
-    return box
+    return frame
 end
 
--- Hàm tạo toggle
+-- Hàm tạo Toggle (giữ style đẹp có nút tròn)
 local function createToggle(parent, labelText, default, onToggle)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, 0, 0, 40)
+    container.Size = UDim2.new(1, -20, 0, 40)
     container.BackgroundTransparency = 1
     container.Parent = parent
 
@@ -572,7 +544,7 @@ local function createToggle(parent, labelText, default, onToggle)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = container
 
-    -- Switch
+    -- Switch nền
     local toggleBtn = Instance.new("TextButton")
     toggleBtn.Size = UDim2.new(0, 50, 0, 22)
     toggleBtn.Position = UDim2.new(1, -60, 0.5, -11)
@@ -592,7 +564,7 @@ local function createToggle(parent, labelText, default, onToggle)
 
     local enabled = default
 
-    -- Click
+    -- Click event
     toggleBtn.MouseButton1Click:Connect(function()
         enabled = not enabled
         if enabled then
@@ -607,27 +579,15 @@ local function createToggle(parent, labelText, default, onToggle)
 
     return toggleBtn
 end
-
-----------------------------------------------------
--- Logic chức năng
 local player = game.Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local mouse = player:GetMouse()
-
-----------------------------------------------------
--- SPEED HACK
 local speedValue = 16
 local speedEnabled = false
 
 -- Input Speed
 createInput(scrolling, "Input Speed", speedValue, function(value)
-    if value then
-        speedValue = value
-        if speedEnabled and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = speedValue
-        end
-        print("New Speed =", speedValue)
+    speedValue = value
+    if speedEnabled and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = speedValue
     end
 end)
 
@@ -636,57 +596,42 @@ createToggle(scrolling, "Enable SpeedHack", false, function(enabled)
     speedEnabled = enabled
     local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if hum then
-        if enabled then
-            hum.WalkSpeed = speedValue
-            print("SpeedHack ON -> WalkSpeed =", speedValue)
-        else
-            hum.WalkSpeed = 16
-            print("SpeedHack OFF -> WalkSpeed reset = 16")
-        end
+        hum.WalkSpeed = enabled and speedValue or 16
     end
 end)
 
--- Theo dõi khi respawn
+-- Respawn giữ speed
 player.CharacterAdded:Connect(function(char)
     local hum = char:WaitForChild("Humanoid")
-
     hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
         if speedEnabled and hum.WalkSpeed ~= speedValue then
             hum.WalkSpeed = speedValue
-            print("Game tried to change WalkSpeed -> Forced back to", speedValue)
         end
     end)
-
     if speedEnabled then
         task.wait(0.2)
         hum.WalkSpeed = speedValue
     end
 end)
 
-----------------------------------------------------
--- INFINITE JUMP
+-- Infinite Jump
+local UserInputService = game:GetService("UserInputService")
 local infJumpEnabled = false
-
 createToggle(scrolling, "Infinite Jump", false, function(enabled)
     infJumpEnabled = enabled
-    print("Infinite Jump:", enabled and "ON" or "OFF")
 end)
-
 UserInputService.JumpRequest:Connect(function()
     if infJumpEnabled and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
         player.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
 
-----------------------------------------------------
--- NO CLIP
+-- NoClip
+local RunService = game:GetService("RunService")
 local noclipEnabled = false
 local noclipConnection
-
 createToggle(scrolling, "No Clip", false, function(enabled)
     noclipEnabled = enabled
-    print("NoClip:", enabled and "ON" or "OFF")
-
     if enabled then
         noclipConnection = RunService.Stepped:Connect(function()
             if player.Character then
@@ -697,23 +642,18 @@ createToggle(scrolling, "No Clip", false, function(enabled)
                 end
             end
         end)
-    else
-        if noclipConnection then
-            noclipConnection:Disconnect()
-            noclipConnection = nil
-        end
+    elseif noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
     end
 end)
 
-----------------------------------------------------
--- CLICK TELEPORT
+-- Click TP
+local mouse = player:GetMouse()
 local clickTPEnabled = false
 local clickTPConnection
-
 createToggle(scrolling, "Click TP", false, function(enabled)
     clickTPEnabled = enabled
-    print("ClickTP:", enabled and "ON" or "OFF")
-
     if enabled then
         clickTPConnection = mouse.Button1Down:Connect(function()
             if mouse.Target then
@@ -724,10 +664,8 @@ createToggle(scrolling, "Click TP", false, function(enabled)
                 end
             end
         end)
-    else
-        if clickTPConnection then
-            clickTPConnection:Disconnect()
-            clickTPConnection = nil
-        end
+    elseif clickTPConnection then
+        clickTPConnection:Disconnect()
+        clickTPConnection = nil
     end
 end)
