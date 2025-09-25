@@ -245,15 +245,17 @@ sidebar.BorderSizePixel = 0
 sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
 sidebar.ScrollBarThickness = 4
 sidebar.ScrollBarImageTransparency = 1 -- ẩn thanh cuộn
-sidebar.ScrollingDirection = Enum.ScrollingDirection.Y -- chỉ cuộn dọc
+sidebar.ScrollingDirection = Enum.ScrollingDirection.Y
 
 -- Layout cho tab
 local listLayout = Instance.new("UIListLayout", sidebar)
 listLayout.Padding = UDim.new(0, 6)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Padding trong sidebar
 local uipadding = Instance.new("UIPadding", sidebar)
-padding.PaddingTop = UDim.new(0, 8)
+uipadding.PaddingTop = UDim.new(0, 8)
 
 -- Content Area
 local content = Instance.new("Frame", main)
@@ -262,7 +264,6 @@ content.Position = UDim2.new(0, 110, 0, 32)
 content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 content.BorderSizePixel = 0
 
--- Tab system
 -- Tab system
 local activeTab
 
@@ -283,9 +284,9 @@ local function createTab(name, order)
     page.Size = UDim2.new(1, 0, 1, 0)
     page.BackgroundTransparency = 1
     page.Visible = false
-    tabBtn.Page = page -- 🔥 gắn trực tiếp vào nút
+    tabBtn.Page = page
 
-    -- Label nội dung tab
+    -- Label trong tab
     local label = Instance.new("TextLabel", page)
     label.Size = UDim2.new(1, -20, 0, 50)
     label.Position = UDim2.new(0, 10, 0, 0)
@@ -313,14 +314,15 @@ end
 -- Tạo tab Local đầu tiên
 local localTab = createTab("Local", 1)
 
--- Chọn tab Local mặc định
-localTab.MouseButton1Click:Fire()
+-- Auto chọn tab Local khi load
+localTab.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+localTab.Page.Visible = true
+activeTab = localTab
 
--- Auto update CanvasSize theo số tab
+-- Auto update CanvasSize
 listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
 end)
-
 -- Nút Close & Minimize
 -- Popup confirm
 local confirmFrame = Instance.new("Frame")
