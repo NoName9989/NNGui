@@ -577,16 +577,22 @@ end
 -- Biến chung
 local speedValue = 16
 local speedEnabled = false
+local player = game.Players.LocalPlayer
+
+-- Hàm áp dụng speed
+local function applySpeed(hum)
+    if speedEnabled and hum then
+        hum.WalkSpeed = speedValue
+    end
+end
 
 -- Input Speed
 local inputBox = createInput(localTabFrame, "Input Speed", 110, speedValue, function(value)
     if value then
         speedValue = value
         print("New Speed =", speedValue)
-
-        -- Nếu toggle đang bật thì update luôn WalkSpeed
-        if speedEnabled then
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+        if speedEnabled and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = speedValue
         end
     end
 end)
@@ -594,11 +600,112 @@ end)
 -- Toggle SpeedHack
 createToggle(localTabFrame, "Enable SpeedHack", 160, false, function(enabled)
     speedEnabled = enabled
+    local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        if enabled then
+            print("SpeedHack ON -> WalkSpeed =", speedValue)
+            hum.WalkSpeed = speedValue
+        else
+            print("SpeedHack OFF -> WalkSpeed reset = 16")
+            hum.WalkSpeed = 16
+        end
+    end
+end)
+
+-- Theo dõi khi respawn
+player.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid")
+
+    -- Khóa WalkSpeed khi game thay đổi
+    hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if speedEnabled and hum.WalkSpeed ~= speedValue then
+            hum.WalkSpeed = speedValue
+            print("Game tried to change WalkSpeed -> Forced back to", speedValue)
+        end
+    end)
+
+    -- Áp dụng speed nếu bật toggle
+    if speedEnabled then
+        task.wait(0.2)
+        hum.WalkSpeed = speedValue
+    end
+end)
+
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+
+local infJumpEnabled = false
+
+-- Toggle Infinite Jump
+createToggle(localTabFrame, "Infinite Jump", 210, false, function(enabled)
+    infJumpEnabled = enabled
+    print("Infinite Jump:", enabled and "ON" or "OFF")
+end)
+
+-- Xử lý nhảy
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+        local hum = player.Character:FindFirstChildOfClass("Humanoid")
+        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+local noclipEnabled = false
+local noclipConnection
+
+-- Toggle NoClip
+createToggle(localTabFrame, "No Clip", 260, false, function(enabled)
+    noclipEnabled = enabled
+    print("NoClip:", enabled and "ON" or "OFF")
+
     if enabled then
-        print("SpeedHack ON -> WalkSpeed =", speedValue)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+        -- Mỗi frame set CanCollide = false
+        noclipConnection = RunService.Stepped:Connect(function()
+            if player.Character then
+                for _, part in ipairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.CanCollide then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
     else
-        print("SpeedHack OFF -> WalkSpeed reset = 16")
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        -- Tắt thì ngắt kết nối
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end)
+
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local clickTPEnabled = false
+local clickTPConnection
+
+-- Toggle Click TP
+createToggle(localTabFrame, "Click TP", 310, false, function(enabled)
+    clickTPEnabled = enabled
+    print("ClickTP:", enabled and "ON" or "OFF")
+
+    if enabled then
+        clickTPConnection = mouse.Button1Down:Connect(function()
+            if mouse.Target then
+                local char = player.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    root.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0)) -- dịch chuyển lên 3 để ko kẹt sàn
+                end
+            end
+        end)
+    else
+        if clickTPConnection then
+            clickTPConnection:Disconnect()
+            clickTPConnection = nil
+        end
     end
 end)
