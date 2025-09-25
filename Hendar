@@ -449,3 +449,50 @@ createButton(localTabFrame, "Copy Discord Link", 60, function()
     setclipboard("https://discord.gg/abcdef")
     print("DISCORD LINK COPIED!")
 end)
+-- Hàm tạo input speed
+local function createInput(parent, labelText, posY, defaultValue, onEnter)
+    -- Label bên trái
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.5, -15, 0, 40) -- nửa trái
+    label.Position = UDim2.new(0, 10, 0, posY)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper(labelText)
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBlack
+    label.TextSize = 16
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = parent
+
+    -- Ô input bên phải
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0.5, -15, 0, 40) -- nửa phải
+    box.Position = UDim2.new(0.5, 5, 0, posY)
+    box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    box.BackgroundTransparency = 0.5
+    box.Text = tostring(defaultValue or "")
+    box.TextColor3 = Color3.fromRGB(230, 230, 230)
+    box.Font = Enum.Font.GothamSemibold
+    box.TextSize = 14
+    box.ClearTextOnFocus = true -- xoá số cũ khi nhập
+    box.Parent = parent
+
+    -- Bo góc
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
+
+    -- Enter để submit
+    box.FocusLost:Connect(function(enterPressed)
+        if enterPressed and onEnter then
+            onEnter(tonumber(box.Text))
+        end
+    end)
+
+    return box
+end
+
+-- Ví dụ: tạo ô input speed ngay sau nút Discord
+createInput(localTabFrame, "Input Speed", 110, 16, function(value)
+    if value then
+        print("New Speed =", value)
+        -- chỗ này bạn set tốc độ player
+    end
+end)
