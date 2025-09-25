@@ -245,17 +245,15 @@ sidebar.BorderSizePixel = 0
 sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
 sidebar.ScrollBarThickness = 4
 sidebar.ScrollBarImageTransparency = 1 -- ẩn thanh cuộn
-sidebar.ScrollingDirection = Enum.ScrollingDirection.Y
+sidebar.ScrollingDirection = Enum.ScrollingDirection.Y -- chỉ cuộn dọc
 
 -- Layout cho tab
 local listLayout = Instance.new("UIListLayout", sidebar)
 listLayout.Padding = UDim.new(0, 6)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
--- Padding trong sidebar
-local uipadding = Instance.new("UIPadding", sidebar)
-uipadding.PaddingTop = UDim.new(0, 8)
+local padding = Instance.new("UIPadding", sidebar)
+padding.PaddingTop = UDim.new(0, 8)
 
 -- Content Area
 local content = Instance.new("Frame", main)
