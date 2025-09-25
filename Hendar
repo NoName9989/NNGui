@@ -268,7 +268,7 @@ local activeTab
 
 local function createTab(name, order)
     local tabBtn = Instance.new("TextButton", sidebar)
-    tabBtn.Size = UDim2.new(1, -16, 0, 32) -- chuẩn khung, đều 2 bên
+    tabBtn.Size = UDim2.new(1, -16, 0, 32)
     tabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     tabBtn.Text = name
     tabBtn.LayoutOrder = order
@@ -283,44 +283,43 @@ local function createTab(name, order)
     page.Size = UDim2.new(1, 0, 1, 0)
     page.BackgroundTransparency = 1
     page.Visible = false
+    tabBtn.Page = page -- 🔥 gắn trực tiếp vào nút
 
-    -- Label nội dung tab chuẩn kiểu "Loading Text"
-local label = Instance.new("TextLabel", page)
-label.Size = UDim2.new(1, -20, 0, 50) -- rộng full trừ margin
-label.Position = UDim2.new(0, 10, 0, 0) -- cách trái 10px
-label.BackgroundTransparency = 1
-label.Text = string.upper(name) -- in hoa, tên tab
-label.TextColor3 = Color3.fromRGB(255, 255, 255)
-label.Font = Enum.Font.Arcade -- giống style Loading
-label.TextSize = 40 -- to nổi bật
-label.TextXAlignment = Enum.TextXAlignment.Left -- căn trái
+    -- Label nội dung tab
+    local label = Instance.new("TextLabel", page)
+    label.Size = UDim2.new(1, -20, 0, 50)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = string.upper(name)
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.Arcade
+    label.TextSize = 40
+    label.TextXAlignment = Enum.TextXAlignment.Left
 
     -- Click tab
     tabBtn.MouseButton1Click:Connect(function()
         if activeTab then
             activeTab.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            content[activeTab.Text].Visible = false
+            activeTab.Page.Visible = false
         end
         tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
         page.Visible = true
         activeTab = tabBtn
     end)
+
+    return tabBtn
 end
 
 -- Tạo tab Local đầu tiên
-createTab("Local",1)
+local localTab = createTab("Local", 1)
 
--- Chọn tab Local mặc định khi GUI load
-local localTab = sidebar:FindFirstChild("Local")
-if localTab then
-    localTab:MouseButton1Click():Connect()
-end
+-- Chọn tab Local mặc định
+localTab.MouseButton1Click:Fire()
 
 -- Auto update CanvasSize theo số tab
 listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
 end)
-
 
 -- Nút Close & Minimize
 -- Popup confirm
