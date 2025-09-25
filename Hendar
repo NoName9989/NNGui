@@ -284,13 +284,16 @@ local function createTab(name, order)
     page.BackgroundTransparency = 1
     page.Visible = false
 
-    local label = Instance.new("TextLabel", page)
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.BackgroundTransparency = 1
-    label.Text = "📌 Nội dung của " .. name
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamSemibold
-    label.TextSize = 16
+    -- Label nội dung tab chuẩn kiểu "Loading Text"
+local label = Instance.new("TextLabel", page)
+label.Size = UDim2.new(1, -20, 0, 50) -- rộng full trừ margin
+label.Position = UDim2.new(0, 10, 0, 0) -- cách trái 10px
+label.BackgroundTransparency = 1
+label.Text = string.upper(name) -- in hoa, tên tab
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.Font = Enum.Font.Arcade -- giống style Loading
+label.TextSize = 40 -- to nổi bật
+label.TextXAlignment = Enum.TextXAlignment.Left -- căn trái
 
     -- Click tab
     tabBtn.MouseButton1Click:Connect(function()
