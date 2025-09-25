@@ -449,32 +449,38 @@ createButton(localTabFrame, "Copy Discord Link", 60, function()
     setclipboard("https://discord.gg/abcdef")
     print("DISCORD LINK COPIED!")
 end)
--- Hàm tạo input speed
+-- Hàm tạo input speed (label sát ô input)
 local function createInput(parent, labelText, posY, defaultValue, onEnter)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, -20, 0, 40)
+    container.Position = UDim2.new(0, 10, 0, posY)
+    container.BackgroundTransparency = 1
+    container.Parent = parent
+
     -- Label bên trái
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0.5, -15, 0, 40) -- nửa trái
-    label.Position = UDim2.new(0, 10, 0, posY)
+    label.Size = UDim2.new(0, 100, 1, 0) -- chỉ rộng bằng text
+    label.Position = UDim2.new(0, 0, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = string.upper(labelText)
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBlack
     label.TextSize = 16
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = parent
+    label.TextXAlignment = Enum.TextXAlignment.Right -- căn phải để gần ô input
+    label.Parent = container
 
     -- Ô input bên phải
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(0.5, -15, 0, 40) -- nửa phải
-    box.Position = UDim2.new(0.5, 5, 0, posY)
+    box.Size = UDim2.new(1, -110, 1, 0) -- trừ chiều ngang label
+    box.Position = UDim2.new(0, 110, 0, 0)
     box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     box.BackgroundTransparency = 0.5
     box.Text = tostring(defaultValue or "")
     box.TextColor3 = Color3.fromRGB(230, 230, 230)
     box.Font = Enum.Font.GothamSemibold
     box.TextSize = 14
-    box.ClearTextOnFocus = true -- xoá số cũ khi nhập
-    box.Parent = parent
+    box.ClearTextOnFocus = true
+    box.Parent = container
 
     -- Bo góc
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
@@ -489,10 +495,9 @@ local function createInput(parent, labelText, posY, defaultValue, onEnter)
     return box
 end
 
--- Ví dụ: tạo ô input speed ngay sau nút Discord
+-- Ví dụ: Input Speed ngay sau nút Discord
 createInput(localTabFrame, "Input Speed", 110, 16, function(value)
     if value then
         print("New Speed =", value)
-        -- chỗ này bạn set tốc độ player
     end
 end)
