@@ -116,7 +116,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
 
 -- Tên Hub
 local title = Instance.new("TextLabel", header)
-title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.7 ✨"
+title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.8 ✨"
 title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 12, 0, 0)
 title.BackgroundTransparency = 1
@@ -288,33 +288,38 @@ local function createTab(name, order)
     page.Visible = false
     page.Parent = content
 
--- Label
+-- Chiều cao label + margin
+local labelHeight = 50
+local margin = 10
+
+-- Label tiêu đề tab
 local label = Instance.new("TextLabel", page)
-label.Size = UDim2.new(1, -20, 0, 50)
+label.Size = UDim2.new(1, -20, 0, labelHeight)
 label.Position = UDim2.new(0, 10, 0, 0)
 label.BackgroundTransparency = 1
-label.Text = string.upper(name)
+label.Text = string.upper(name) -- tên tab in hoa
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
 label.Font = Enum.Font.Arcade
 label.TextSize = 40
 label.TextXAlignment = Enum.TextXAlignment.Left
 
--- ScrollingFrame chứa toàn bộ nội dung
+-- ScrollingFrame chứa toàn bộ nút/input
 local scrolling = Instance.new("ScrollingFrame")
-scrolling.Size = UDim2.new(1, -20, 1, -60) -- trừ label
-scrolling.Position = UDim2.new(0, 10, 0, 60)
+scrolling.Size = UDim2.new(1, -20, 1, -(labelHeight + margin))
+scrolling.Position = UDim2.new(0, 10, 0, labelHeight + margin)
 scrolling.CanvasSize = UDim2.new(0, 0, 0, 0)
 scrolling.ScrollBarThickness = 6
 scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
 scrolling.BackgroundTransparency = 1
 scrolling.Parent = page
 
--- Layout + Padding
+-- Layout để xếp dọc các nút
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 10)
+layout.Padding = UDim.new(0, 10) -- khoảng cách giữa các item
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = scrolling
 
+-- Padding để tạo lề trong ScrollingFrame
 local padding = Instance.new("UIPadding")
 padding.PaddingTop = UDim.new(0, 10)
 padding.PaddingBottom = UDim.new(0, 10)
@@ -322,7 +327,7 @@ padding.PaddingLeft = UDim.new(0, 10)
 padding.PaddingRight = UDim.new(0, 10)
 padding.Parent = scrolling
 
--- Auto cập nhật CanvasSize
+-- Tự động cập nhật CanvasSize theo nội dung
 layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     scrolling.CanvasSize = UDim2.new(
         0, 0,
