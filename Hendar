@@ -252,7 +252,7 @@ local listLayout = Instance.new("UIListLayout", sidebar)
 listLayout.Padding = UDim.new(0, 6)
 listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-local padding = Instance.new("UIPadding", sidebar)
+local uipadding = Instance.new("UIPadding", sidebar)
 padding.PaddingTop = UDim.new(0, 8)
 
 -- Content Area
