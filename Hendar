@@ -263,87 +263,52 @@ content.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 content.BorderSizePixel = 0
 
 -- Tab system
--- Lưu tab hiện tại
+-- Tab system
 local activeTab
 
--- Hàm tạo tab
 local function createTab(name, order)
-    -- Nút tab
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Size = UDim2.new(1, -16, 0, 32)
-    tabBtn.Position = UDim2.new(0, 8, 0, 34 * (order-1))
+    local tabBtn = Instance.new("TextButton", sidebar)
+    tabBtn.Size = UDim2.new(1, -16, 0, 32) -- chuẩn khung, đều 2 bên
     tabBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    tabBtn.Text = string.upper(name) -- in hoa
+    tabBtn.Text = name
+    tabBtn.LayoutOrder = order
     tabBtn.Font = Enum.Font.GothamSemibold
     tabBtn.TextSize = 13
     tabBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
-    Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0,6)
-    tabBtn.Parent = sidebar
+    Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 6)
 
-    -- Frame nội dung tab
-    local page = Instance.new("Frame")
-    page.Name = name .. "_Content"
-    page.Size = UDim2.new(1,0,1,0)
+    -- Nội dung tab
+    local page = Instance.new("Frame", content)
+    page.Name = name
+    page.Size = UDim2.new(1, 0, 1, 0)
     page.BackgroundTransparency = 1
     page.Visible = false
-    page.Parent = content
 
-    -- Label (tiêu đề tab)
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -20, 0, 50)
-    label.Position = UDim2.new(0, 10, 0, 0)
+    local label = Instance.new("TextLabel", page)
+    label.Size = UDim2.new(1, 0, 1, 0)
     label.BackgroundTransparency = 1
-    label.Text = string.upper(name)
+    label.Text = "📌 Nội dung của " .. name
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.Arcade
-    label.TextSize = 40
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = page
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 16
 
-    -- ScrollingFrame chứa toàn bộ nội dung
-    local scrolling = Instance.new("ScrollingFrame")
-    scrolling.Size = UDim2.new(1, -20, 1, -60) -- trừ chỗ label
-    scrolling.Position = UDim2.new(0, 10, 0, 60)
-    scrolling.CanvasSize = UDim2.new(0, 0, 0, 0)
-    scrolling.ScrollBarThickness = 6
-    scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
-    scrolling.BackgroundTransparency = 1
-    scrolling.Parent = page
-
-    -- Layout + Padding
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 10)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Parent = scrolling
-
-    local padding = Instance.new("UIPadding")
-    padding.PaddingTop = UDim.new(0, 10)
-    padding.PaddingBottom = UDim.new(0, 10)
-    padding.PaddingLeft = UDim.new(0, 10)
-    padding.PaddingRight = UDim.new(0, 10)
-    padding.Parent = scrolling
-
-    -- Auto cập nhật CanvasSize
-    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        scrolling.CanvasSize = UDim2.new(
-            0, 0,
-            0, layout.AbsoluteContentSize.Y + padding.PaddingTop.Offset + padding.PaddingBottom.Offset
-        )
-    end)
-
-    return page, scrolling
-end
-    -- Xử lý click tab
+    -- Click tab
     tabBtn.MouseButton1Click:Connect(function()
         if activeTab then
-            activeTab.BackgroundColor3 = Color3.fromRGB(45,45,45)
-            content[activeTab.Text .. "_Content"].Visible = false
+            activeTab.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            content[activeTab.Text].Visible = false
         end
-        tabBtn.BackgroundColor3 = Color3.fromRGB(70,130,180)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
         page.Visible = true
         activeTab = tabBtn
     end)
 end
+
+
+-- Auto update CanvasSize theo số tab
+listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
+end)
 
 -- Tạo tab Local đầu tiên
 createTab("Local",1)
@@ -354,10 +319,6 @@ if localTab then
     localTab:MouseButton1Click():Connect()
 end
 
--- Auto update CanvasSize theo số tab
-listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    sidebar.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 16)
-end)
 
 -- Nút Close & Minimize
 -- Popup confirm
