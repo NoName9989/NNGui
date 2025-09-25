@@ -480,7 +480,7 @@ end)
 -- Hàm tạo ô input
 local function createInput(parent, labelText, defaultValue, onEnter)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, -20, 0, 40)
+    container.Size = UDim2.new(1, 0, 0, 40)
     container.BackgroundTransparency = 1
     container.Parent = parent
 
@@ -519,11 +519,10 @@ local function createInput(parent, labelText, defaultValue, onEnter)
     return box
 end
 
-----------------------------------------------------
 -- Hàm tạo toggle
 local function createToggle(parent, labelText, default, onToggle)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, -20, 0, 40)
+    container.Size = UDim2.new(1, 0, 0, 40)
     container.BackgroundTransparency = 1
     container.Parent = parent
 
@@ -574,9 +573,15 @@ local function createToggle(parent, labelText, default, onToggle)
     return toggleBtn
 end
 
-
+----------------------------------------------------
 -- Logic chức năng
 local player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local mouse = player:GetMouse()
+
+----------------------------------------------------
+-- SPEED HACK
 local speedValue = 16
 local speedEnabled = false
 
@@ -624,8 +629,7 @@ player.CharacterAdded:Connect(function(char)
 end)
 
 ----------------------------------------------------
--- Infinite Jump
-local UserInputService = game:GetService("UserInputService")
+-- INFINITE JUMP
 local infJumpEnabled = false
 
 createToggle(scrolling, "Infinite Jump", false, function(enabled)
@@ -640,8 +644,7 @@ UserInputService.JumpRequest:Connect(function()
 end)
 
 ----------------------------------------------------
--- NoClip
-local RunService = game:GetService("RunService")
+-- NO CLIP
 local noclipEnabled = false
 local noclipConnection
 
@@ -668,8 +671,7 @@ createToggle(scrolling, "No Clip", false, function(enabled)
 end)
 
 ----------------------------------------------------
--- Click TP
-local mouse = player:GetMouse()
+-- CLICK TELEPORT
 local clickTPEnabled = false
 local clickTPConnection
 
