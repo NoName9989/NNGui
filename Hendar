@@ -280,43 +280,55 @@ local function createTab(name, order)
     tabBtn.Parent = sidebar
 
     -- Frame nội dung tab
-    local page = Instance.new("Frame")
-    page.Name = name .. "_Content"
-    page.Size = UDim2.new(1,0,1,0)
-    page.BackgroundTransparency = 1
-    page.Visible = false
-    page.Parent = content
+-- Frame nội dung tab
+local page = Instance.new("Frame")
+page.Name = name .. "_Content"
+page.Size = UDim2.new(1,0,1,0)
+page.BackgroundTransparency = 1
+page.Visible = false
+page.Parent = content
 
-    -- Label nội dung tab chuẩn kiểu "Loading Text"
+-- Label nội dung tab
 local label = Instance.new("TextLabel", page)
-label.Size = UDim2.new(1, -20, 0, 50) -- rộng full trừ margin
-label.Position = UDim2.new(0, 10, 0, 0) -- cách trái 10px
+label.Size = UDim2.new(1, -20, 0, 50)
+label.Position = UDim2.new(0, 10, 0, 0)
 label.BackgroundTransparency = 1
-label.Text = string.upper(name) -- in hoa, tên tab
+label.Text = string.upper(name)
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
-label.Font = Enum.Font.Arcade -- giống style Loading
-label.TextSize = 40 -- to nổi bật
-label.TextXAlignment = Enum.TextXAlignment.Left -- căn trái
+label.Font = Enum.Font.Arcade
+label.TextSize = 40
+label.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Xử lý click tab
-    tabBtn.MouseButton1Click:Connect(function()
-        if activeTab then
-            activeTab.BackgroundColor3 = Color3.fromRGB(45,45,45)
-            content[activeTab.Text .. "_Content"].Visible = false
-        end
-        tabBtn.BackgroundColor3 = Color3.fromRGB(70,130,180)
-        page.Visible = true
-        activeTab = tabBtn
-    end)
-end
+-- 🔥 ScrollingFrame chứa các nút bên dưới label
+local scrolling = Instance.new("ScrollingFrame", page)
+scrolling.Size = UDim2.new(1, -20, 1, -60) -- trừ chỗ label
+scrolling.Position = UDim2.new(0, 10, 0, 60)
+scrolling.CanvasSize = UDim2.new(0,0,0,0)
+scrolling.ScrollBarThickness = 6
+scrolling.ScrollBarImageColor3 = Color3.fromRGB(150,150,150)
+scrolling.BackgroundTransparency = 1
 
--- Tạo tab Local đầu tiên
-createTab("Local",1)
+-- Layout + Padding
+local layout = Instance.new("UIListLayout", scrolling)
+layout.Padding = UDim.new(0, 10)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-local localTab = sidebar:FindFirstChild("Local")
-if localTab then
-    localTab.MouseButton1Click:Fire() -- 🔥 bắn sự kiện click
-end
+local padding = Instance.new("UIPadding", scrolling)
+padding.PaddingTop = UDim.new(0, 10)
+padding.PaddingBottom = UDim.new(0, 10)
+padding.PaddingLeft = UDim.new(0, 10)
+padding.PaddingRight = UDim.new(0, 10)
+
+-- Auto cập nhật CanvasSize
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrolling.CanvasSize = UDim2.new(0,0,0,
+        layout.AbsoluteContentSize.Y + padding.PaddingTop.Offset + padding.PaddingBottom.Offset
+    )
+end)
+
+-- 👉 trả về scrolling để add nút
+return tabBtn, scrolling
+
 -- Nút Close & Minimize
 -- Popup confirm
 local confirmFrame = Instance.new("Frame")
@@ -393,3 +405,12 @@ miniSquare.MouseButton1Click:Connect(function()
     main.Visible = true
     miniSquare.Visible = false
 end)
+
+
+local localTab, localTabContent = createTab("Local", 1)
+
+-- Ví dụ thêm nút vào tab Local
+local btn = Instance.new("TextButton", localTabContent)
+btn.Size = UDim2.new(1, 0, 0, 40)
+btn.Text = "Click Me"
+
