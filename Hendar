@@ -494,22 +494,22 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
 
     -- Label bên trái
     local label = Instance.new("TextLabel")
-    label.AutomaticSize = Enum.AutomaticSize.X -- tự động co theo chữ
+    label.AutomaticSize = Enum.AutomaticSize.X
     label.Size = UDim2.new(0, 0, 1, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
-    label.TextSize = 18
+    label.TextSize = 16
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
     local pad = Instance.new("UIPadding", label)
     pad.PaddingLeft = UDim.new(0, 2)
 
-    -- Ô nhập bên phải
+    -- Ô nhập bên phải (nhỏ lại, rộng 200px)
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -label.TextBounds.X - 20, 1, 0)
+    box.Size = UDim2.new(0, 200, 1, 0) -- ❗ chỉ rộng 200px
     box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     box.BackgroundTransparency = 0.6
     box.Text = tostring(defaultValue) or ""
@@ -525,7 +525,7 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     -- Hiệu ứng focus
     box.Focused:Connect(function()
         if box.Text == tostring(defaultValue) then
-            box.Text = "" -- xoá text mặc định khi nhấn vào
+            box.Text = "" 
         end
         box.BackgroundTransparency = 0.3
     end)
@@ -533,7 +533,7 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     box.FocusLost:Connect(function(enterPressed)
         box.BackgroundTransparency = 0.6
         if box.Text == "" then
-            box.Text = tostring(defaultValue) -- nếu để trống thì khôi phục mặc định
+            box.Text = tostring(defaultValue)
         elseif enterPressed then
             if onEnter then onEnter(box.Text) end
         end
