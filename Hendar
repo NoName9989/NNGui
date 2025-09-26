@@ -490,33 +490,37 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     layout.FillDirection = Enum.FillDirection.Horizontal
     layout.VerticalAlignment = Enum.VerticalAlignment.Center
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 8)
+    layout.Padding = UDim.new(0, 6)
 
     -- Label bên trái
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 100, 1, 0) -- label rộng 100px
+    label.AutomaticSize = Enum.AutomaticSize.X -- tự động co theo chữ
+    label.Size = UDim2.new(0, 0, 1, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamSemibold
-    label.TextSize = 14
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 18
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
+    local pad = Instance.new("UIPadding", label)
+    pad.PaddingLeft = UDim.new(0, 2)
+
     -- Ô nhập bên phải
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -100, 1, 0)
-    box.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    box.Size = UDim2.new(1, -label.TextBounds.X - 20, 1, 0)
+    box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     box.BackgroundTransparency = 0.6
     box.Text = tostring(defaultValue) or ""
-    box.TextColor3 = Color3.fromRGB(230,230,230)
+    box.TextColor3 = Color3.fromRGB(230, 230, 230)
     box.Font = Enum.Font.GothamSemibold
     box.TextSize = 14
     box.ClearTextOnFocus = false
     box.Parent = holder
 
     local corner = Instance.new("UICorner", box)
-    corner.CornerRadius = UDim.new(0,6)
+    corner.CornerRadius = UDim.new(0, 6)
 
     -- Hiệu ứng focus
     box.Focused:Connect(function()
