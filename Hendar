@@ -754,3 +754,88 @@ createToggle(localTabScroll, "Click Teleport", false, 4, function(state)
         clickTPConnection, touchTPConnection = nil, nil
     end
 end)
+
+-- Tạo Tab Main
+local mainTabBtn, mainTabScroll = createTab("Main", 2)
+
+local function createDropdown(parent, labelText, options, defaultIndex, order, onSelect)
+    -- Holder
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(1, -20, 0, 40)
+    holder.Position = UDim2.new(0, 10, 0, 0)
+    holder.BackgroundTransparency = 1
+    holder.LayoutOrder = order
+    holder.Parent = parent
+
+    local layout = Instance.new("UIListLayout", holder)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 8)
+
+    -- Label bên trái
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 100, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = holder
+
+    -- Button hiển thị giá trị chọn
+    local dropdownBtn = Instance.new("TextButton")
+    dropdownBtn.Size = UDim2.new(1, -100, 1, 0)
+    dropdownBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    dropdownBtn.BackgroundTransparency = 0.6
+    dropdownBtn.Text = options[defaultIndex] or "Select..."
+    dropdownBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    dropdownBtn.Font = Enum.Font.GothamSemibold
+    dropdownBtn.TextSize = 14
+    dropdownBtn.TextXAlignment = Enum.TextXAlignment.Left
+    dropdownBtn.Parent = holder
+    Instance.new("UICorner", dropdownBtn).CornerRadius = UDim.new(0,6)
+
+    -- Container danh sách
+    local listFrame = Instance.new("Frame")
+    listFrame.Size = UDim2.new(1, -100, 0, #options * 30)
+    listFrame.Position = UDim2.new(0, 100, 0, 40)
+    listFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    listFrame.Visible = false
+    listFrame.ClipsDescendants = true
+    listFrame.Parent = holder
+    Instance.new("UICorner", listFrame).CornerRadius = UDim.new(0,6)
+
+    local listLayout = Instance.new("UIListLayout", listFrame)
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Tạo item cho từng option
+    for i, opt in ipairs(options) do
+        local item = Instance.new("TextButton")
+        item.Size = UDim2.new(1, 0, 0, 30)
+        item.BackgroundTransparency = 1
+        item.Text = opt
+        item.TextColor3 = Color3.fromRGB(230,230,230)
+        item.Font = Enum.Font.Gotham
+        item.TextSize = 14
+        item.Parent = listFrame
+
+        item.MouseButton1Click:Connect(function()
+            dropdownBtn.Text = opt
+            listFrame.Visible = false
+            if onSelect then onSelect(opt, i) end
+        end)
+    end
+
+    -- Toggle mở/đóng dropdown
+    dropdownBtn.MouseButton1Click:Connect(function()
+        listFrame.Visible = not listFrame.Visible
+    end)
+
+    return holder, dropdownBtn
+end
+
+createDropdown(mainTabScroll, "Mode", {"Easy","Normal","Hard"}, 2, 1, function(choice, index)
+    print("Đã chọn:", choice, index)
+end)
