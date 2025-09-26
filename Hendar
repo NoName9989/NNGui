@@ -490,12 +490,11 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     layout.FillDirection = Enum.FillDirection.Horizontal
     layout.VerticalAlignment = Enum.VerticalAlignment.Center
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 6)
+    layout.Padding = UDim.new(0, 8)
 
-    -- Label bên trái
+    -- Label (chiếm phần còn lại, dài hơn input)
     local label = Instance.new("TextLabel")
-    label.AutomaticSize = Enum.AutomaticSize.X
-    label.Size = UDim2.new(0, 0, 1, 0)
+    label.Size = UDim2.new(1, -160, 1, 0) -- chừa chỗ cho input (160px)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -504,12 +503,9 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    local pad = Instance.new("UIPadding", label)
-    pad.PaddingLeft = UDim.new(0, 2)
-
-    -- Ô nhập bên phải (nhỏ lại, rộng 200px)
+    -- Ô nhập nhỏ gọn (luôn cố định 150px)
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(0, 200, 1, 0) -- ❗ chỉ rộng 200px
+    box.Size = UDim2.new(0, 150, 1, 0)
     box.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     box.BackgroundTransparency = 0.6
     box.Text = tostring(defaultValue) or ""
@@ -525,7 +521,7 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     -- Hiệu ứng focus
     box.Focused:Connect(function()
         if box.Text == tostring(defaultValue) then
-            box.Text = "" 
+            box.Text = ""
         end
         box.BackgroundTransparency = 0.3
     end)
@@ -542,7 +538,7 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     return holder, box
 end
 
-createLabeledInput(localTabScroll, "Speed:", "3", 1, function(value)
+createLabeledInput(localTabScroll, "SPEED", "3", 1, function(value)
     local num = tonumber(value)
     if num then
         print("Speed mới:", num)
