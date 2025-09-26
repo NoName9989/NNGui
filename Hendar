@@ -757,9 +757,9 @@ end)
 
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
-
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 -- type = "single" or "multi"
 local function createDropdown(parent, labelText, items, order, type, defaultSelected, onSelect)
@@ -802,10 +802,10 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     button.MouseEnter:Connect(function() button.BackgroundColor3 = Color3.fromRGB(70,70,70) end)
     button.MouseLeave:Connect(function() button.BackgroundColor3 = Color3.fromRGB(50,50,50) end)
 
-    -- Dropdown frame
+    -- Dropdown frame (ban đầu size 0)
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = UDim2.new(0, button.AbsoluteSize.X, 0, 0)
-    dropdownFrame.Position = UDim2.new(0, button.AbsolutePosition.X, 0, button.AbsolutePosition.Y + button.AbsoluteSize.Y + 2)
+    dropdownFrame.Position = UDim2.new(0,0,0,0) -- tạm thời, sẽ cập nhật khi mở
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
     dropdownFrame.BackgroundTransparency = 0.6
     dropdownFrame.BorderSizePixel = 1
@@ -813,8 +813,7 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 50
     dropdownFrame.Parent = parent
-    local frameCorner = Instance.new("UICorner", dropdownFrame)
-    frameCorner.CornerRadius = UDim.new(0,6)
+    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,6)
 
     -- Blur effect
     local blur = Instance.new("UIBlurEffect")
@@ -919,6 +918,9 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     -- Toggle dropdown
     local function toggleDropdown()
         isOpen = not isOpen
+        -- Cập nhật vị trí frame từ button trước khi mở
+        RunService.RenderStepped:Wait()
+        dropdownFrame.Position = UDim2.new(0, button.AbsolutePosition.X, 0, button.AbsolutePosition.Y + button.AbsoluteSize.Y + 2)
         local targetHeight = isOpen and math.min(25+uiList.AbsoluteContentSize.Y,300) or 0
         TweenService:Create(dropdownFrame,TweenInfo.new(0.2),{Size=UDim2.new(dropdownFrame.Size.X.Scale,dropdownFrame.Size.X.Offset,0,targetHeight)}):Play()
     end
@@ -936,28 +938,19 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
                                 mousePos.Y >= framePos.Y and mousePos.Y <= framePos.Y+frameSize.Y
             if not insideButton and not insideFrame then
                 isOpen=false
-                TweenService:Create(dropdownFrame,TweenInfo.new(0.2),{Size=UDim2.new(dropdownFrame.Size.X.Scale,dropdownFrame.Size.X.Offset,0,0)}):Play()
-            end
-        end
-    end)
+                TweenService:Create(dropdownFrame,TweenInfo.new(0.2),{Size=UDim2.new(dropdownFrame.Size
 
-    return holder
-end
-
--- 🌟 Test
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
+-- Giả sử mainTabScroll là frame đã có sẵn trong GUI
 local fruits = {"Apple","Banana","Cherry","Dragonfruit","Elderberry","Fig","Grape"}
 
--- Single-select
-local dd1 = createDropdown(mainTabScroll,"Fruit (single):",fruits,1,"single",nil,function(sel)
-    print("Single selected:",sel)
+-- Single-select test
+local dd1 = createDropdown(mainTabScroll, "Fruit (single):", fruits, 1, "single", nil, function(sel)
+    print("Single selected:", sel)
 end)
-dd1.Position = UDim2.new(0,50,0,50)
+dd1.Position = UDim2.new(0, 10, 0, 10)  -- đặt vị trí trong mainTabScroll
 
--- Multi-select
-local dd2 = createDropdown(mainTabScroll,"Fruit (multi):",fruits,2,"multi",nil,function(sel)
-    print("Multi selected:",sel)
+-- Multi-select test
+local dd2 = createDropdown(mainTabScroll, "Fruit (multi):", fruits, 2, "multi", nil, function(sel)
+    print("Multi selected:", sel)
 end)
-dd2.Position = UDim2.new(0,50,0,120)
+dd2.Position = UDim2.new(0, 10, 0, 70)  -- đặt dưới dropdown đầu tiên
