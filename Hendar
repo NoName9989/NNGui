@@ -758,7 +758,7 @@ end)
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
-local function createDropdown(parent, labelText, options, defaultIndex, order, onSelect)
+local function createDropdownSearch(parent, labelText, options, order, onSelect)
     -- Holder
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
@@ -773,69 +773,112 @@ local function createDropdown(parent, labelText, options, defaultIndex, order, o
     layout.SortOrder = Enum.SortOrder.LayoutOrder
     layout.Padding = UDim.new(0, 8)
 
-    -- Label bên trái
+    -- Label
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 100, 1, 0)
+    label.Size = UDim2.new(0, 120, 1, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextColor3 = Color3.fromRGB(255,255,255)
     label.Font = Enum.Font.GothamSemibold
     label.TextSize = 14
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    -- Button hiển thị giá trị chọn
-    local dropdownBtn = Instance.new("TextButton")
-    dropdownBtn.Size = UDim2.new(1, -100, 1, 0)
-    dropdownBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    dropdownBtn.BackgroundTransparency = 0.6
-    dropdownBtn.Text = options[defaultIndex] or "Select..."
-    dropdownBtn.TextColor3 = Color3.fromRGB(230,230,230)
-    dropdownBtn.Font = Enum.Font.GothamSemibold
-    dropdownBtn.TextSize = 14
-    dropdownBtn.TextXAlignment = Enum.TextXAlignment.Left
-    dropdownBtn.Parent = holder
-    Instance.new("UICorner", dropdownBtn).CornerRadius = UDim.new(0,6)
+    -- Nút mở dropdown
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -120, 1, 0)
+    button.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    button.BackgroundTransparency = 0.6
+    button.Text = "Select..."
+    button.TextColor3 = Color3.fromRGB(230,230,230)
+    button.Font = Enum.Font.GothamSemibold
+    button.TextSize = 14
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Parent = holder
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0,6)
 
-    -- Container danh sách
-    local listFrame = Instance.new("Frame")
-    listFrame.Size = UDim2.new(1, -100, 0, #options * 30)
-    listFrame.Position = UDim2.new(0, 100, 0, 40)
-    listFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    listFrame.Visible = false
-    listFrame.ClipsDescendants = true
-    listFrame.Parent = holder
-    Instance.new("UICorner", listFrame).CornerRadius = UDim.new(0,6)
+    -- Menu dropdown
+    local menu = Instance.new("Frame")
+    menu.Size = UDim2.new(1, -20, 0, 150)
+    menu.Position = UDim2.new(0, 10, 0, 40)
+    menu.BackgroundColor3 = Color3.fromRGB(60,0,0)
+    menu.Visible = false
+    menu.ZIndex = 10
+    menu.Parent = parent
+    Instance.new("UICorner", menu).CornerRadius = UDim.new(0,6)
 
-    local listLayout = Instance.new("UIListLayout", listFrame)
+    -- Ô search
+    local searchBox = Instance.new("TextBox", menu)
+    searchBox.Size = UDim2.new(1, -20, 0, 30)
+    searchBox.Position = UDim2.new(0, 10, 0, 10)
+    searchBox.BackgroundColor3 = Color3.fromRGB(80,0,0)
+    searchBox.Text = "Search"
+    searchBox.TextColor3 = Color3.fromRGB(255,255,255)
+    searchBox.Font = Enum.Font.Gotham
+    searchBox.TextSize = 14
+    searchBox.ClearTextOnFocus = true
+    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0,6)
+
+    -- Scrolling list
+    local list = Instance.new("ScrollingFrame", menu)
+    list.Size = UDim2.new(1, -20, 1, -50)
+    list.Position = UDim2.new(0, 10, 0, 45)
+    list.BackgroundTransparency = 1
+    list.BorderSizePixel = 0
+    list.CanvasSize = UDim2.new(0,0,0,0)
+    list.ScrollBarThickness = 6
+
+    local listLayout = Instance.new("UIListLayout", list)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    listLayout.Padding = UDim.new(0,5)
 
-    -- Tạo item cho từng option
-    for i, opt in ipairs(options) do
+    -- Auto update canvas
+    listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        list.CanvasSize = UDim2.new(0,0,0,listLayout.AbsoluteContentSize.Y+10)
+    end)
+
+    -- Hàm tạo item
+    local function createItem(text)
         local item = Instance.new("TextButton")
         item.Size = UDim2.new(1, 0, 0, 30)
-        item.BackgroundTransparency = 1
-        item.Text = opt
-        item.TextColor3 = Color3.fromRGB(230,230,230)
+        item.BackgroundColor3 = Color3.fromRGB(100,0,0)
+        item.Text = text
+        item.TextColor3 = Color3.fromRGB(255,255,255)
         item.Font = Enum.Font.Gotham
         item.TextSize = 14
-        item.Parent = listFrame
+        item.Parent = list
+        Instance.new("UICorner", item).CornerRadius = UDim.new(0,6)
 
         item.MouseButton1Click:Connect(function()
-            dropdownBtn.Text = opt
-            listFrame.Visible = false
-            if onSelect then onSelect(opt, i) end
+            button.Text = text
+            menu.Visible = false
+            if onSelect then onSelect(text) end
         end)
     end
 
-    -- Toggle mở/đóng dropdown
-    dropdownBtn.MouseButton1Click:Connect(function()
-        listFrame.Visible = not listFrame.Visible
+    -- Load items
+    for _,opt in ipairs(options) do
+        createItem(opt)
+    end
+
+    -- Search filter
+    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        local query = string.lower(searchBox.Text)
+        for _,child in ipairs(list:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.Visible = query == "" or string.find(string.lower(child.Text), query)
+            end
+        end
     end)
 
-    return holder, dropdownBtn
+    -- Toggle mở
+    button.MouseButton1Click:Connect(function()
+        menu.Visible = not menu.Visible
+    end)
+
+    return holder
 end
 
-createDropdown(mainTabScroll, "Mode", {"Easy","Normal","Hard"}, 2, 1, function(choice, index)
-    print("Đã chọn:", choice, index)
+createDropdownSearch(mainTabScroll, "Select Position", {"Good Position","Random","Player Position"}, 1, function(choice)
+    print("Bạn chọn:", choice)
 end)
