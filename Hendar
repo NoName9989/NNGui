@@ -476,3 +476,68 @@ createButton(localTabScroll, "Copy Discord Link", 1, function()
         print("⚠️ setclipboard not supported")
     end
 end)
+
+local function createLabeledInput(parent, labelText, defaultValue, order, onEnter)
+    -- Frame chứa cả Label + Input
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(1, -20, 0, 40)
+    holder.Position = UDim2.new(0, 10, 0, 0)
+    holder.BackgroundTransparency = 1
+    holder.LayoutOrder = order
+    holder.Parent = parent
+
+    local layout = Instance.new("UIListLayout", holder)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 8)
+
+    -- Label bên trái
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 100, 1, 0) -- label rộng 100px
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = holder
+
+    -- Ô nhập bên phải
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(1, -100, 1, 0)
+    box.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    box.BackgroundTransparency = 0.6
+    box.Text = tostring(defaultValue) or ""
+    box.TextColor3 = Color3.fromRGB(230,230,230)
+    box.Font = Enum.Font.GothamSemibold
+    box.TextSize = 14
+    box.ClearTextOnFocus = false
+    box.Parent = holder
+
+    local corner = Instance.new("UICorner", box)
+    corner.CornerRadius = UDim.new(0,6)
+
+    -- Hiệu ứng focus
+    box.Focused:Connect(function()
+        if box.Text == tostring(defaultValue) then
+            box.Text = "" -- xoá text mặc định khi nhấn vào
+        end
+        box.BackgroundTransparency = 0.3
+    end)
+
+    box.FocusLost:Connect(function(enterPressed)
+        box.BackgroundTransparency = 0.6
+        if box.Text == "" then
+            box.Text = tostring(defaultValue) -- nếu để trống thì khôi phục mặc định
+        elseif enterPressed then
+            if onEnter then onEnter(box.Text) end
+        end
+    end)
+
+    return holder, box
+end
+
+createLabeledInput(scrollFrame, "Speed:", 3, 1, function(value)
+    print("Speed set to:", value)
+end)
