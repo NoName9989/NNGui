@@ -500,7 +500,7 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamBold
     label.TextSize = 16
-    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextXAlignment = Enum.TextXAlignment.Center
     label.Parent = holder
 
     -- Ô nhập nhỏ gọn (luôn cố định 150px)
