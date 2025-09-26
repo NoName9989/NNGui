@@ -540,9 +540,93 @@ end
 
 createLabeledInput(localTabScroll, "SPEED", "3", 1, function(value)
     local num = tonumber(value)
-    if num then
-        print("Speed mới:", num)
-    else
-        print("Không phải số hợp lệ!")
-    end
+    
+
+local TweenService = game:GetService("TweenService")
+
+local function createToggle(parent, labelText, default, order, onToggle)
+    -- Holder
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(1, -20, 0, 40)
+    holder.Position = UDim2.new(0, 10, 0, 0)
+    holder.BackgroundTransparency = 1
+    holder.LayoutOrder = order
+    holder.Parent = parent
+
+    local layout = Instance.new("UIListLayout", holder)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Label
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -60, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = holder
+
+    -- Switch nền
+    local switch = Instance.new("Frame")
+    switch.Size = UDim2.new(0, 50, 0, 22)
+    switch.BackgroundColor3 = default and Color3.fromRGB(70, 130, 180) or Color3.fromRGB(80, 80, 80)
+    switch.BorderSizePixel = 0
+    switch.Parent = holder
+    switch.Name = "Switch"
+    Instance.new("UICorner", switch).CornerRadius = UDim.new(1, 0)
+
+    -- Knob
+    local knob = Instance.new("Frame", switch)
+    knob.Size = UDim2.new(0, 18, 0, 18)
+    knob.Position = default and UDim2.new(1, -20, 0.5, -9) or UDim2.new(0, 2, 0.5, -9)
+    knob.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    knob.BorderSizePixel = 0
+    Instance.new("UICorner", knob).CornerRadius = UDim.new(1,0)
+
+    -- Button click
+    local button = Instance.new("TextButton", switch)
+    button.Size = UDim2.new(1,0,1,0)
+    button.BackgroundTransparency = 1
+    button.Text = ""
+
+    -- State
+    local state = default or false
+
+    -- Tween info
+    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+    -- Toggle logic
+    button.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            -- đổi màu nền
+            TweenService:Create(switch, tweenInfo, {BackgroundColor3 = Color3.fromRGB(70, 130, 180)}):Play()
+            -- trượt knob sang phải
+            TweenService:Create(knob, tweenInfo, {Position = UDim2.new(1, -20, 0.5, -9)}):Play()
+        else
+            TweenService:Create(switch, tweenInfo, {BackgroundColor3 = Color3.fromRGB(80,80,80)}):Play()
+            TweenService:Create(knob, tweenInfo, {Position = UDim2.new(0, 2, 0.5, -9)}):Play()
+        end
+        if onToggle then onToggle(state) end
+    end)
+
+    return holder
+end
+
+createToggle(localTabScroll, "Infinite Jump", false, 1, function(state)
+    print("Infinite Jump:", state)
+end)
+
+createToggle(localTabScroll, "Speed Hack", true, 2, function(state)
+    print("Speed Hack:", state)
+end)
+createToggle(localTabScroll, "Infinite", false, 3, function(state)
+    print("Infinite Jump:", state)
+end)
+
+createToggle(localTabScroll, "Speed", true, 4, function(state)
+    print("Speed Hack:", state)
 end)
