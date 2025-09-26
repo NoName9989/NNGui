@@ -116,7 +116,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
 
 -- Tên Hub
 local title = Instance.new("TextLabel", header)
-title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.9.2✨"
+title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.9.3 ✨"
 title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 12, 0, 0)
 title.BackgroundTransparency = 1
@@ -538,6 +538,11 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     return holder, box
 end
 
-createLabeledInput(scrollFrame, "Speed:", 3, 1, function(value)
-    print("Speed set to:", value)
+createLabeledInput(localTabScroll, "Speed:", "3", 1, function(value)
+    local num = tonumber(value)
+    if num then
+        print("Speed mới:", num)
+    else
+        print("Không phải số hợp lệ!")
+    end
 end)
