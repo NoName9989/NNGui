@@ -758,7 +758,9 @@ end)
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
-local function createDropdownSearch(parent, labelText, options, order, onSelect)
+local UserInputService = game:GetService("UserInputService")
+
+local function createDropdown(parent, labelText, items, order, onSelect)
     -- Holder
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
@@ -771,114 +773,111 @@ local function createDropdownSearch(parent, labelText, options, order, onSelect)
     layout.FillDirection = Enum.FillDirection.Horizontal
     layout.VerticalAlignment = Enum.VerticalAlignment.Center
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 8)
 
     -- Label
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(0, 120, 1, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
-    label.TextColor3 = Color3.fromRGB(255,255,255)
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamSemibold
     label.TextSize = 14
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    -- Nút mở dropdown
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, -120, 1, 0)
-    button.BackgroundColor3 = Color3.fromRGB(0,0,0)
-    button.BackgroundTransparency = 0.6
-    button.Text = "Select..."
-    button.TextColor3 = Color3.fromRGB(230,230,230)
-    button.Font = Enum.Font.GothamSemibold
-    button.TextSize = 14
-    button.TextXAlignment = Enum.TextXAlignment.Left
-    button.Parent = holder
-    Instance.new("UICorner", button).CornerRadius = UDim.new(0,6)
+    -- Dropdown frame
+    local dropdown = Instance.new("Frame")
+    dropdown.Size = UDim2.new(1, -130, 0, 25) -- mặc định chỉ cao bằng search box
+    dropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    dropdown.BorderSizePixel = 0
+    dropdown.ClipsDescendants = true
+    dropdown.Parent = holder
+    Instance.new("UICorner", dropdown).CornerRadius = UDim.new(0, 4)
 
-    -- Menu dropdown
-    local menu = Instance.new("Frame")
-    menu.Size = UDim2.new(1, -20, 0, 150)
-    menu.Position = UDim2.new(0, 10, 0, 40)
-    menu.BackgroundColor3 = Color3.fromRGB(60,0,0)
-    menu.Visible = false
-    menu.ZIndex = 10
-    menu.Parent = parent
-    Instance.new("UICorner", menu).CornerRadius = UDim.new(0,6)
-
-    -- Ô search
-    local searchBox = Instance.new("TextBox", menu)
-    searchBox.Size = UDim2.new(1, -20, 0, 30)
-    searchBox.Position = UDim2.new(0, 10, 0, 10)
-    searchBox.BackgroundColor3 = Color3.fromRGB(80,0,0)
-    searchBox.Text = "Search"
-    searchBox.TextColor3 = Color3.fromRGB(255,255,255)
+    -- Search box
+    local searchBox = Instance.new("TextBox")
+    searchBox.Size = UDim2.new(1, 0, 0, 25)
+    searchBox.Position = UDim2.new(0, 0, 0, 0)
+    searchBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    searchBox.BorderSizePixel = 0
+    searchBox.PlaceholderText = "Search"
+    searchBox.Text = ""
+    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     searchBox.Font = Enum.Font.Gotham
     searchBox.TextSize = 14
-    searchBox.ClearTextOnFocus = true
-    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0,6)
+    searchBox.Parent = dropdown
+    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 4)
 
     -- Scrolling list
-    local list = Instance.new("ScrollingFrame", menu)
-    list.Size = UDim2.new(1, -20, 1, -50)
-    list.Position = UDim2.new(0, 10, 0, 45)
-    list.BackgroundTransparency = 1
-    list.BorderSizePixel = 0
-    list.CanvasSize = UDim2.new(0,0,0,0)
-    list.ScrollBarThickness = 6
+    local listFrame = Instance.new("ScrollingFrame")
+    listFrame.Size = UDim2.new(1, 0, 1, -25)
+    listFrame.Position = UDim2.new(0, 0, 0, 25)
+    listFrame.BackgroundTransparency = 1
+    listFrame.BorderSizePixel = 0
+    listFrame.CanvasSize = UDim2.new(0,0,0,0)
+    listFrame.ScrollBarThickness = 4
+    listFrame.Parent = dropdown
 
-    local listLayout = Instance.new("UIListLayout", list)
-    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    listLayout.Padding = UDim.new(0,5)
+    local uiList = Instance.new("UIListLayout", listFrame)
+    uiList.SortOrder = Enum.SortOrder.LayoutOrder
 
-    -- Auto update canvas
-    listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        list.CanvasSize = UDim2.new(0,0,0,listLayout.AbsoluteContentSize.Y+10)
-    end)
+    local isOpen = false
 
-    -- Hàm tạo item
-    local function createItem(text)
-        local item = Instance.new("TextButton")
-        item.Size = UDim2.new(1, 0, 0, 30)
-        item.BackgroundColor3 = Color3.fromRGB(100,0,0)
-        item.Text = text
-        item.TextColor3 = Color3.fromRGB(255,255,255)
-        item.Font = Enum.Font.Gotham
-        item.TextSize = 14
-        item.Parent = list
-        Instance.new("UICorner", item).CornerRadius = UDim.new(0,6)
+    -- Function add items
+    local function addItems(filter)
+        listFrame:ClearAllChildren()
+        uiList.Parent = listFrame
+        for _,item in ipairs(items) do
+            if filter == "" or string.find(string.lower(item), string.lower(filter)) then
+                local button = Instance.new("TextButton")
+                button.Size = UDim2.new(1, -4, 0, 25)
+                button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+                button.BorderSizePixel = 0
+                button.Text = item
+                button.TextColor3 = Color3.fromRGB(255,255,255)
+                button.Font = Enum.Font.Gotham
+                button.TextSize = 14
+                button.Parent = listFrame
+                Instance.new("UICorner", button).CornerRadius = UDim.new(0, 4)
 
-        item.MouseButton1Click:Connect(function()
-            button.Text = text
-            menu.Visible = false
-            if onSelect then onSelect(text) end
-        end)
-    end
-
-    -- Load items
-    for _,opt in ipairs(options) do
-        createItem(opt)
-    end
-
-    -- Search filter
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-        local query = string.lower(searchBox.Text)
-        for _,child in ipairs(list:GetChildren()) do
-            if child:IsA("TextButton") then
-                child.Visible = query == "" or string.find(string.lower(child.Text), query)
+                button.MouseButton1Click:Connect(function()
+                    searchBox.Text = item
+                    isOpen = false
+                    dropdown.Size = UDim2.new(1, -130, 0, 25)
+                    if onSelect then onSelect(item) end
+                end)
             end
         end
+        listFrame.CanvasSize = UDim2.new(0,0,0,uiList.AbsoluteContentSize.Y)
+    end
+
+    -- Initial items
+    addItems("")
+
+    -- Filter logic
+    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        addItems(searchBox.Text)
     end)
 
-    -- Toggle mở
-    button.MouseButton1Click:Connect(function()
-        menu.Visible = not menu.Visible
+    -- Toggle dropdown khi click vào ô search
+    searchBox.Focused:Connect(function()
+        isOpen = true
+        dropdown.Size = UDim2.new(1, -130, 0, 150) -- mở ra
+    end)
+
+    -- Click ngoài thì đóng lại
+    UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if not searchBox:IsFocused() and isOpen then
+                isOpen = false
+                dropdown.Size = UDim2.new(1, -130, 0, 25)
+            end
+        end
     end)
 
     return holder
 end
 
-createDropdownSearch(mainTabScroll, "Select Position", {"Good Position","Random","Player Position"}, 1, function(choice)
+createDropdown(localTabScroll, "Select Position", {"Good Position", "Random", "Player Position"}, 1, function(choice)
     print("Bạn chọn:", choice)
 end)
