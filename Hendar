@@ -626,7 +626,7 @@ local currentSpeed = defaultWalkSpeed
 local speedEnabled = false
 
 -- Input Speed (mặc định bằng WalkSpeed hiện tại)
-local _, speedBox = createLabeledInput(localTabScroll, "Speed Value", defaultWalkSpeed, 1, function(text)
+local _, speedBox = createLabeledInput(localTabScroll, "WalkSpeed", defaultWalkSpeed, 1, function(text)
     local val = tonumber(text)
     if val then
         currentSpeed = val
@@ -665,5 +665,96 @@ end)
 game:GetService("RunService").Heartbeat:Connect(function()
     if speedEnabled and humanoid and humanoid.WalkSpeed ~= currentSpeed then
         humanoid.WalkSpeed = currentSpeed
+    end
+end)
+
+-- Infinite Jump Toggle
+local userInputService = game:GetService("UserInputService")
+local infiniteJumpEnabled = false
+
+-- Toggle Infinite Jump
+createToggle(localTabScroll, "Infinite Jump", false, 2, function(state)
+    infiniteJumpEnabled = state
+end)
+
+-- Kích hoạt nhảy vô hạn
+userInputService.JumpRequest:Connect(function()
+    if infiniteJumpEnabled then
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+local player = game.Players.LocalPlayer
+local runService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local mouse = player:GetMouse()
+
+----------------------------------------------------
+-- NOCLIP
+local noclipEnabled = false
+local noclipConnection
+
+createToggle(localTabScroll, "No Clip", false, 1, function(state)
+    noclipEnabled = state
+    if state then
+        noclipConnection = runService.Stepped:Connect(function()
+            if player.Character then
+                for _, part in ipairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.CanCollide then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end)
+
+----------------------------------------------------
+-- CLICK TP (PC + MOBILE)
+local clickTPEnabled = false
+local clickTPConnection
+local touchTPConnection
+
+createToggle(localTabScroll, "Click Teleport", false, 2, function(state)
+    clickTPEnabled = state
+    if state then
+        -- PC
+        clickTPConnection = mouse.Button1Down:Connect(function()
+            if mouse.Target then
+                local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    root.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
+                end
+            end
+        end)
+        -- MOBILE
+        touchTPConnection = UserInputService.TouchTap:Connect(function(touchPositions, processed)
+            if not processed then
+                local pos = touchPositions[1]
+                local unitRay = workspace.CurrentCamera:ScreenPointToRay(pos.X, pos.Y)
+                local ray = Ray.new(unitRay.Origin, unitRay.Direction * 1000)
+                local part, hitPos = workspace:FindPartOnRay(ray, player.Character, false, true)
+                if hitPos then
+                    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        root.CFrame = CFrame.new(hitPos + Vector3.new(0, 3, 0))
+                    end
+                end
+            end
+        end)
+    else
+        if clickTPConnection then clickTPConnection:Disconnect() end
+        if touchTPConnection then touchTPConnection:Disconnect() end
+        clickTPConnection, touchTPConnection = nil, nil
     end
 end)
