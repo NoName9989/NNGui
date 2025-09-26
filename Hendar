@@ -538,12 +538,9 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     return holder, box
 end
   
-
 local TweenService = game:GetService("TweenService")
 
 local function createToggle(parent, labelText, default, order, onToggle)
-    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
     -- Holder
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
@@ -552,6 +549,7 @@ local function createToggle(parent, labelText, default, order, onToggle)
     holder.BackgroundTransparency = 0.6
     holder.LayoutOrder = order
     holder.Parent = parent
+
     Instance.new("UICorner", holder).CornerRadius = UDim.new(0,6)
 
     local layout = Instance.new("UIListLayout", holder)
@@ -562,21 +560,23 @@ local function createToggle(parent, labelText, default, order, onToggle)
 
     -- Label
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -60, 1, 0)
+    label.Size = UDim2.new(1, -80, 1, 0) -- chừa nhiều chỗ hơn cho toggle
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.Font = Enum.Font.GothamSemibold
-    label.TextSize = 14
-    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextSize = 18
+    label.TextXAlignment = Enum.TextXAlignment.Center -- 🔥 canh giữa
     label.Parent = holder
 
-    -- Switch nền
+    -- Switch nền (cho lui vô trong xíu)
     local switch = Instance.new("Frame")
     switch.Size = UDim2.new(0, 50, 0, 22)
+    switch.Position = UDim2.new(0, 0, 0, 0)
     switch.BackgroundColor3 = default and Color3.fromRGB(70, 130, 180) or Color3.fromRGB(80, 80, 80)
     switch.BorderSizePixel = 0
     switch.Parent = holder
+    switch.Name = "Switch"
     Instance.new("UICorner", switch).CornerRadius = UDim.new(1, 0)
 
     -- Knob
@@ -596,6 +596,9 @@ local function createToggle(parent, labelText, default, order, onToggle)
     -- State
     local state = default or false
 
+    -- Tween info
+    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
     -- Toggle logic
     button.MouseButton1Click:Connect(function()
         state = not state
@@ -609,16 +612,9 @@ local function createToggle(parent, labelText, default, order, onToggle)
         if onToggle then onToggle(state) end
     end)
 
-    -- Hover effect cho holder
-    holder.MouseEnter:Connect(function()
-        TweenService:Create(holder, tweenInfo, {BackgroundTransparency = 0.3}):Play()
-    end)
-    holder.MouseLeave:Connect(function()
-        TweenService:Create(holder, tweenInfo, {BackgroundTransparency = 0.6}):Play()
-    end)
-
     return holder
 end
+
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
