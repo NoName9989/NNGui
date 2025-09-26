@@ -313,10 +313,9 @@ end
 -- Tạo tab Local đầu tiên
 createTab("Local",1)
 
--- Chọn tab Local mặc định khi GUI load
 local localTab = sidebar:FindFirstChild("Local")
 if localTab then
-    localTab:MouseButton1Click():Connect()
+    localTab.MouseButton1Click:Fire() -- 🔥 bắn sự kiện click
 end
 -- Nút Close & Minimize
 -- Popup confirm
