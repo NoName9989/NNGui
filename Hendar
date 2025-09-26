@@ -343,7 +343,7 @@ local function createTab(name, order)
 end
 
 -- Ví dụ tạo tab
-local localTabBtn, localTabScroll = createTab("Local",1)
+local localTabBtn, localTabScroll = createTab("Locals",1)
 local exploitTabBtn, exploitTabScroll = createTab("Exploit",2)
 
 -- Chọn tab mặc định
@@ -426,50 +426,3 @@ miniSquare.MouseButton1Click:Connect(function()
     miniSquare.Visible = false
 end)
 
--- Tạo tab Local (trả về nút + content scrolling)
-local localTab, localTabContent = createTab("Local", 1)
--- Hàm tạo nút chuẩn
-local function createButton(parent, text, onClick)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, -20, 0, 40) -- full ngang, trừ margin
-    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    button.BackgroundTransparency = 0.6
-    button.Text = "    " .. string.upper(text) -- lùi chữ vào
-    button.TextColor3 = Color3.fromRGB(230, 230, 230)
-    button.Font = Enum.Font.GothamSemibold
-    button.TextSize = 14
-    button.TextXAlignment = Enum.TextXAlignment.Left
-    button.Parent = parent
-
-    -- Bo góc
-    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 6)
-
-    -- Hover sáng nhẹ
-    button.MouseEnter:Connect(function()
-        button.BackgroundTransparency = 0.3
-    end)
-    button.MouseLeave:Connect(function()
-        button.BackgroundTransparency = 0.6
-    end)
-
-    -- Mũi tên > cuối nút
-    local arrow = Instance.new("TextLabel")
-    arrow.Size = UDim2.new(0, 20, 1, 0)
-    arrow.Position = UDim2.new(1, -22, 0, 0)
-    arrow.BackgroundTransparency = 1
-    arrow.Text = ">"
-    arrow.TextColor3 = Color3.fromRGB(255, 255, 255)
-    arrow.Font = Enum.Font.GothamBold
-    arrow.TextSize = 18
-    arrow.Parent = button
-
-    button.MouseButton1Click:Connect(onClick)
-
-    return button
-end
-
--- Nút Copy Discord Link trong tab Local
-createButton(localTabContent, "Copy Discord Link", function()
-    setclipboard("https://discord.gg/abcdef")
-    print("DISCORD LINK COPIED!")
-end)
