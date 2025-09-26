@@ -538,8 +538,14 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
     return holder, box
 end
 
-createLabeledInput(localTabScroll, "SPEED", "3", 1, function(value)
+createLabeledInput(localTabScroll, "Speed:", "3", 1, function(value)
     local num = tonumber(value)
+    if num then
+        print("Speed mới:", num)
+    else
+        print("Không phải số hợp lệ!")
+    end
+end)
     
 
 local TweenService = game:GetService("TweenService")
@@ -621,12 +627,5 @@ createToggle(localTabScroll, "Infinite Jump", false, 1, function(state)
 end)
 
 createToggle(localTabScroll, "Speed Hack", true, 2, function(state)
-    print("Speed Hack:", state)
-end)
-createToggle(localTabScroll, "Infinite", false, 3, function(state)
-    print("Infinite Jump:", state)
-end)
-
-createToggle(localTabScroll, "Speed", true, 4, function(state)
     print("Speed Hack:", state)
 end)
