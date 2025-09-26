@@ -342,10 +342,6 @@ local function createTab(name, order)
     return tabBtn, scrolling
 end
 
--- Ví dụ tạo tab
-
-local exploitTabBtn, exploitTabScroll = createTab("Exploit",2)
-
 -- Nút Close & Minimize
 -- Popup confirm
 local confirmFrame = Instance.new("Frame")
@@ -637,7 +633,7 @@ local _, speedBox = createLabeledInput(localTabScroll, "WalkSpeed", defaultWalkS
 end)
 
 -- Toggle Speed
-createToggle(localTabScroll, "Enable Speed", false, 2, function(state)
+createToggle(localTabScroll, "Enable Speed", false, 1, function(state)
     humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if not humanoid then return end
 
@@ -699,7 +695,7 @@ local mouse = player:GetMouse()
 local noclipEnabled = false
 local noclipConnection
 
-createToggle(localTabScroll, "No Clip", false, 1, function(state)
+createToggle(localTabScroll, "No Clip", false, 3, function(state)
     noclipEnabled = state
     if state then
         noclipConnection = runService.Stepped:Connect(function()
@@ -725,7 +721,7 @@ local clickTPEnabled = false
 local clickTPConnection
 local touchTPConnection
 
-createToggle(localTabScroll, "Click Teleport", false, 2, function(state)
+createToggle(localTabScroll, "Click Teleport", false, 4, function(state)
     clickTPEnabled = state
     if state then
         -- PC
