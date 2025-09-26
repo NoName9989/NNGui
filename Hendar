@@ -537,16 +537,7 @@ local function createLabeledInput(parent, labelText, defaultValue, order, onEnte
 
     return holder, box
 end
-
-createLabeledInput(localTabScroll, "Speed:", "3", 1, function(value)
-    local num = tonumber(value)
-    if num then
-        print("Speed mới:", num)
-    else
-        print("Không phải số hợp lệ!")
-    end
-end)
-    
+  
 
 local TweenService = game:GetService("TweenService")
 
@@ -622,10 +613,54 @@ local function createToggle(parent, labelText, default, order, onToggle)
     return holder
 end
 
-createToggle(localTabScroll, "Infinite Jump", false, 1, function(state)
-    print("Infinite Jump:", state)
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+
+-- Lấy WalkSpeed mặc định
+local defaultWalkSpeed = humanoid and humanoid.WalkSpeed or 16
+local currentSpeed = defaultWalkSpeed
+local speedEnabled = false
+
+-- Input Speed (mặc định bằng WalkSpeed hiện tại)
+local _, speedBox = createLabeledInput(localTabScroll, "Speed Value", defaultWalkSpeed, 1, function(text)
+    local val = tonumber(text)
+    if val then
+        currentSpeed = val
+        if speedEnabled and humanoid then
+            humanoid.WalkSpeed = currentSpeed
+        end
+    end
 end)
 
-createToggle(localTabScroll, "Speed Hack", true, 2, function(state)
-    print("Speed Hack:", state)
+-- Toggle Speed
+createToggle(localTabScroll, "Enable Speed", false, 2, function(state)
+    humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    speedEnabled = state
+    if state then
+        humanoid.WalkSpeed = currentSpeed
+    else
+        humanoid.WalkSpeed = defaultWalkSpeed
+    end
+end)
+
+-- Reset lại khi respawn
+player.CharacterAdded:Connect(function(char)
+    humanoid = char:WaitForChild("Humanoid")
+    defaultWalkSpeed = humanoid.WalkSpeed
+    currentSpeed = defaultWalkSpeed
+    speedBox.Text = tostring(defaultWalkSpeed)
+
+    if speedEnabled then
+        humanoid.WalkSpeed = currentSpeed
+    end
+end)
+
+-- Giữ speed đã cài nếu game tự đổi (chỉ khi toggle bật)
+game:GetService("RunService").Heartbeat:Connect(function()
+    if speedEnabled and humanoid and humanoid.WalkSpeed ~= currentSpeed then
+        humanoid.WalkSpeed = currentSpeed
+    end
 end)
