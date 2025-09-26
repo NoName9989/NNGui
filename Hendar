@@ -758,10 +758,10 @@ end)
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
-local UserInputService = game:GetService("UserInputService"
+local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
-local function createDropdown(parent, labelText, items, order, onSelect)
+local function createDropdown(parent, labelText, items, order, defaultSelected, onSelect)
     -- Holder
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
@@ -795,9 +795,9 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     dropdown.Parent = holder
     Instance.new("UICorner", dropdown).CornerRadius = UDim.new(0, 4)
 
-    -- Search box (luôn ở đầu dropdown)
+    -- Search box
     local searchBox = Instance.new("TextBox")
-    searchBox.Size = UDim2.new(1, -25, 0, 25) -- trừ space cho nút
+    searchBox.Size = UDim2.new(1, -25, 0, 25)
     searchBox.Position = UDim2.new(0, 0, 0, 0)
     searchBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     searchBox.BorderSizePixel = 0
@@ -821,6 +821,14 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     toggleButton.Parent = dropdown
     Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 4)
 
+    -- Hover cho toggleButton
+toggleButton.MouseEnter:Connect(function()
+    toggleButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+end)
+toggleButton.MouseLeave:Connect(function()
+    toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+end)
+
     -- Scrolling list
     local listFrame = Instance.new("ScrollingFrame")
     listFrame.Size = UDim2.new(1, 0, 1, -25)
@@ -838,7 +846,7 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     local isOpen = false
     local buttons = {}
 
-    -- Tạo buttons lần đầu
+    -- Tạo buttons
     for _,item in ipairs(items) do
         local button = Instance.new("TextButton")
         button.Size = UDim2.new(1, -4, 0, 25)
@@ -862,13 +870,19 @@ local function createDropdown(parent, labelText, items, order, onSelect)
             searchBox.Text = button.Text
             isOpen = false
             TweenService:Create(dropdown, TweenInfo.new(0.2), {Size = UDim2.new(1, -130, 0, 25)}):Play()
+            toggleButton.Text = "▼"
             if onSelect then onSelect(button.Text) end
         end)
 
         table.insert(buttons, button)
     end
 
-    -- Filter logic
+    -- Set selected mặc định
+    if defaultSelected and table.find(items, defaultSelected) then
+        searchBox.Text = defaultSelected
+    end
+
+    -- Filter
     searchBox:GetPropertyChangedSignal("Text"):Connect(function()
         for _,button in ipairs(buttons) do
             button.Visible = (searchBox.Text == "" or string.find(string.lower(button.Text), string.lower(searchBox.Text)))
@@ -880,15 +894,16 @@ local function createDropdown(parent, labelText, items, order, onSelect)
         end
     end)
 
-    -- Toggle button mở/đóng
+    -- Toggle button mở/đóng + đổi icon
     toggleButton.MouseButton1Click:Connect(function()
         isOpen = not isOpen
         local contentHeight = uiList.AbsoluteContentSize.Y
         local targetHeight = math.min(contentHeight + 25, 150)
         TweenService:Create(dropdown, TweenInfo.new(0.2), {Size = UDim2.new(1, -130, 0, isOpen and targetHeight or 25)}):Play()
+        toggleButton.Text = isOpen and "▲" or "▼"
     end)
 
-    -- Click ngoài dropdown thì đóng
+    -- Click ngoài đóng dropdown
     UserInputService.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 and isOpen then
             local mousePos = UserInputService:GetMouseLocation()
@@ -898,9 +913,31 @@ local function createDropdown(parent, labelText, items, order, onSelect)
                 or mousePos.Y < absPos.Y or mousePos.Y > absPos.Y + absSize.Y then
                 isOpen = false
                 TweenService:Create(dropdown, TweenInfo.new(0.2), {Size = UDim2.new(1, -130, 0, 25)}):Play()
+                toggleButton.Text = "▼"
             end
         end
     end)
 
     return holder
 end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Danh sách test
+local items = {"Apple", "Banana", "Cherry", "Dragonfruit", "Elderberry", "Fig", "Grape"}
+
+-- Gọi dropdown
+local dropdown = createDropdown(
+    ScreenGui,
+    "Fruit:",        -- label
+    items,           -- items list
+    1,               -- order
+    "Cherry",        -- default selected
+    function(selected)
+        print("Bạn chọn: "..selected)
+    end
+)
+
+-- Đặt vị trí dropdown
+dropdown.Position = UDim2.new(0, 50, 0, 50)
