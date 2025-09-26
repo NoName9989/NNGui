@@ -878,6 +878,6 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     return holder
 end
 
-createDropdown(localTabScroll, "Select Position", {"Good Position", "Random", "Player Position"}, 1, function(choice)
+createDropdown(mainTabScroll, "Select Position", {"Good Position", "Random", "Player Position"}, 1, function(choice)
     print("Bạn chọn:", choice)
 end)
