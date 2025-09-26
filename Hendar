@@ -470,7 +470,7 @@ createButton(localTabScroll, "Copy Discord Link", 1, function()
     end
 end)
 -- 🟦 Tạo 6 tab và 6 nút test mỗi tab
-local tabNames = {"Local", "Player", "World", "Combat", "Misc", "Settings"}
+local tabNames = {"Locals", "Player", "World", "Combat", "Misc", "Settings"}
 
 for i, name in ipairs(tabNames) do
     local tabBtn, scrollFrame = createTab(name, i)
