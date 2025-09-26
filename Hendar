@@ -469,3 +469,15 @@ createButton(localTabScroll, "Copy Discord Link", 1, function()
         print("⚠️ setclipboard not supported")
     end
 end)
+-- 🟦 Tạo 6 tab và 6 nút test mỗi tab
+local tabNames = {"Local", "Player", "World", "Combat", "Misc", "Settings"}
+
+for i, name in ipairs(tabNames) do
+    local tabBtn, scrollFrame = createTab(name, i)
+
+    for j = 1, 6 do
+        createButton(scrollFrame, name .. " Button " .. j, j, function()
+            print(name .. " Button " .. j .. " clicked!")
+        end)
+    end
+end
