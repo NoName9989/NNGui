@@ -422,26 +422,57 @@ miniSquare.MouseButton1Click:Connect(function()
     main.Visible = true
     miniSquare.Visible = false
 end)
--- Giả sử bạn đã có tab Local
+-- Hàm tạo button đẹp
+local function createButton(parent, text, order, onClick)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,-20,0,40)
+    btn.Position = UDim2.new(0,10,0,0)
+    btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    btn.BackgroundTransparency = 0.6
+    btn.Text = "    " .. string.upper(text)
+    btn.TextColor3 = Color3.fromRGB(230,230,230)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 14
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.LayoutOrder = order
+    btn.Parent = parent
+
+    -- góc bo tròn
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+
+    -- mũi tên bên phải
+    local arrow = Instance.new("TextLabel")
+    arrow.Size = UDim2.new(0,20,1,0)
+    arrow.Position = UDim2.new(1,-22,0,0)
+    arrow.BackgroundTransparency = 1
+    arrow.Text = ">"
+    arrow.TextColor3 = Color3.fromRGB(255,255,255)
+    arrow.Font = Enum.Font.GothamBold
+    arrow.TextSize = 18
+    arrow.Parent = btn
+
+    -- hover hiệu ứng
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundTransparency = 0.3
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundTransparency = 0.6
+    end)
+
+    -- click
+    btn.MouseButton1Click:Connect(onClick)
+
+    return btn
+end
+
+-- 🔥 Ví dụ: nút copy discord trong tab Local
 local localTabBtn, localTabScroll = createTab("Local",1)
 
--- Tạo nút copy link Discord
-local copyBtn = Instance.new("TextButton")
-copyBtn.Size = UDim2.new(1, -20, 0, 40)
-copyBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-copyBtn.Text = "Copy Discord Link"
-copyBtn.Font = Enum.Font.Gotham
-copyBtn.TextSize = 14
-copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", copyBtn).CornerRadius = UDim.new(0, 6)
-copyBtn.Parent = localTabScroll
-
--- Sự kiện click
-copyBtn.MouseButton1Click:Connect(function()
+createButton(localTabScroll, "Copy Discord Link", 1, function()
     if setclipboard then
-        setclipboard("https://discord.gg/your-link-here")
-        print("✅ Copied Discord link to clipboard!")
+        setclipboard("https://discord.gg/abcdef")
+        print("✅ DISCORD LINK COPIED!")
     else
-        print("⚠️ setclipboard not supported in this executor.")
+        print("⚠️ setclipboard not supported")
     end
 end)
