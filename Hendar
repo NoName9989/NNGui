@@ -343,7 +343,7 @@ local function createTab(name, order)
 end
 
 -- Ví dụ tạo tab
-local localTabBtn, localTabScroll = createTab("Locals",1)
+
 local exploitTabBtn, exploitTabScroll = createTab("Exploit",2)
 
 -- Chọn tab mặc định
@@ -425,4 +425,26 @@ miniSquare.MouseButton1Click:Connect(function()
     main.Visible = true
     miniSquare.Visible = false
 end)
+-- Giả sử bạn đã có tab Local
+local localTabBtn, localTabScroll = createTab("Local",1)
 
+-- Tạo nút copy link Discord
+local copyBtn = Instance.new("TextButton")
+copyBtn.Size = UDim2.new(1, -20, 0, 40)
+copyBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+copyBtn.Text = "Copy Discord Link"
+copyBtn.Font = Enum.Font.Gotham
+copyBtn.TextSize = 14
+copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", copyBtn).CornerRadius = UDim.new(0, 6)
+copyBtn.Parent = localTabScroll
+
+-- Sự kiện click
+copyBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard("https://discord.gg/your-link-here")
+        print("✅ Copied Discord link to clipboard!")
+    else
+        print("⚠️ setclipboard not supported in this executor.")
+    end
+end)
