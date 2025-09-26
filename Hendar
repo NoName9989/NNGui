@@ -542,18 +542,23 @@ end
 local TweenService = game:GetService("TweenService")
 
 local function createToggle(parent, labelText, default, order, onToggle)
+    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
     -- Holder
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
     holder.Position = UDim2.new(0, 10, 0, 0)
-    holder.BackgroundTransparency = 1
+    holder.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    holder.BackgroundTransparency = 0.6
     holder.LayoutOrder = order
     holder.Parent = parent
+    Instance.new("UICorner", holder).CornerRadius = UDim.new(0,6)
 
     local layout = Instance.new("UIListLayout", holder)
     layout.FillDirection = Enum.FillDirection.Horizontal
     layout.VerticalAlignment = Enum.VerticalAlignment.Center
     layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 8)
 
     -- Label
     local label = Instance.new("TextLabel")
@@ -572,7 +577,6 @@ local function createToggle(parent, labelText, default, order, onToggle)
     switch.BackgroundColor3 = default and Color3.fromRGB(70, 130, 180) or Color3.fromRGB(80, 80, 80)
     switch.BorderSizePixel = 0
     switch.Parent = holder
-    switch.Name = "Switch"
     Instance.new("UICorner", switch).CornerRadius = UDim.new(1, 0)
 
     -- Knob
@@ -592,22 +596,25 @@ local function createToggle(parent, labelText, default, order, onToggle)
     -- State
     local state = default or false
 
-    -- Tween info
-    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
     -- Toggle logic
     button.MouseButton1Click:Connect(function()
         state = not state
         if state then
-            -- đổi màu nền
             TweenService:Create(switch, tweenInfo, {BackgroundColor3 = Color3.fromRGB(70, 130, 180)}):Play()
-            -- trượt knob sang phải
             TweenService:Create(knob, tweenInfo, {Position = UDim2.new(1, -20, 0.5, -9)}):Play()
         else
             TweenService:Create(switch, tweenInfo, {BackgroundColor3 = Color3.fromRGB(80,80,80)}):Play()
             TweenService:Create(knob, tweenInfo, {Position = UDim2.new(0, 2, 0.5, -9)}):Play()
         end
         if onToggle then onToggle(state) end
+    end)
+
+    -- Hover effect cho holder
+    holder.MouseEnter:Connect(function()
+        TweenService:Create(holder, tweenInfo, {BackgroundTransparency = 0.3}):Play()
+    end)
+    holder.MouseLeave:Connect(function()
+        TweenService:Create(holder, tweenInfo, {BackgroundTransparency = 0.6}):Play()
     end)
 
     return holder
