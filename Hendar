@@ -951,13 +951,13 @@ ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local fruits = {"Apple","Banana","Cherry","Dragonfruit","Elderberry","Fig","Grape"}
 
 -- Single-select
-local dd1 = createDropdown(ScreenGui,"Fruit (single):",fruits,1,"single",nil,function(sel)
+local dd1 = createDropdown(mainTabScroll,"Fruit (single):",fruits,1,"single",nil,function(sel)
     print("Single selected:",sel)
 end)
 dd1.Position = UDim2.new(0,50,0,50)
 
 -- Multi-select
-local dd2 = createDropdown(ScreenGui,"Fruit (multi):",fruits,2,"multi",nil,function(sel)
+local dd2 = createDropdown(mainTabScroll,"Fruit (multi):",fruits,2,"multi",nil,function(sel)
     print("Multi selected:",sel)
 end)
 dd2.Position = UDim2.new(0,50,0,120)
