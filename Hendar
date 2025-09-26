@@ -346,9 +346,6 @@ end
 
 local exploitTabBtn, exploitTabScroll = createTab("Exploit",2)
 
--- Chọn tab mặc định
-localTabBtn:MouseButton1Click()
-
 -- Nút Close & Minimize
 -- Popup confirm
 local confirmFrame = Instance.new("Frame")
