@@ -759,7 +759,6 @@ end)
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
 
 local function createDropdown(parent, labelText, items, order, onSelect)
     local holder = Instance.new("Frame")
@@ -795,17 +794,17 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     selected.Parent = holder
     Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 6)
 
-    -- Dropdown frame
-    local screenGui = parent:FindFirstAncestorWhichIsA("ScreenGui")
+    -- Dropdown frame (gắn vào parent luôn)
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
+    dropdownFrame.Position = UDim2.new(0, selected.Position.X.Offset, 1, 0)
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     dropdownFrame.BackgroundTransparency = 0.2
     dropdownFrame.BorderSizePixel = 0
     dropdownFrame.Visible = false
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = screenGui
+    dropdownFrame.Parent = holder
     Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
 
     -- Search box
@@ -882,10 +881,6 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     -- Toggle dropdown
     local function toggleDropdown(state)
         if state then
-            dropdownFrame.Position = UDim2.fromOffset(
-                selected.AbsolutePosition.X,
-                selected.AbsolutePosition.Y + selected.AbsoluteSize.Y
-            )
             dropdownFrame.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
             dropdownFrame.Visible = true
             TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 200)}):Play()
@@ -901,21 +896,20 @@ local function createDropdown(parent, labelText, items, order, onSelect)
         toggleDropdown(not dropdownFrame.Visible)
     end)
 
-    -- Click ra ngoài thì đóng
-    UserInputService.InputBegan:Connect(function(input, gp)
-        if gp then return end
+    -- Ấn vào frame khác trong GUI thì đóng dropdown
+    parent.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             if dropdownFrame.Visible then
-                local mousePos = input.Position
-                local insideDropdown = (mousePos.X >= dropdownFrame.AbsolutePosition.X
-                    and mousePos.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X
-                    and mousePos.Y >= dropdownFrame.AbsolutePosition.Y
-                    and mousePos.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y)
+                local pos = input.Position
+                local insideDropdown = (pos.X >= dropdownFrame.AbsolutePosition.X
+                    and pos.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X
+                    and pos.Y >= dropdownFrame.AbsolutePosition.Y
+                    and pos.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y)
 
-                local insideSelected = (mousePos.X >= selected.AbsolutePosition.X
-                    and mousePos.X <= selected.AbsolutePosition.X + selected.AbsoluteSize.X
-                    and mousePos.Y >= selected.AbsolutePosition.Y
-                    and mousePos.Y <= selected.AbsolutePosition.Y + selected.AbsoluteSize.Y)
+                local insideSelected = (pos.X >= selected.AbsolutePosition.X
+                    and pos.X <= selected.AbsolutePosition.X + selected.AbsoluteSize.X
+                    and pos.Y >= selected.AbsolutePosition.Y
+                    and pos.Y <= selected.AbsolutePosition.Y + selected.AbsoluteSize.Y)
 
                 if not insideDropdown and not insideSelected then
                     toggleDropdown(false)
