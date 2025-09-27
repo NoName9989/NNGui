@@ -772,7 +772,7 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     layout.SortOrder = Enum.SortOrder.LayoutOrder
     layout.Padding = UDim.new(0, 8)
 
-    -- Label bên trái (luôn căn giữa dọc)
+    -- Label bên trái
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(0, 100, 1, 0)
     label.BackgroundTransparency = 1
@@ -783,7 +783,7 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    -- Dropdown button
+    -- Nút dropdown
     local dropdownBtn = Instance.new("TextButton")
     dropdownBtn.Size = UDim2.new(1, -100, 1, 0)
     dropdownBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -796,19 +796,21 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     dropdownBtn.Parent = holder
     Instance.new("UICorner", dropdownBtn).CornerRadius = UDim.new(0,6)
 
-    -- Danh sách xổ xuống
+    -- Danh sách xổ xuống (đặt chung parent với holder để ko bị che)
     local dropdownFrame = Instance.new("Frame")
-    dropdownFrame.Size = UDim2.new(1, -100, 0, #items * 30)
-    dropdownFrame.Position = UDim2.new(0, 100, 1, 2)
+    dropdownFrame.Size = UDim2.new(dropdownBtn.Size.X.Scale, dropdownBtn.Size.X.Offset,
+        0, #items * 30)
+    dropdownFrame.Position = UDim2.new(holder.Position.X.Scale, holder.Position.X.Offset + 100,
+        holder.Position.Y.Scale, holder.Position.Y.Offset + 40)
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     dropdownFrame.Visible = false
-    dropdownFrame.Parent = holder
+    dropdownFrame.Parent = parent -- ✅ không còn là con của holder
     Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,6)
 
     local listLayout = Instance.new("UIListLayout", dropdownFrame)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    -- Thêm item vào dropdown
+    -- Thêm item
     for i, v in ipairs(items) do
         local itemBtn = Instance.new("TextButton")
         itemBtn.Size = UDim2.new(1, 0, 0, 30)
@@ -826,7 +828,7 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
         end)
     end
 
-    -- Mở / đóng dropdown
+    -- Mở / đóng
     dropdownBtn.MouseButton1Click:Connect(function()
         dropdownFrame.Visible = not dropdownFrame.Visible
     end)
