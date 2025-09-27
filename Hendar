@@ -818,16 +818,16 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     arrow.TextSize = 14
     arrow.Parent = selected
 
--- Dropdown frame gắn vào mainGui (không phải selected)
-local dropdownFrame = Instance.new("Frame")
-dropdownFrame.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
-dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-dropdownFrame.BackgroundTransparency = 0.15
-dropdownFrame.Visible = false
-dropdownFrame.ClipsDescendants = true
-dropdownFrame.ZIndex = 10
-dropdownFrame.Parent = parent -- hoặc parent.Parent (nếu parent là tab/frame trong main GUI)
-Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
+-- Dropdown frame (ra ngoài holder để đè lên)
+    local dropdownFrame = Instance.new("Frame")
+    dropdownFrame.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    dropdownFrame.BackgroundTransparency = 0.15
+    dropdownFrame.Visible = false
+    dropdownFrame.ClipsDescendants = true
+    dropdownFrame.ZIndex = 10
+    dropdownFrame.Parent = holder
+    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
 
     local dpPadding = Instance.new("UIPadding", dropdownFrame)
     dpPadding.PaddingTop = UDim.new(0, 5)
@@ -923,33 +923,22 @@ Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
     refreshItems()
 
     -- Toggle open/closelocal function updateDropdownPos()
-    dropdownFrame.Position = UDim2.fromOffset(
-        selected.AbsolutePosition.X,
-        selected.AbsolutePosition.Y + selected.AbsoluteSize.Y
-    )
-end
+        local opened = false
+    selected.MouseButton1Click:Connect(function()
+        opened = not opened
+        if opened then
+            dropdownFrame.Visible = true
+            dropdownFrame.Position = UDim2.new(0, holder.AbsolutePosition.X, 0, holder.AbsolutePosition.Y + holder.AbsoluteSize.Y)
+            arrow.Text = "▲"
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 150)}):Play()
+            refreshItems()
+        else
+            arrow.Text = "▼"
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)}):Play()
+            task.delay(0.25, function() dropdownFrame.Visible = false end)
+        end
+    end)
 
-selected.MouseButton1Click:Connect(function()
-    opened = not opened
-    if opened then
-        updateDropdownPos()
-        dropdownFrame.Visible = true
-        arrow.Text = "▲"
-        TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {
-            Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 150)
-        }):Play()
-        refreshItems()
-    else
-        arrow.Text = "▼"
-        TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {
-            Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
-        }):Play()
-        task.delay(0.25, function() dropdownFrame.Visible = false end)
-    end
-end)
-
-    return holder, selected, dropdownFrame
-end
 
 -- Giả sử bạn đã có mainTabScroll (ScrollingFrame của tab Main)
 
