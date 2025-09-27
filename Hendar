@@ -758,7 +758,7 @@ end)
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
-local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
 local function createDropdown(parent, labelText, items, order, onSelect)
     local holder = Instance.new("Frame")
@@ -781,67 +781,109 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     local selected = Instance.new("TextButton")
     selected.Size = UDim2.new(0.7, -10, 1, -10)
     selected.Position = UDim2.new(0.3, 5, 0, 5)
-    selected.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    selected.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     selected.TextColor3 = Color3.fromRGB(255, 255, 255)
     selected.Text = items[1] or "Select"
     selected.Font = Enum.Font.Gotham
     selected.TextSize = 14
-    selected.AutoButtonColor = true
+    selected.TextXAlignment = Enum.TextXAlignment.Left
+    selected.AutoButtonColor = false
     selected.Parent = holder
-    Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 4)
+    Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 6)
 
-    -- Dropdown list (nằm ngoài holder để đè được lên mấy nút khác)
+    -- 🔲 Thêm viền cho Selected
+    local stroke = Instance.new("UIStroke", selected)
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Thickness = 1
+    stroke.Transparency = 0.8
+
+    -- Mũi tên
+    local arrow = Instance.new("ImageLabel")
+    arrow.Size = UDim2.new(0, 18, 0, 18)
+    arrow.Position = UDim2.new(1, -24, 0.5, -9)
+    arrow.BackgroundTransparency = 1
+    arrow.Image = "rbxassetid://7072706620"
+    arrow.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    arrow.Rotation = 0
+    arrow.ZIndex = 12
+    arrow.Parent = selected
+
+    -- Hover effect
+    selected.MouseEnter:Connect(function()
+        TweenService:Create(selected, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(65, 65, 65)}):Play()
+    end)
+    selected.MouseLeave:Connect(function()
+        TweenService:Create(selected, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+    end)
+
+    -- Dropdown list
     local screenGui = parent:FindFirstAncestorWhichIsA("ScreenGui")
     local dropdownList = Instance.new("Frame")
-    dropdownList.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, #items * 30)
-    dropdownList.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    dropdownList.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
+    dropdownList.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    dropdownList.BorderSizePixel = 0
     dropdownList.Visible = false
     dropdownList.ZIndex = 10
+    dropdownList.ClipsDescendants = true
     dropdownList.Parent = screenGui
-    Instance.new("UICorner", dropdownList).CornerRadius = UDim.new(0, 4)
+    Instance.new("UICorner", dropdownList).CornerRadius = UDim.new(0, 6)
 
     local layout = Instance.new("UIListLayout", dropdownList)
     layout.SortOrder = Enum.SortOrder.LayoutOrder
 
+    -- Create options
     for _, item in ipairs(items) do
         local option = Instance.new("TextButton")
         option.Size = UDim2.new(1, 0, 0, 30)
-        option.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        option.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
         option.TextColor3 = Color3.fromRGB(255, 255, 255)
         option.Text = item
         option.Font = Enum.Font.Gotham
         option.TextSize = 14
         option.ZIndex = 11
+        option.AutoButtonColor = false
         option.Parent = dropdownList
+
+        Instance.new("UICorner", option).CornerRadius = UDim.new(0, 6)
+
+        -- 🔲 Thêm viền cho từng Option
+        local optStroke = Instance.new("UIStroke", option)
+        optStroke.Color = Color3.fromRGB(255, 255, 255)
+        optStroke.Thickness = 1
+        optStroke.Transparency = 0.8
+
+        -- Hover
+        option.MouseEnter:Connect(function()
+            TweenService:Create(option, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(70, 70, 70)}):Play()
+        end)
+        option.MouseLeave:Connect(function()
+            TweenService:Create(option, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+        end)
 
         option.MouseButton1Click:Connect(function()
             selected.Text = item
             dropdownList.Visible = false
+            TweenService:Create(arrow, TweenInfo.new(0.25), {Rotation = 0}):Play()
             if onSelect then onSelect(item) end
         end)
     end
 
-    -- Toggle hiển thị dropdown
+    -- Toggle dropdown
     selected.MouseButton1Click:Connect(function()
         if dropdownList.Visible then
+            TweenService:Create(dropdownList, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)}):Play()
+            TweenService:Create(arrow, TweenInfo.new(0.25), {Rotation = 0}):Play()
+            task.wait(0.25)
             dropdownList.Visible = false
         else
             dropdownList.Position = UDim2.fromOffset(
                 selected.AbsolutePosition.X,
                 selected.AbsolutePosition.Y + selected.AbsoluteSize.Y
             )
-            dropdownList.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, #items * 30)
+            dropdownList.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
             dropdownList.Visible = true
-        end
-    end)
-
-    -- Click ra ngoài thì tắt dropdown
-    UserInputService.InputBegan:Connect(function(input, gpe)
-        if gpe then return end
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            if dropdownList.Visible and not dropdownList:IsDescendantOf(game:GetService("Players").LocalPlayer.PlayerGui:GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)[1]) then
-                dropdownList.Visible = false
-            end
+            TweenService:Create(dropdownList, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, #items * 30)}):Play()
+            TweenService:Create(arrow, TweenInfo.new(0.25), {Rotation = 180}):Play()
         end
     end)
 
