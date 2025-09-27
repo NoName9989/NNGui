@@ -818,23 +818,23 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     arrow.TextSize = 14
     arrow.Parent = selected
 
-   -- Dropdown frame gắn vào cùng parent với selected (là holder)
-local dropdownFrame = Instance.new("Frame")
-dropdownFrame.Size = UDim2.new(1, 0, 0, 0) -- bắt đầu cao 0
-dropdownFrame.Position = UDim2.new(0, 0, 0, selected.AbsoluteSize.Y) -- ngay dưới selected
-dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-dropdownFrame.BackgroundTransparency = 0.15
-dropdownFrame.Visible = false
-dropdownFrame.ClipsDescendants = true
-dropdownFrame.ZIndex = 10
-dropdownFrame.Parent = holder -- 🔥 parent = holder, không phải selected
-Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
+    -- Dropdown frame (parent = holder)
+    local dropdownFrame = Instance.new("Frame")
+    dropdownFrame.Size = UDim2.new(1, 0, 0, 0) -- bắt đầu cao 0
+    dropdownFrame.Position = UDim2.new(0, 0, 0, selected.AbsoluteSize.Y) -- nằm dưới selected
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    dropdownFrame.BackgroundTransparency = 0.15
+    dropdownFrame.Visible = false
+    dropdownFrame.ClipsDescendants = true
+    dropdownFrame.ZIndex = 10
+    dropdownFrame.Parent = holder -- 🔥 parent = holder
+    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
 
-local dpPadding = Instance.new("UIPadding", dropdownFrame)
-dpPadding.PaddingTop = UDim.new(0, 5)
-dpPadding.PaddingBottom = UDim.new(0, 5)
-dpPadding.PaddingLeft = UDim.new(0, 5)
-dpPadding.PaddingRight = UDim.new(0, 5)
+    local dpPadding = Instance.new("UIPadding", dropdownFrame)
+    dpPadding.PaddingTop = UDim.new(0, 5)
+    dpPadding.PaddingBottom = UDim.new(0, 5)
+    dpPadding.PaddingLeft = UDim.new(0, 5)
+    dpPadding.PaddingRight = UDim.new(0, 5)
 
     -- ScrollingFrame
     local listFrame = Instance.new("ScrollingFrame")
@@ -902,7 +902,7 @@ dpPadding.PaddingRight = UDim.new(0, 5)
                     selectedItems = {item}
                     updateSelectedText()
                     arrow.Text = "▼"
-                    TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)}):Play()
+                    TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(1,0,0,0)}):Play()
                     task.delay(0.25, function() dropdownFrame.Visible = false end)
                     if onSelect then onSelect(item) end
                 else
@@ -924,30 +924,23 @@ dpPadding.PaddingRight = UDim.new(0, 5)
     refreshItems()
 
     -- Toggle open/close
-local opened = false
-selected.MouseButton1Click:Connect(function()
-    opened = not opened
-    if opened then
-        dropdownFrame.Visible = true
-        arrow.Text = "▲"
+    local opened = false
+    selected.MouseButton1Click:Connect(function()
+        opened = not opened
+        if opened then
+            dropdownFrame.Visible = true
+            arrow.Text = "▲"
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(1,0,0,150)}):Play()
+            refreshItems()
+        else
+            arrow.Text = "▼"
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(1,0,0,0)}):Play()
+            task.delay(0.25, function() dropdownFrame.Visible = false end)
+        end
+    end)
 
-        -- Tween mở dropdown
-        local targetHeight = 150
-        TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {
-            Size = UDim2.new(1, 0, 0, targetHeight)
-        }):Play()
-        refreshItems()
-    else
-        arrow.Text = "▼"
-        TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {
-            Size = UDim2.new(1, 0, 0, 0)
-        }):Play()
-        task.delay(0.25, function()
-            dropdownFrame.Visible = false
-        end)
-    end
-end)
-
+    return holder, selected, dropdownFrame
+end
 
 -- Giả sử bạn đã có mainTabScroll (ScrollingFrame của tab Main)
 
