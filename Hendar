@@ -820,7 +820,7 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
 
     -- Dropdown frame (ra ngoài holder để đè lên)
     local dropdownFrame = Instance.new("Frame")
-    dropdownFrame.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
+    dropdownFrame.Size = UDim2.new(0, 0, 0, 0)
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     dropdownFrame.BackgroundTransparency = 0.15
     dropdownFrame.Visible = false
