@@ -758,9 +758,11 @@ end)
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
+local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
-local function createDropdown(parent, labelText, items, order, onSelect)
+local function createDropdown(parent, labelText, items, order, default, onSelect)
+    -- Holder
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
     holder.Position = UDim2.new(0, 10, 0, 0)
@@ -768,9 +770,14 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     holder.LayoutOrder = order
     holder.Parent = parent
 
-    -- Label bên trái
+    local layout = Instance.new("UIListLayout", holder)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Label
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0.3, 0, 1, 0)
+    label.Size = UDim2.new(0.4, 0, 1, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(255,255,255)
@@ -779,143 +786,123 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    -- Selected button
+    -- Select Button
     local selected = Instance.new("TextButton")
-    selected.Size = UDim2.new(0.7, -10, 1, -10)
-    selected.Position = UDim2.new(0.3, 5, 0, 5)
-    selected.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    selected.BackgroundTransparency = 0.2
+    selected.Size = UDim2.new(0.6, -10, 1, 0)
+    selected.BackgroundColor3 = Color3.fromRGB(40,40,40)
     selected.TextColor3 = Color3.fromRGB(255,255,255)
-    selected.Text = items[1] or "Select"
     selected.Font = Enum.Font.Gotham
     selected.TextSize = 14
-    selected.TextXAlignment = Enum.TextXAlignment.Left
+    selected.Text = default or "Select..."
     selected.AutoButtonColor = false
+    selected.ZIndex = 5
     selected.Parent = holder
-    Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", selected).CornerRadius = UDim.new(0,6)
 
-    -- Dropdown frame (gắn vào parent luôn)
+    -- Dropdown Frame
     local dropdownFrame = Instance.new("Frame")
-    dropdownFrame.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
-    dropdownFrame.Position = UDim2.new(0, selected.Position.X.Offset, 1, 0)
-    dropdownFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    dropdownFrame.Size = UDim2.new(1, 0, 0, 0)
+    dropdownFrame.Position = UDim2.new(0, 0, 1, 0)
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
     dropdownFrame.BackgroundTransparency = 0.2
     dropdownFrame.BorderSizePixel = 0
     dropdownFrame.Visible = false
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = holder
-    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
+    dropdownFrame.Parent = selected
+    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,6)
 
     -- Search box
     local searchBox = Instance.new("TextBox")
     searchBox.Size = UDim2.new(1, -10, 0, 25)
     searchBox.Position = UDim2.new(0, 5, 0, 5)
-    searchBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    searchBox.BackgroundTransparency = 0.3
-    searchBox.PlaceholderText = "Tìm kiếm..."
+    searchBox.PlaceholderText = "Search..."
+    searchBox.BackgroundColor3 = Color3.fromRGB(35,35,35)
     searchBox.TextColor3 = Color3.fromRGB(255,255,255)
     searchBox.Font = Enum.Font.Gotham
     searchBox.TextSize = 14
     searchBox.ZIndex = 11
     searchBox.Parent = dropdownFrame
-    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0,4)
 
-    -- ScrollingFrame cho item
-    local itemsFrame = Instance.new("ScrollingFrame")
-    itemsFrame.Size = UDim2.new(1, -10, 1, -35)
-    itemsFrame.Position = UDim2.new(0, 5, 0, 35)
-    itemsFrame.BackgroundTransparency = 1
-    itemsFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    itemsFrame.ScrollBarThickness = 4
-    itemsFrame.ZIndex = 11
-    itemsFrame.Parent = dropdownFrame
+    -- Items holder
+    local itemHolder = Instance.new("Frame")
+    itemHolder.Size = UDim2.new(1, -10, 1, -35)
+    itemHolder.Position = UDim2.new(0, 5, 0, 35)
+    itemHolder.BackgroundTransparency = 1
+    itemHolder.ZIndex = 11
+    itemHolder.Parent = dropdownFrame
 
-    local UIListLayout = Instance.new("UIListLayout", itemsFrame)
-    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Padding = UDim.new(0, 2)
+    local itemLayout = Instance.new("UIListLayout", itemHolder)
+    itemLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    itemLayout.Padding = UDim.new(0, 3)
 
-    -- Tạo item
-    local allButtons = {}
-    local function createItem(text)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -4, 0, 24)
-        btn.BackgroundColor3 = Color3.fromRGB(45,45,45)
-        btn.BackgroundTransparency = 0.2
-        btn.TextColor3 = Color3.fromRGB(255,255,255)
-        btn.Text = text
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 14
-        btn.AutoButtonColor = false
-        btn.ZIndex = 11
-        btn.Parent = itemsFrame
+    local function refreshItems(filter)
+        for _, c in ipairs(itemHolder:GetChildren()) do
+            if c:IsA("TextButton") then c:Destroy() end
+        end
+        for _, item in ipairs(items) do
+            if (not filter) or string.find(string.lower(item), string.lower(filter)) then
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(1, 0, 0, 25)
+                btn.BackgroundColor3 = Color3.fromRGB(45,45,45)
+                btn.TextColor3 = Color3.fromRGB(255,255,255)
+                btn.Font = Enum.Font.Gotham
+                btn.TextSize = 14
+                btn.Text = item
+                btn.AutoButtonColor = false
+                btn.ZIndex = 11
+                btn.Parent = itemHolder
+                Instance.new("UICorner", btn).CornerRadius = UDim.new(0,4)
 
-        btn.MouseEnter:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(65,65,65)
-        end)
-        btn.MouseLeave:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(45,45,45)
-        end)
-        btn.MouseButton1Click:Connect(function()
-            selected.Text = text
-            dropdownFrame.Visible = false
-            if onSelect then onSelect(text) end
-        end)
-
-        table.insert(allButtons, btn)
+                btn.MouseButton1Click:Connect(function()
+                    selected.Text = item
+                    dropdownFrame.Visible = false
+                    TweenService:Create(dropdownFrame, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, 0)}):Play()
+                    if onSelect then onSelect(item) end
+                end)
+            end
+        end
     end
 
-    for _, item in ipairs(items) do
-        createItem(item)
-    end
+    refreshItems()
+
+    -- Toggle dropdown
+    local opened = false
+    selected.MouseButton1Click:Connect(function()
+        opened = not opened
+        dropdownFrame.Visible = true
+        local goalSize = opened and UDim2.new(1, 0, 0, 150) or UDim2.new(1, 0, 0, 0)
+        TweenService:Create(dropdownFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = goalSize}):Play()
+        if not opened then
+            task.delay(0.25, function()
+                if not opened then dropdownFrame.Visible = false end
+            end)
+        end
+    end)
+
+    -- Đóng khi click chỗ khác
+    UserInputService.InputBegan:Connect(function(input, gp)
+        if gp then return end
+        if opened and input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local mousePos = UserInputService:GetMouseLocation()
+            local guiPos = dropdownFrame.AbsolutePosition
+            local guiSize = dropdownFrame.AbsoluteSize
+            local inside = (mousePos.X >= guiPos.X and mousePos.X <= guiPos.X+guiSize.X and
+                           mousePos.Y >= guiPos.Y and mousePos.Y <= guiPos.Y+guiSize.Y)
+            if not inside then
+                opened = false
+                TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(1,0,0,0)}):Play()
+                task.delay(0.25, function()
+                    if not opened then dropdownFrame.Visible = false end
+                end)
+            end
+        end
+    end)
 
     -- Search filter
     searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-        local keyword = searchBox.Text:lower()
-        for _, btn in ipairs(allButtons) do
-            btn.Visible = (keyword == "" or btn.Text:lower():find(keyword))
-        end
-        itemsFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
-    end)
-
-    -- Toggle dropdown
-    local function toggleDropdown(state)
-        if state then
-            dropdownFrame.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
-            dropdownFrame.Visible = true
-            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 200)}):Play()
-            itemsFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
-        else
-            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)}):Play()
-            task.wait(0.25)
-            dropdownFrame.Visible = false
-        end
-    end
-
-    selected.MouseButton1Click:Connect(function()
-        toggleDropdown(not dropdownFrame.Visible)
-    end)
-
-    -- Ấn vào frame khác trong GUI thì đóng dropdown
-    parent.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            if dropdownFrame.Visible then
-                local pos = input.Position
-                local insideDropdown = (pos.X >= dropdownFrame.AbsolutePosition.X
-                    and pos.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X
-                    and pos.Y >= dropdownFrame.AbsolutePosition.Y
-                    and pos.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y)
-
-                local insideSelected = (pos.X >= selected.AbsolutePosition.X
-                    and pos.X <= selected.AbsolutePosition.X + selected.AbsoluteSize.X
-                    and pos.Y >= selected.AbsolutePosition.Y
-                    and pos.Y <= selected.AbsolutePosition.Y + selected.AbsoluteSize.Y)
-
-                if not insideDropdown and not insideSelected then
-                    toggleDropdown(false)
-                end
-            end
-        end
+        refreshItems(searchBox.Text)
     end)
 
     return holder
