@@ -797,8 +797,14 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     selected.Font = Enum.Font.GothamSemibold
     selected.TextSize = 14
     selected.TextXAlignment = Enum.TextXAlignment.Left
+    selected.AutoButtonColor = false
     selected.Parent = holder
     Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 6)
+
+    -- Padding cho selected text
+    local selPadding = Instance.new("UIPadding", selected)
+    selPadding.PaddingLeft = UDim.new(0, 10)
+    selPadding.PaddingRight = UDim.new(0, 20)
 
     -- Arrow
     local arrow = Instance.new("TextLabel")
@@ -812,21 +818,27 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     arrow.TextSize = 14
     arrow.Parent = selected
 
-    -- Dropdown frame
+    -- Dropdown frame (ra ngoài holder để đè lên)
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    dropdownFrame.BackgroundTransparency = 0.2
+    dropdownFrame.BackgroundTransparency = 0.15
     dropdownFrame.Visible = false
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = parent.Parent
+    dropdownFrame.Parent = parent:FindFirstAncestorOfClass("ScreenGui") or parent
     Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
+
+    local dpPadding = Instance.new("UIPadding", dropdownFrame)
+    dpPadding.PaddingTop = UDim.new(0, 5)
+    dpPadding.PaddingBottom = UDim.new(0, 5)
+    dpPadding.PaddingLeft = UDim.new(0, 5)
+    dpPadding.PaddingRight = UDim.new(0, 5)
 
     -- ScrollingFrame
     local listFrame = Instance.new("ScrollingFrame")
-    listFrame.Size = UDim2.new(1, -20, 1, -10)
-    listFrame.Position = UDim2.new(0, 10, 0, 5)
+    listFrame.Size = UDim2.new(1, -10, 1, -10)
+    listFrame.Position = UDim2.new(0, 5, 0, 5)
     listFrame.BackgroundTransparency = 1
     listFrame.ScrollBarThickness = 6
     listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -844,11 +856,7 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
         if type == "single" then
             selected.Text = selectedItems[1] or "Select..."
         else
-            if #selectedItems == 0 then
-                selected.Text = "Select..."
-            else
-                selected.Text = table.concat(selectedItems, ", ")
-            end
+            selected.Text = (#selectedItems == 0) and "Select..." or table.concat(selectedItems, ", ")
         end
     end
 
@@ -857,7 +865,6 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
             if child:IsA("Frame") then child:Destroy() end
         end
         for _, item in ipairs(items) do
-            -- Item container
             local itemFrame = Instance.new("Frame")
             itemFrame.Size = UDim2.new(1, 0, 0, 32)
             itemFrame.BackgroundTransparency = 1
@@ -870,7 +877,6 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
             hLayout.SortOrder = Enum.SortOrder.LayoutOrder
             hLayout.Padding = UDim.new(0, 6)
 
-            -- Checkbox
             local checkBox = Instance.new("Frame")
             checkBox.Size = UDim2.new(0, 18, 0, 18)
             checkBox.BackgroundColor3 = table.find(selectedItems, item) and Color3.fromRGB(70,130,180) or Color3.fromRGB(50,50,50)
@@ -879,7 +885,6 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
             checkBox.ZIndex = 13
             Instance.new("UICorner", checkBox).CornerRadius = UDim.new(0,4)
 
-            -- Label
             local btn = Instance.new("TextButton")
             btn.Size = UDim2.new(1, -30, 1, 0)
             btn.BackgroundTransparency = 1
@@ -896,7 +901,7 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
                     selectedItems = {item}
                     updateSelectedText()
                     arrow.Text = "▼"
-                    TweenService:Create(dropdownFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)}):Play()
+                    TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)}):Play()
                     task.delay(0.25, function() dropdownFrame.Visible = false end)
                     if onSelect then onSelect(item) end
                 else
@@ -919,39 +924,32 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
 
     -- Toggle open/close
     local opened = false
-    local function closeDropdown()
-        if opened then
-            opened = false
-            arrow.Text = "▼"
-            TweenService:Create(dropdownFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)}):Play()
-            task.delay(0.25, function() dropdownFrame.Visible = false end)
-        end
-    end
-
     selected.MouseButton1Click:Connect(function()
         opened = not opened
         if opened then
             dropdownFrame.Visible = true
             dropdownFrame.Position = UDim2.new(0, holder.AbsolutePosition.X, 0, holder.AbsolutePosition.Y + holder.AbsoluteSize.Y)
             arrow.Text = "▲"
-            TweenService:Create(dropdownFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 150)}):Play()
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 150)}):Play()
             refreshItems()
         else
-            closeDropdown()
+            arrow.Text = "▼"
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)}):Play()
+            task.delay(0.25, function() dropdownFrame.Visible = false end)
         end
     end)
 
-    -- Click ra ngoài thì đóng dropdown
-    UserInputService.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            if opened and not (dropdownFrame.AbsolutePosition.X <= input.Position.X and 
-                input.Position.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X and
-                dropdownFrame.AbsolutePosition.Y <= input.Position.Y and
-                input.Position.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y) then
-                closeDropdown()
-            end
+-- Click ra ngoài thì đóng dropdown
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if opened and not (dropdownFrame.AbsolutePosition.X <= input.Position.X and 
+            input.Position.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X and
+            dropdownFrame.AbsolutePosition.Y <= input.Position.Y and
+            input.Position.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y) then
+            closeDropdown()
         end
-    end)
+    end
+end)
 
     return holder, selected, dropdownFrame
 end
