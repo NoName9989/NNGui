@@ -760,7 +760,7 @@ local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
 local UserInputService = game:GetService("UserInputService")
 
-local function createDropdown(parent, labelText, items, default, order, onSelect)
+local function createDropdown(parent, labelText, items, order, onSelect)
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
     holder.Position = UDim2.new(0, 10, 0, 0)
@@ -768,15 +768,8 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     holder.LayoutOrder = order
     holder.Parent = parent
 
-    local layout = Instance.new("UIListLayout", holder)
-    layout.FillDirection = Enum.FillDirection.Horizontal
-    layout.VerticalAlignment = Enum.VerticalAlignment.Center
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 8)
-
-    -- Label bên trái
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0, 100, 1, 0)
+    label.Size = UDim2.new(0.3, 0, 1, 0)
     label.BackgroundTransparency = 1
     label.Text = labelText
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -785,77 +778,74 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    -- Nút dropdown
-    local dropdownBtn = Instance.new("TextButton")
-    dropdownBtn.Size = UDim2.new(1, -100, 1, 0)
-    dropdownBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    dropdownBtn.BackgroundTransparency = 0.6
-    dropdownBtn.Text = default or "Select..."
-    dropdownBtn.TextColor3 = Color3.fromRGB(230,230,230)
-    dropdownBtn.Font = Enum.Font.GothamSemibold
-    dropdownBtn.TextSize = 14
-    dropdownBtn.TextXAlignment = Enum.TextXAlignment.Left
-    dropdownBtn.Parent = holder
-    Instance.new("UICorner", dropdownBtn).CornerRadius = UDim.new(0,6)
+    local selected = Instance.new("TextButton")
+    selected.Size = UDim2.new(0.7, -10, 1, -10)
+    selected.Position = UDim2.new(0.3, 5, 0, 5)
+    selected.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    selected.TextColor3 = Color3.fromRGB(255, 255, 255)
+    selected.Text = items[1] or "Select"
+    selected.Font = Enum.Font.Gotham
+    selected.TextSize = 14
+    selected.AutoButtonColor = true
+    selected.Parent = holder
+    Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 4)
 
-    -- Frame xổ xuống
-    local dropdownFrame = Instance.new("Frame")
-    dropdownFrame.Size = UDim2.new(dropdownBtn.Size.X.Scale, dropdownBtn.Size.X.Offset,
-        0, #items * 30)
-    dropdownFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    dropdownFrame.Visible = false
-    dropdownFrame.ZIndex = 10 -- nổi lên trên
-    dropdownFrame.Parent = parent
-    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,6)
+    -- Dropdown list (nằm ngoài holder để đè được lên mấy nút khác)
+    local screenGui = parent:FindFirstAncestorWhichIsA("ScreenGui")
+    local dropdownList = Instance.new("Frame")
+    dropdownList.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, #items * 30)
+    dropdownList.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    dropdownList.Visible = false
+    dropdownList.ZIndex = 10
+    dropdownList.Parent = screenGui
+    Instance.new("UICorner", dropdownList).CornerRadius = UDim.new(0, 4)
 
-    local listLayout = Instance.new("UIListLayout", dropdownFrame)
-    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    local layout = Instance.new("UIListLayout", dropdownList)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    for _, v in ipairs(items) do
-        local itemBtn = Instance.new("TextButton")
-        itemBtn.Size = UDim2.new(1, 0, 0, 30)
-        itemBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
-        itemBtn.Text = v
-        itemBtn.TextColor3 = Color3.fromRGB(230,230,230)
-        itemBtn.Font = Enum.Font.Gotham
-        itemBtn.TextSize = 14
-        itemBtn.Parent = dropdownFrame
+    for _, item in ipairs(items) do
+        local option = Instance.new("TextButton")
+        option.Size = UDim2.new(1, 0, 0, 30)
+        option.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        option.TextColor3 = Color3.fromRGB(255, 255, 255)
+        option.Text = item
+        option.Font = Enum.Font.Gotham
+        option.TextSize = 14
+        option.ZIndex = 11
+        option.Parent = dropdownList
 
-        itemBtn.MouseButton1Click:Connect(function()
-            dropdownBtn.Text = v
-            dropdownFrame.Visible = false
-            if onSelect then onSelect(v) end
+        option.MouseButton1Click:Connect(function()
+            selected.Text = item
+            dropdownList.Visible = false
+            if onSelect then onSelect(item) end
         end)
     end
 
-    -- Toggle xổ xuống
-    dropdownBtn.MouseButton1Click:Connect(function()
-        if not dropdownFrame.Visible then
-            -- đặt ngay dưới nút dropdown
-            local absPos = dropdownBtn.AbsolutePosition
-            local absSize = dropdownBtn.AbsoluteSize
-            dropdownFrame.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y)
-            dropdownFrame.Size = UDim2.new(0, absSize.X, 0, #items * 30)
+    -- Toggle hiển thị dropdown
+    selected.MouseButton1Click:Connect(function()
+        if dropdownList.Visible then
+            dropdownList.Visible = false
+        else
+            dropdownList.Position = UDim2.fromOffset(
+                selected.AbsolutePosition.X,
+                selected.AbsolutePosition.Y + selected.AbsoluteSize.Y
+            )
+            dropdownList.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, #items * 30)
+            dropdownList.Visible = true
         end
-        dropdownFrame.Visible = not dropdownFrame.Visible
     end)
 
-    -- Click ra ngoài để đóng
-    UserInputService.InputBegan:Connect(function(input)
+    -- Click ra ngoài thì tắt dropdown
+    UserInputService.InputBegan:Connect(function(input, gpe)
+        if gpe then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            if dropdownFrame.Visible then
-                local mouse = game:GetService("Players").LocalPlayer:GetMouse()
-                local x, y = mouse.X, mouse.Y
-                local absPos, absSize = dropdownFrame.AbsolutePosition, dropdownFrame.AbsoluteSize
-                if not (x >= absPos.X and x <= absPos.X + absSize.X and
-                        y >= absPos.Y and y <= absPos.Y + absSize.Y) then
-                    dropdownFrame.Visible = false
-                end
+            if dropdownList.Visible and not dropdownList:IsDescendantOf(game:GetService("Players").LocalPlayer.PlayerGui:GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)[1]) then
+                dropdownList.Visible = false
             end
         end
     end)
 
-    return holder, dropdownBtn
+    return holder
 end
 
 createDropdown(mainTabScroll, "Mode", {"Easy","Normal","Hard"}, "Normal", 1, function(selected)
