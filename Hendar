@@ -834,6 +834,6 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     return holder, dropdownBtn
 end
 
-createDropdown(localTabScroll, "Mode", {"Easy","Normal","Hard"}, "Normal", 1, function(selected)
+createDropdown(mainTabScroll, "Mode", {"Easy","Normal","Hard"}, "Normal", 1, function(selected)
     print("Bạn chọn:", selected)
 end)
