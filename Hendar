@@ -116,7 +116,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
 
 -- Tên Hub
 local title = Instance.new("TextLabel", header)
-title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.9.6 ✨"
+title.Text = "✨ Hendar Hub  |  Plants vs Brainrots 1.9.7 ✨"
 title.Size = UDim2.new(1, -80, 1, 0)
 title.Position = UDim2.new(0, 12, 0, 0)
 title.BackgroundTransparency = 1
@@ -818,16 +818,17 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     arrow.TextSize = 14
     arrow.Parent = selected
 
-    -- Dropdown frame (ra ngoài holder để đè lên)
-    local dropdownFrame = Instance.new("Frame")
-    dropdownFrame.Size = UDim2.new(0, 0, 0, 0)
-    dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    dropdownFrame.BackgroundTransparency = 0.15
-    dropdownFrame.Visible = false
-    dropdownFrame.ClipsDescendants = true
-    dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = selected
-    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
+    -- Dropdown frame gắn vào holder
+local dropdownFrame = Instance.new("Frame")
+dropdownFrame.Size = UDim2.new(1, 0, 0, 0) -- cùng chiều rộng với selected
+dropdownFrame.Position = UDim2.new(0, 0, 1, 0) -- ngay dưới selected
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+dropdownFrame.BackgroundTransparency = 0.15
+dropdownFrame.Visible = false
+dropdownFrame.ClipsDescendants = true
+dropdownFrame.ZIndex = 10
+dropdownFrame.Parent = selected -- 🔥 gắn trực tiếp vào selected
+Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
 
     local dpPadding = Instance.new("UIPadding", dropdownFrame)
     dpPadding.PaddingTop = UDim.new(0, 5)
