@@ -818,7 +818,6 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     arrow.TextSize = 14
     arrow.Parent = selected
 
--- Dropdown frame (ra ngoài holder để đè lên)
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -826,7 +825,7 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     dropdownFrame.Visible = false
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = holder
+    dropdownFrame.Parent = parent.parent
     Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
 
     local dpPadding = Instance.new("UIPadding", dropdownFrame)
