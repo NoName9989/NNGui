@@ -826,7 +826,7 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     dropdownFrame.Visible = false
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = holder
+    dropdownFrame.Parent = selected
     Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
 
     local dpPadding = Instance.new("UIPadding", dropdownFrame)
