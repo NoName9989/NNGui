@@ -758,6 +758,8 @@ end)
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
+local UserInputService = game:GetService("UserInputService")
+
 local function createDropdown(parent, labelText, items, default, order, onSelect)
     local holder = Instance.new("Frame")
     holder.Size = UDim2.new(1, -20, 0, 40)
@@ -796,22 +798,20 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
     dropdownBtn.Parent = holder
     Instance.new("UICorner", dropdownBtn).CornerRadius = UDim.new(0,6)
 
-    -- Danh sách xổ xuống (đặt chung parent với holder để ko bị che)
+    -- Frame xổ xuống
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = UDim2.new(dropdownBtn.Size.X.Scale, dropdownBtn.Size.X.Offset,
         0, #items * 30)
-    dropdownFrame.Position = UDim2.new(holder.Position.X.Scale, holder.Position.X.Offset + 100,
-        holder.Position.Y.Scale, holder.Position.Y.Offset + 40)
     dropdownFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     dropdownFrame.Visible = false
-    dropdownFrame.Parent = parent -- ✅ không còn là con của holder
+    dropdownFrame.ZIndex = 10 -- nổi lên trên
+    dropdownFrame.Parent = parent
     Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,6)
 
     local listLayout = Instance.new("UIListLayout", dropdownFrame)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    -- Thêm item
-    for i, v in ipairs(items) do
+    for _, v in ipairs(items) do
         local itemBtn = Instance.new("TextButton")
         itemBtn.Size = UDim2.new(1, 0, 0, 30)
         itemBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
@@ -828,9 +828,31 @@ local function createDropdown(parent, labelText, items, default, order, onSelect
         end)
     end
 
-    -- Mở / đóng
+    -- Toggle xổ xuống
     dropdownBtn.MouseButton1Click:Connect(function()
+        if not dropdownFrame.Visible then
+            -- đặt ngay dưới nút dropdown
+            local absPos = dropdownBtn.AbsolutePosition
+            local absSize = dropdownBtn.AbsoluteSize
+            dropdownFrame.Position = UDim2.fromOffset(absPos.X, absPos.Y + absSize.Y)
+            dropdownFrame.Size = UDim2.new(0, absSize.X, 0, #items * 30)
+        end
         dropdownFrame.Visible = not dropdownFrame.Visible
+    end)
+
+    -- Click ra ngoài để đóng
+    UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if dropdownFrame.Visible then
+                local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+                local x, y = mouse.X, mouse.Y
+                local absPos, absSize = dropdownFrame.AbsolutePosition, dropdownFrame.AbsoluteSize
+                if not (x >= absPos.X and x <= absPos.X + absSize.X and
+                        y >= absPos.Y and y <= absPos.Y + absSize.Y) then
+                    dropdownFrame.Visible = false
+                end
+            end
+        end
     end)
 
     return holder, dropdownBtn
