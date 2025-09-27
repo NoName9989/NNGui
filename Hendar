@@ -787,18 +787,23 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = holder
 
-    -- Button selected
-    local selected = Instance.new("TextButton")
-    selected.Size = UDim2.new(1, -100, 1, 0)
-    selected.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    selected.BackgroundTransparency = 0.6
-    selected.Text = defaultSelected or "Select..."
-    selected.TextColor3 = Color3.fromRGB(230, 230, 230)
-    selected.Font = Enum.Font.GothamSemibold
-    selected.TextSize = 14
-    selected.TextXAlignment = Enum.TextXAlignment.Left
-    selected.Parent = holder
-    Instance.new("UICorner", selected).CornerRadius = UDim.new(0, 6)
+ -- Nút hiển thị selected
+local selectedBtn = Instance.new("TextButton")
+selectedBtn.Size = UDim2.new(0, 200, 0, 30)
+selectedBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+selectedBtn.Text = "Select option"
+selectedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+selectedBtn.Font = Enum.Font.Gotham
+selectedBtn.TextSize = 14
+selectedBtn.TextXAlignment = Enum.TextXAlignment.Left
+selectedBtn.AutoButtonColor = false
+selectedBtn.Parent = parent
+
+-- Padding để chữ không dính sát mép
+local padding = Instance.new("UIPadding")
+padding.Parent = selectedBtn
+padding.PaddingLeft = UDim.new(0, 10) -- 👈 cách mép trái 10px
+padding.PaddingRight = UDim.new(0, 10) -- 👈 cách mép phải 10px
 
     -- Arrow
     local arrow = Instance.new("TextLabel")
@@ -812,16 +817,15 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
     arrow.TextSize = 14
     arrow.Parent = selected
 
-    -- Dropdown frame
-    local dropdownFrame = Instance.new("Frame")
-    dropdownFrame.Size = UDim2.new(0, holder.AbsoluteSize.X, 0, 0)
-    dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    dropdownFrame.BackgroundTransparency = 0.2
-    dropdownFrame.Visible = false
-    dropdownFrame.ClipsDescendants = true
-    dropdownFrame.ZIndex = 10
-    dropdownFrame.Parent = parent.Parent
-    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0, 6)
+    -- Dropdown Frame
+local dropdownFrame = Instance.new("Frame")
+dropdownFrame.Size = UDim2.new(0, 200, 0, #items * 30 + 5)
+dropdownFrame.Position = UDim2.new(0, 0, 1, 5) -- Nằm ngay dưới selectedBtn (y = 100%)
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+dropdownFrame.BackgroundTransparency = 0.2
+dropdownFrame.BorderSizePixel = 0
+dropdownFrame.Visible = false
+dropdownFrame.Parent = selectedBtn -- 👈 Gắn vào selectedBtn, nó sẽ luôn xuất hiện ngay dưới
 
     -- ScrollingFrame
     local listFrame = Instance.new("ScrollingFrame")
