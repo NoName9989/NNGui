@@ -939,17 +939,6 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
         end
     end)
 
--- Click ra ngoài thì đóng dropdown
-UserInputService.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        if opened and not (dropdownFrame.AbsolutePosition.X <= input.Position.X and 
-            input.Position.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X and
-            dropdownFrame.AbsolutePosition.Y <= input.Position.Y and
-            input.Position.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y) then
-            closeDropdown()
-        end
-    end
-end)
 
     return holder, selected, dropdownFrame
 end
