@@ -974,7 +974,22 @@ local function createDropdown(parent, labelText, items, order, type, defaultSele
             local insideSelected = x >= selectedPos.X and x <= selectedPos.X + selectedSize.X and
                                    y >= selectedPos.Y and y <= selectedPos.Y + selectedSize.Y
 
-           
+            if not (insideDropdown or insideSelected) then
+                closeDropdown()
+            end
+        end
+    end)
+
+    RunService.RenderStepped:Connect(function()
+        if dropdownFrame.Visible then
+            dropdownFrame.Position = UDim2.new(0, holder.AbsolutePosition.X, 0, holder.AbsolutePosition.Y + holder.AbsoluteSize.Y)
+        end
+    end)
+
+    return holder, selected, dropdownFrame
+end
+
+return createDropdown
 
 -- Giả sử bạn đã có mainTabScroll (ScrollingFrame của tab Main)
 
