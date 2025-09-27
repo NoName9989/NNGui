@@ -759,6 +759,7 @@ end)
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
 
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local function createDropdown(parent, labelText, items, order, onSelect)
     local holder = Instance.new("Frame")
@@ -783,7 +784,8 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     local selected = Instance.new("TextButton")
     selected.Size = UDim2.new(0.7, -10, 1, -10)
     selected.Position = UDim2.new(0.3, 5, 0, 5)
-    selected.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    selected.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    selected.BackgroundTransparency = 0.2
     selected.TextColor3 = Color3.fromRGB(255,255,255)
     selected.Text = items[1] or "Select"
     selected.Font = Enum.Font.Gotham
@@ -797,7 +799,9 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     local screenGui = parent:FindFirstAncestorWhichIsA("ScreenGui")
     local dropdownFrame = Instance.new("Frame")
     dropdownFrame.Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)
-    dropdownFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    dropdownFrame.BackgroundTransparency = 0.2
+    dropdownFrame.BorderSizePixel = 0
     dropdownFrame.Visible = false
     dropdownFrame.ClipsDescendants = true
     dropdownFrame.ZIndex = 10
@@ -808,7 +812,8 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     local searchBox = Instance.new("TextBox")
     searchBox.Size = UDim2.new(1, -10, 0, 25)
     searchBox.Position = UDim2.new(0, 5, 0, 5)
-    searchBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    searchBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    searchBox.BackgroundTransparency = 0.3
     searchBox.PlaceholderText = "Tìm kiếm..."
     searchBox.TextColor3 = Color3.fromRGB(255,255,255)
     searchBox.Font = Enum.Font.Gotham
@@ -832,10 +837,12 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     UIListLayout.Padding = UDim.new(0, 2)
 
     -- Tạo item
+    local allButtons = {}
     local function createItem(text)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, -4, 0, 24)
         btn.BackgroundColor3 = Color3.fromRGB(45,45,45)
+        btn.BackgroundTransparency = 0.2
         btn.TextColor3 = Color3.fromRGB(255,255,255)
         btn.Text = text
         btn.Font = Enum.Font.Gotham
@@ -856,12 +863,11 @@ local function createDropdown(parent, labelText, items, order, onSelect)
             if onSelect then onSelect(text) end
         end)
 
-        return btn
+        table.insert(allButtons, btn)
     end
 
-    local allButtons = {}
     for _, item in ipairs(items) do
-        table.insert(allButtons, createItem(item))
+        createItem(item)
     end
 
     -- Search filter
@@ -874,12 +880,8 @@ local function createDropdown(parent, labelText, items, order, onSelect)
     end)
 
     -- Toggle dropdown
-    selected.MouseButton1Click:Connect(function()
-        if dropdownFrame.Visible then
-            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)}):Play()
-            task.wait(0.25)
-            dropdownFrame.Visible = false
-        else
+    local function toggleDropdown(state)
+        if state then
             dropdownFrame.Position = UDim2.fromOffset(
                 selected.AbsolutePosition.X,
                 selected.AbsolutePosition.Y + selected.AbsoluteSize.Y
@@ -888,6 +890,37 @@ local function createDropdown(parent, labelText, items, order, onSelect)
             dropdownFrame.Visible = true
             TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 200)}):Play()
             itemsFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
+        else
+            TweenService:Create(dropdownFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, selected.AbsoluteSize.X, 0, 0)}):Play()
+            task.wait(0.25)
+            dropdownFrame.Visible = false
+        end
+    end
+
+    selected.MouseButton1Click:Connect(function()
+        toggleDropdown(not dropdownFrame.Visible)
+    end)
+
+    -- Click ra ngoài thì đóng
+    UserInputService.InputBegan:Connect(function(input, gp)
+        if gp then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            if dropdownFrame.Visible then
+                local mousePos = input.Position
+                local insideDropdown = (mousePos.X >= dropdownFrame.AbsolutePosition.X
+                    and mousePos.X <= dropdownFrame.AbsolutePosition.X + dropdownFrame.AbsoluteSize.X
+                    and mousePos.Y >= dropdownFrame.AbsolutePosition.Y
+                    and mousePos.Y <= dropdownFrame.AbsolutePosition.Y + dropdownFrame.AbsoluteSize.Y)
+
+                local insideSelected = (mousePos.X >= selected.AbsolutePosition.X
+                    and mousePos.X <= selected.AbsolutePosition.X + selected.AbsoluteSize.X
+                    and mousePos.Y >= selected.AbsolutePosition.Y
+                    and mousePos.Y <= selected.AbsolutePosition.Y + selected.AbsoluteSize.Y)
+
+                if not insideDropdown and not insideSelected then
+                    toggleDropdown(false)
+                end
+            end
         end
     end)
 
