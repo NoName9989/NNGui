@@ -757,3 +757,83 @@ end)
 
 -- Tạo Tab Main
 local mainTabBtn, mainTabScroll = createTab("Main", 2)
+
+local function createDropdown(parent, labelText, items, default, order, onSelect)
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(1, -20, 0, 40)
+    holder.Position = UDim2.new(0, 10, 0, 0)
+    holder.BackgroundTransparency = 1
+    holder.LayoutOrder = order
+    holder.Parent = parent
+
+    local layout = Instance.new("UIListLayout", holder)
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.VerticalAlignment = Enum.VerticalAlignment.Center
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 8)
+
+    -- Label bên trái (luôn căn giữa dọc)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 100, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = holder
+
+    -- Dropdown button
+    local dropdownBtn = Instance.new("TextButton")
+    dropdownBtn.Size = UDim2.new(1, -100, 1, 0)
+    dropdownBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    dropdownBtn.BackgroundTransparency = 0.6
+    dropdownBtn.Text = default or "Select..."
+    dropdownBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    dropdownBtn.Font = Enum.Font.GothamSemibold
+    dropdownBtn.TextSize = 14
+    dropdownBtn.TextXAlignment = Enum.TextXAlignment.Left
+    dropdownBtn.Parent = holder
+    Instance.new("UICorner", dropdownBtn).CornerRadius = UDim.new(0,6)
+
+    -- Danh sách xổ xuống
+    local dropdownFrame = Instance.new("Frame")
+    dropdownFrame.Size = UDim2.new(1, -100, 0, #items * 30)
+    dropdownFrame.Position = UDim2.new(0, 100, 1, 2)
+    dropdownFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    dropdownFrame.Visible = false
+    dropdownFrame.Parent = holder
+    Instance.new("UICorner", dropdownFrame).CornerRadius = UDim.new(0,6)
+
+    local listLayout = Instance.new("UIListLayout", dropdownFrame)
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Thêm item vào dropdown
+    for i, v in ipairs(items) do
+        local itemBtn = Instance.new("TextButton")
+        itemBtn.Size = UDim2.new(1, 0, 0, 30)
+        itemBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+        itemBtn.Text = v
+        itemBtn.TextColor3 = Color3.fromRGB(230,230,230)
+        itemBtn.Font = Enum.Font.Gotham
+        itemBtn.TextSize = 14
+        itemBtn.Parent = dropdownFrame
+
+        itemBtn.MouseButton1Click:Connect(function()
+            dropdownBtn.Text = v
+            dropdownFrame.Visible = false
+            if onSelect then onSelect(v) end
+        end)
+    end
+
+    -- Mở / đóng dropdown
+    dropdownBtn.MouseButton1Click:Connect(function()
+        dropdownFrame.Visible = not dropdownFrame.Visible
+    end)
+
+    return holder, dropdownBtn
+end
+
+createDropdown(localTabScroll, "Mode", {"Easy","Normal","Hard"}, "Normal", 1, function(selected)
+    print("Bạn chọn:", selected)
+end)
