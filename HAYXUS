@@ -114,18 +114,16 @@ function HayxusLibrary:CreateWindow(title)
         frame.Visible = false
         minimized = true
 
-        miniBtn = Instance.new("ImageButton")  -- dùng ImageButton để có thể set hình
+        -- Khi minimize tạo mini button
+miniBtn = Instance.new("ImageButton")  -- đổi từ TextButton
 miniBtn.Size = UDim2.new(0, 50, 0, 50) -- ô vuông
 miniBtn.Position = UDim2.new(0, 10, 0, 10)
 miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255) -- mặc định trắng
 miniBtn.BackgroundTransparency = 0
-miniBtn.Image = ""  -- mặc định chưa có ảnh
+miniBtn.Image = "rbxassetid://134140295627868"  -- gán ngay asset id
 miniBtn.Active = true
 miniBtn.Draggable = true
 miniBtn.Parent = gui
-
--- Nếu muốn thay ảnh khi chạy window:
--- miniBtn.Image = "rbxassetid://1234567890"
 
         -- Kéo mini button trên mobile
         makeDraggable(miniBtn, miniBtn)
