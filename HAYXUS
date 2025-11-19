@@ -3,7 +3,6 @@ HayxusLibrary.__index = HayxusLibrary
 
 function HayxusLibrary:CreateWindow(title)
     local self = setmetatable({}, HayxusLibrary)
-
     local player = game.Players.LocalPlayer
     local gui = Instance.new("ScreenGui")
     gui.Name = title
@@ -66,7 +65,7 @@ function HayxusLibrary:CreateWindow(title)
     local minimized = false
     local miniBtn
 
-    -- Hàm drag hỗ trợ mobile
+    -- Drag hỗ trợ mobile
     local function makeDraggable(dragFrame, dragTarget)
         local dragging = false
         local dragInput, startPos, startPosTarget
@@ -105,28 +104,23 @@ function HayxusLibrary:CreateWindow(title)
         end)
     end
 
-    -- Kéo GUI chính
     makeDraggable(titleBar, frame)
 
-    -- Minimize → nút nhỏ kéo được
+    -- Minimize → mini button hiện asset id luôn
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
         minimized = true
 
-        -- Khi minimize tạo mini button
-miniBtn = Instance.new("ImageButton")  -- đổi từ TextButton
-miniBtn.Size = UDim2.new(0, 50, 0, 50) -- ô vuông
-miniBtn.Position = UDim2.new(0, 10, 0, 10)
-miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255) -- mặc định trắng
-miniBtn.BackgroundTransparency = 0
-miniBtn.Image = "rbxassetid://134140295627868"  -- gán ngay asset id
-miniBtn.Active = true
-miniBtn.Draggable = true
-miniBtn.Parent = gui
-
-        -- Kéo mini button trên mobile
-        makeDraggable(miniBtn, miniBtn)
+        miniBtn = Instance.new("ImageButton")  -- ImageButton để set ảnh
+        miniBtn.Size = UDim2.new(0, 50, 0, 50) -- ô vuông
+        miniBtn.Position = UDim2.new(0, 10, 0, 10)
+        miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+        miniBtn.BackgroundTransparency = 0
+        miniBtn.Image = "rbxassetid://134140295627868"  -- gán asset id luôn
+        miniBtn.Active = true
+        miniBtn.Draggable = true
+        miniBtn.Parent = gui
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
