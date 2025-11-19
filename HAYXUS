@@ -17,8 +17,6 @@ function HayxusLibrary:CreateWindow(title)
     frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     frame.BackgroundTransparency = 0.35
     frame.BorderSizePixel = 0
-    frame.Active = true
-    frame.Draggable = true
     frame.Parent = gui
     self.Frame = frame
 
@@ -68,6 +66,49 @@ function HayxusLibrary:CreateWindow(title)
     local minimized = false
     local miniBtn
 
+    -- Hàm drag hỗ trợ mobile
+    local function makeDraggable(dragFrame, dragTarget)
+        local dragging = false
+        local dragInput, startPos, startPosTarget
+
+        dragFrame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or
+               input.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                startPos = input.Position
+                startPosTarget = dragTarget.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+
+        dragFrame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or
+               input.UserInputType == Enum.UserInputType.Touch then
+                dragInput = input
+            end
+        end)
+
+        game:GetService("UserInputService").InputChanged:Connect(function(input)
+            if dragging and input == dragInput then
+                local delta = input.Position - startPos
+                dragTarget.Position = UDim2.new(
+                    startPosTarget.X.Scale,
+                    startPosTarget.X.Offset + delta.X,
+                    startPosTarget.Y.Scale,
+                    startPosTarget.Y.Offset + delta.Y
+                )
+            end
+        end)
+    end
+
+    -- Kéo GUI chính
+    makeDraggable(titleBar, frame)
+
+    -- Minimize → nút nhỏ kéo được
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
@@ -81,9 +122,10 @@ function HayxusLibrary:CreateWindow(title)
         miniBtn.Text = title
         miniBtn.Font = Enum.Font.GothamSemibold
         miniBtn.TextSize = 14
-        miniBtn.Active = true
-        miniBtn.Draggable = true
         miniBtn.Parent = gui
+
+        -- Kéo mini button trên mobile
+        makeDraggable(miniBtn, miniBtn)
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
