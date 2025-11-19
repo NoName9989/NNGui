@@ -122,7 +122,7 @@ function HayxusLibrary:CreateWindow(title)
         miniBtn.Draggable = true
         miniBtn.Parent = gui
         wait() -- đảm bảo parent xong
-        miniBtn.Image = "rbxassetid://134140295627868"
+        miniBtn.Image = "rbxassetid://98966772841112"
 
         local aspect = Instance.new("UIAspectRatioConstraint")
         aspect.Parent = miniBtn
