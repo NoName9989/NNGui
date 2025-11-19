@@ -1,0 +1,152 @@
+local HAYXUS = {}
+
+-- Theme
+HAYXUS.theme = {
+    MainColor = Color3.fromRGB(155, 123, 255),
+    BrighterMainColor = Color3.fromRGB(240, 240, 240),
+    Accent = Color3.fromRGB(255, 175, 75),
+    BrightText = Color3.fromRGB(245, 245, 245),
+    DarkText = Color3.fromRGB(50, 50, 50),
+    IconsColor = Color3.fromRGB(200, 200, 200),
+    Font = "SourceSans"
+}
+
+-- Tween helper
+function HAYXUS.Tween(obj, time, props)
+    local TweenService = game:GetService("TweenService")
+    local tween = TweenService:Create(obj, TweenInfo.new(time, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), props)
+    tween:Play()
+end
+
+-- Instance helper
+function HAYXUS.make(className, props)
+    local obj = Instance.new(className)
+    for i,v in pairs(props) do obj[i] = v end
+    return obj
+end
+
+-- Init main GUI
+function HAYXUS.Init()
+    HAYXUS.Main = HAYXUS.make("ScreenGui",{Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"); Name = "HAYXUS_GUI"})
+end
+
+-- Create Page
+function HAYXUS.NewPage(title)
+    local Page = {}
+    local PageFrame = HAYXUS.make("Frame",{
+        Parent = HAYXUS.Main;
+        Name = title;
+        Size = UDim2.new(0.96,0,0.95,0);
+        Position = UDim2.new(0.02,0,0.03,0);
+        BackgroundColor3 = HAYXUS.theme.BrighterMainColor;
+        BorderSizePixel = 0;
+        ClipsDescendants = true;
+    })
+    HAYXUS.make("UIListLayout",{Parent=PageFrame; FillDirection=Enum.FillDirection.Vertical; HorizontalAlignment=Enum.HorizontalAlignment.Center; Padding=UDim.new(0,10); SortOrder=Enum.SortOrder.LayoutOrder})
+    Page.Frame = PageFrame
+
+    -- Create Section
+    function Page.Section(title)
+        local Section = {}
+        local SectionFrame = HAYXUS.make("Frame",{
+            Parent = PageFrame;
+            Name = title;
+            Size = UDim2.new(0.95,0,0,50);
+            BackgroundColor3 = HAYXUS.theme.BrighterMainColor;
+            BorderSizePixel = 0;
+            ClipsDescendants = true;
+        })
+        HAYXUS.make("UIListLayout",{Parent=SectionFrame; FillDirection=Enum.FillDirection.Vertical; HorizontalAlignment=Enum.HorizontalAlignment.Center; Padding=UDim.new(0,5); SortOrder=Enum.SortOrder.LayoutOrder})
+        Section.Frame = SectionFrame
+
+        -- Add components
+        function Section.Component(type, arg1,arg2,arg3,arg4,arg5,arg6,arg7)
+            if type=="Card" then
+                local Card = HAYXUS.make("Frame",{Parent=SectionFrame; Name="Card_"..arg1; Size=UDim2.new(0.95,0,0,70); BackgroundColor3=HAYXUS.theme.BrighterMainColor; BorderSizePixel=0})
+                HAYXUS.make("UICorner",{Parent=Card; CornerRadius=UDim.new(0,8)})
+                HAYXUS.make("TextLabel",{Parent=Card; Name="Title"; Size=UDim2.new(1,-20,0,25); Position=UDim2.new(0,10,0,10); BackgroundTransparency=1; Text=arg1; TextColor3=HAYXUS.theme.DarkText; Font=Enum.Font[HAYXUS.theme.Font]; TextSize=18; TextXAlignment=Enum.TextXAlignment.Left})
+                HAYXUS.make("TextLabel",{Parent=Card; Name="Desc"; Size=UDim2.new(1,-20,0,25); Position=UDim2.new(0,10,0,35); BackgroundTransparency=1; Text=arg2 or ""; TextColor3=HAYXUS.theme.BrightText; Font=Enum.Font[HAYXUS.theme.Font]; TextSize=15; TextXAlignment=Enum.TextXAlignment.Left; TextWrapped=true})
+                Card.MouseEnter:Connect(function() HAYXUS.Tween(Card,0.2,{BackgroundColor3=HAYXUS.theme.MainColor}) end)
+                Card.MouseLeave:Connect(function() HAYXUS.Tween(Card,0.2,{BackgroundColor3=HAYXUS.theme.BrighterMainColor}) end)
+                if arg3 then Card.MouseButton1Click:Connect(arg3) end
+            end
+
+            if type=="Toggle" then
+                local Toggle = HAYXUS.make("TextButton",{Parent=SectionFrame; Name=arg1; Size=UDim2.new(0.96,0,0,40); BackgroundColor3=HAYXUS.theme.BrighterMainColor; BorderSizePixel=0; Text="   "..arg1; TextColor3=HAYXUS.theme.DarkText; Font=Enum.Font[HAYXUS.theme.Font]; TextXAlignment=Enum.TextXAlignment.Left})
+                HAYXUS.make("UICorner",{Parent=Toggle; CornerRadius=UDim.new(0,6)})
+                local State = HAYXUS.make("BoolValue",{Parent=Toggle; Name="State"; Value=arg3 or false})
+                Toggle.MouseButton1Click:Connect(function()
+                    State.Value = not State.Value
+                    if arg2 then arg2(State.Value) end
+                end)
+            end
+
+            if type=="Button" then
+                local Btn = HAYXUS.make("TextButton",{Parent=SectionFrame; Name=arg1; Size=UDim2.new(0.96,0,0,40); BackgroundColor3=HAYXUS.theme.BrighterMainColor; BorderSizePixel=0; Text=arg1; TextColor3=HAYXUS.theme.BrightText; Font=Enum.Font[HAYXUS.theme.Font]})
+                HAYXUS.make("UICorner",{Parent=Btn; CornerRadius=UDim.new(0,6)})
+                if arg2 then Btn.MouseButton1Click:Connect(arg2) end
+            end
+
+            if type=="Dropdown" then
+                local Dropdown = HAYXUS.make("TextButton",{Parent=SectionFrame; Name=arg1; Size=UDim2.new(0.96,0,0,40); BackgroundColor3=HAYXUS.theme.BrighterMainColor; BorderSizePixel=0; Text="   "..arg1; TextColor3=HAYXUS.theme.DarkText; Font=Enum.Font[HAYXUS.theme.Font]; TextXAlignment=Enum.TextXAlignment.Left})
+                HAYXUS.make("UICorner",{Parent=Dropdown; CornerRadius=UDim.new(0,6)})
+                local OptionsFrame = HAYXUS.make("Frame",{Parent=Dropdown; Name="Options"; Size=UDim2.new(1,0,0,0); Position=UDim2.new(0,0,1,0); BackgroundColor3=HAYXUS.theme.BrighterMainColor; ClipsDescendants=true})
+                HAYXUS.make("UIListLayout",{Parent=OptionsFrame; FillDirection=Enum.FillDirection.Vertical; HorizontalAlignment=Enum.HorizontalAlignment.Center; SortOrder=Enum.SortOrder.LayoutOrder; Padding=UDim.new(0,3)})
+                local isOpen=false
+                Dropdown.MouseButton1Click:Connect(function()
+                    isOpen = not isOpen
+                    OptionsFrame:TweenSize(UDim2.new(1,0,0,(isOpen and #arg2*25 or 0)),"Out","Quart",0.3,true)
+                end)
+                for _,v in pairs(arg2) do
+                    local Opt = HAYXUS.make("TextButton",{Parent=OptionsFrame; Size=UDim2.new(0.95,0,0,25); BackgroundColor3=HAYXUS.theme.MainColor; Text="   "..v; TextColor3=HAYXUS.theme.DarkText; Font=Enum.Font[HAYXUS.theme.Font]; TextSize=14})
+                    HAYXUS.make("UICorner",{Parent=Opt; CornerRadius=UDim.new(0,4)})
+                    Opt.MouseButton1Click:Connect(function()
+                        if arg3 then arg3(v) end
+                        OptionsFrame:TweenSize(UDim2.new(1,0,0,0),"Out","Quart",0.3,true)
+                    end)
+                end
+            end
+
+            if type=="Slider" then
+                local Slider = HAYXUS.make("Frame",{Parent=SectionFrame; Name=arg1; Size=UDim2.new(0.96,0,0,40); BackgroundColor3=HAYXUS.theme.BrighterMainColor; BorderSizePixel=0})
+                HAYXUS.make("UICorner",{Parent=Slider; CornerRadius=UDim.new(0,6)})
+                local Track = HAYXUS.make("Frame",{Parent=Slider; Size=UDim2.new(1,-20,0,6); Position=UDim2.new(0,10,0.5,0); AnchorPoint=Vector2.new(0,0.5); BackgroundColor3=HAYXUS.theme.MainColor})
+                HAYXUS.make("UICorner",{Parent=Track; CornerRadius=UDim.new(0,3)})
+                local Progress = HAYXUS.make("Frame",{Parent=Track; Size=UDim2.new(0,0,1,0); BackgroundColor3=HAYXUS.theme.Accent})
+                HAYXUS.make("UICorner",{Parent=Progress; CornerRadius=UDim.new(0,3)})
+                local Circle = HAYXUS.make("Frame",{Parent=Progress; Size=UDim2.new(0,12,0,12); AnchorPoint=Vector2.new(0.5,0.5); Position=UDim2.new(0,0,0.5,0); BackgroundColor3=HAYXUS.theme.MainColor})
+                HAYXUS.make("UICorner",{Parent=Circle; CornerRadius=UDim.new(1,6)})
+                local dragging=false
+                local min,max=arg2 or 0,arg3 or 100
+                local value=arg4 or min
+                local function update(x)
+                    local rel=math.clamp((x-Track.AbsolutePosition.X)/Track.AbsoluteSize.X,0,1)
+                    Progress.Size=UDim2.new(rel,0,1,0)
+                    Circle.Position=UDim2.new(rel,0,0.5,0)
+                    value=math.floor(min+(max-min)*rel)
+                    if arg5 then arg5(value) end
+                end
+                Slider.InputBegan:Connect(function(input)
+                    if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true update(input.Position.X) end
+                end)
+                Slider.InputEnded:Connect(function(input) if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end end)
+                game:GetService("UserInputService").InputChanged:Connect(function(input)
+                    if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then update(input.Position.X) end
+                end)
+            end
+
+            if type=="TimePicker" then
+                local TP = HAYXUS.make("Frame",{Parent=SectionFrame; Name=arg1; Size=UDim2.new(0.96,0,0,50); BackgroundColor3=HAYXUS.theme.BrighterMainColor; BorderSizePixel=0})
+                HAYXUS.make("UICorner",{Parent=TP; CornerRadius=UDim.new(0,6)})
+                local HourBox=HAYXUS.make("Frame",{Parent=TP; Size=UDim2.new(0,40,0,30); Position=UDim2.new(0.65,0,0.5,0); AnchorPoint=Vector2.new(0,0.5); BackgroundTransparency=1})
+                local MinuteBox=HAYXUS.make("Frame",{Parent=TP; Size=UDim2.new(0,40,0,30); Position=UDim2.new(0.85,0,0.5,0); AnchorPoint=Vector2.new(0,0.5); BackgroundTransparency=1})
+                -- Labels & UIPageLayout logic can be added
+            end
+        end
+        return Section
+    end
+
+    return Page
+end
+
+return HAYXUS
