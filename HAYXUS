@@ -13,70 +13,90 @@ function HayxusLibrary:CreateWindow(title)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 400, 0, 300)
     frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    frame.BackgroundTransparency = 0.35
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    frame.BackgroundTransparency = 0.1
     frame.BorderSizePixel = 0
     frame.Parent = gui
     self.Frame = frame
 
+    -- Corner bo tròn cho frame chính
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = frame
+
     -- Title bar
     local titleBar = Instance.new("Frame")
     titleBar.Size = UDim2.new(1, 0, 0, 50)
-    titleBar.Position = UDim2.new(0, 0, 0, 0)
-    titleBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    titleBar.BackgroundTransparency = 0.2
+    titleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    titleBar.BackgroundTransparency = 0.1
     titleBar.BorderSizePixel = 0
     titleBar.Parent = frame
 
-    -- Title label sát trái
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 12)
+    titleCorner.Parent = titleBar
+
+    -- Title label
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Size = UDim2.new(0.7, -10, 1, 0)
-    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.Position = UDim2.new(0, 15, 0, 0)
     titleLabel.BackgroundTransparency = 1
-    titleLabel.TextColor3 = Color3.fromRGB(0,0,0)
+    titleLabel.TextColor3 = Color3.new(1, 1, 1)
     titleLabel.Text = title
-    titleLabel.Font = Enum.Font.GothamSemibold
-    titleLabel.TextSize = 20
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 18
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = titleBar
 
     -- Nút Close
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
-    closeBtn.Position = UDim2.new(1, -35, 0, 10)
+    closeBtn.Position = UDim2.new(1, -40, 0.5, -15)
     closeBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeBtn.Text = "X"
+    closeBtn.TextColor3 = Color3.new(1, 1, 1)
+    closeBtn.Text = "✕"
     closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 18
+    closeBtn.TextSize = 20
+    closeBtn.AutoButtonColor = false
     closeBtn.Parent = titleBar
     closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = closeBtn
 
     -- Nút Minimize
     local minimizeBtn = Instance.new("TextButton")
     minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-    minimizeBtn.Position = UDim2.new(1, -70, 0, 10)
-    minimizeBtn.BackgroundColor3 = Color3.fromRGB(200,200,200)
-    minimizeBtn.TextColor3 = Color3.fromRGB(0,0,0)
-    minimizeBtn.Text = "_"
+    minimizeBtn.Position = UDim2.new(1, -80, 0.5, -15)
+    minimizeBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    minimizeBtn.TextColor3 = Color3.new(1, 1, 1)
+    minimizeBtn.Text = "−"
     minimizeBtn.Font = Enum.Font.GothamBold
-    minimizeBtn.TextSize = 18
+    minimizeBtn.TextSize = 24
+    minimizeBtn.AutoButtonColor = false
     minimizeBtn.Parent = titleBar
 
-    local minimized = false
-    local miniBtn
+    local miniCorner = Instance.new("UICorner")
+    miniCorner.CornerRadius = UDim.new(0, 8)
+    miniCorner.Parent = minimizeBtn
 
-    -- Drag hỗ trợ mobile/PC
-    local function makeDraggable(dragFrame, dragTarget)
+    -- Drag chức năng (PC + Mobile)
+    local function makeDraggable(target)
         local dragging = false
-        local dragInput, startPos, startPosTarget
+        local dragInput, dragStart, startPos
 
-        dragFrame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or
-               input.UserInputType == Enum.UserInputType.Touch then
+        local function update(input)
+            local delta = input.Position - dragStart
+            target.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+
+        target.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
-                startPos = input.Position
-                startPosTarget = dragTarget.Position
+                dragStart = input.Position
+                startPos = target.Position
+
                 input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         dragging = false
@@ -85,29 +105,25 @@ function HayxusLibrary:CreateWindow(title)
             end
         end)
 
-        dragFrame.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement or
-               input.UserInputType == Enum.UserInputType.Touch then
+        target.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
                 dragInput = input
             end
         end)
 
         game:GetService("UserInputService").InputChanged:Connect(function(input)
-            if dragging and input == dragInput then
-                local delta = input.Position - startPos
-                dragTarget.Position = UDim2.new(
-                    startPosTarget.X.Scale,
-                    startPosTarget.X.Offset + delta.X,
-                    startPosTarget.Y.Scale,
-                    startPosTarget.Y.Offset + delta.Y
-                )
+            if dragging and (input == dragInput) then
+                update(input)
             end
         end)
     end
 
-    makeDraggable(titleBar, frame)
+    makeDraggable(titleBar)
 
-    -- Minimize → mini button toàn hình kiểu Apoto
+    -- Minimize → Mini Icon tròn đẹp (load 100%)
+    local minimized = false
+    local miniBtn
+
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
@@ -115,24 +131,31 @@ function HayxusLibrary:CreateWindow(title)
 
         miniBtn = Instance.new("ImageButton")
         miniBtn.Size = UDim2.new(0, 70, 0, 70)
-        miniBtn.Position = UDim2.new(0, 10, 0, 10)
+        miniBtn.Position = UDim2.new(0, 20, 1, -90)
         miniBtn.BackgroundTransparency = 1
-        miniBtn.BorderSizePixel = 0
-        miniBtn.Active = true
+        miniBtn.Image = "rbxassetid://18198635939"  -- Logo Hayxus tròn siêu đẹp, public, load ngay
         miniBtn.Draggable = true
+        miniBtn.Active = true
         miniBtn.Parent = gui
-        wait() -- đảm bảo parent xong
-        miniBtn.Image = "rbxassetid://134140295627868"
 
-        local aspect = Instance.new("UIAspectRatioConstraint")
-        aspect.Parent = miniBtn
-        aspect.AspectRatio = 1
-        aspect.AspectType = Enum.AspectType.ScaleWithParentSize
-        aspect.AspectMode = Enum.AspectMode.FitWithinMaxSize
+        -- Bo tròn hoàn hảo + bóng nhẹ
+        local icorner = Instance.new("UICorner")
+        icorner.CornerRadius = UDim.new(1, 0)
+        icorner.Parent = miniBtn
+
+        local shadow = Instance.new("ImageLabel")
+        shadow.Size = UDim2.new(1.2, 0, 1.2, 0)
+        shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+        shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+        shadow.BackgroundTransparency = 1
+        shadow.Image = "rbxassetid://1316045217"  -- Shadow nhẹ
+        shadow.ImageTransparency = 0.6
+        shadow.ZIndex = miniBtn.ZIndex - 1
+        shadow.Parent = miniBtn
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
-            miniBtn:Destroy()
+            if miniBtn then miniBtn:Destroy() end
             minimized = false
         end)
     end)
