@@ -9,7 +9,6 @@ function HayxusLibrary:CreateWindow(title)
     gui.Name = title
     gui.ResetOnSpawn = false
     gui.Parent = player:WaitForChild("PlayerGui")
-    self.ScreenGui = gui
 
     -- Frame chính
     local frame = Instance.new("Frame")
@@ -18,6 +17,8 @@ function HayxusLibrary:CreateWindow(title)
     frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     frame.BackgroundTransparency = 0.35
     frame.BorderSizePixel = 0
+    frame.Active = true
+    frame.Draggable = true
     frame.Parent = gui
     self.Frame = frame
 
@@ -30,12 +31,11 @@ function HayxusLibrary:CreateWindow(title)
     titleBar.BorderSizePixel = 0
     titleBar.Parent = frame
 
-    -- Title Label
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Size = UDim2.new(0.7, -10, 1, 0)
     titleLabel.Position = UDim2.new(0, 10, 0, 0)
     titleLabel.BackgroundTransparency = 1
-    titleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+    titleLabel.TextColor3 = Color3.fromRGB(0,0,0)
     titleLabel.Text = title
     titleLabel.Font = Enum.Font.GothamSemibold
     titleLabel.TextSize = 20
@@ -47,24 +47,19 @@ function HayxusLibrary:CreateWindow(title)
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
     closeBtn.Position = UDim2.new(1, -35, 0, 10)
     closeBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-    closeBtn.BackgroundTransparency = 0.1
     closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeBtn.Text = "X"
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.TextSize = 18
     closeBtn.Parent = titleBar
-
-    closeBtn.MouseEnter:Connect(function() closeBtn.BackgroundColor3 = Color3.fromRGB(255,50,50) end)
-    closeBtn.MouseLeave:Connect(function() closeBtn.BackgroundColor3 = Color3.fromRGB(255,80,80) end)
     closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
     -- Nút Minimize
     local minimizeBtn = Instance.new("TextButton")
     minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
     minimizeBtn.Position = UDim2.new(1, -70, 0, 10)
-    minimizeBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    minimizeBtn.BackgroundTransparency = 0.1
-    minimizeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    minimizeBtn.BackgroundColor3 = Color3.fromRGB(200,200,200)
+    minimizeBtn.TextColor3 = Color3.fromRGB(0,0,0)
     minimizeBtn.Text = "_"
     minimizeBtn.Font = Enum.Font.GothamBold
     minimizeBtn.TextSize = 18
@@ -73,56 +68,22 @@ function HayxusLibrary:CreateWindow(title)
     local minimized = false
     local miniBtn
 
-    -- Hàm kéo
-    local function makeDraggable(dragFrame, dragTarget)
-        local dragging, dragInput, mousePos, framePos
-        dragFrame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = true
-                mousePos = input.Position
-                framePos = dragTarget.Position
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        dragging = false
-                    end
-                end)
-            end
-        end)
-        dragFrame.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
-                dragInput = input
-            end
-        end)
-        game:GetService("UserInputService").InputChanged:Connect(function(input)
-            if input == dragInput and dragging then
-                local delta = input.Position - mousePos
-                dragTarget.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X,
-                                                framePos.Y.Scale, framePos.Y.Offset + delta.Y)
-            end
-        end)
-    end
-
-    -- Kéo GUI chính
-    makeDraggable(titleBar, frame)
-
-    -- Minimize → nút nhỏ kéo được
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
         minimized = true
 
         miniBtn = Instance.new("TextButton")
-        miniBtn.Size = UDim2.new(0, 50, 0, 30)
+        miniBtn.Size = UDim2.new(0, 80, 0, 30)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
-        miniBtn.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
-        miniBtn.BackgroundTransparency = 0.2
-        miniBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+        miniBtn.BackgroundColor3 = Color3.fromRGB(220,220,220)
+        miniBtn.TextColor3 = Color3.fromRGB(0,0,0)
         miniBtn.Text = title
         miniBtn.Font = Enum.Font.GothamSemibold
         miniBtn.TextSize = 14
+        miniBtn.Active = true
+        miniBtn.Draggable = true
         miniBtn.Parent = gui
-
-        makeDraggable(miniBtn, miniBtn)
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
