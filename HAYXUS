@@ -112,15 +112,15 @@ function HayxusLibrary:CreateWindow(title)
         frame.Visible = false
         minimized = true
 
-        miniBtn = Instance.new("ImageButton")  -- ImageButton để set ảnh
+        miniBtn = Instance.new("ImageButton")
         miniBtn.Size = UDim2.new(0, 50, 0, 50) -- ô vuông
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
         miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
         miniBtn.BackgroundTransparency = 0
-        miniBtn.Image = "rbxassetid://134140295627868"  -- gán asset id luôn
         miniBtn.Active = true
         miniBtn.Draggable = true
-        miniBtn.Parent = gui
+        miniBtn.Parent = gui  -- gán parent trước khi set image
+        miniBtn.Image = "rbxassetid://134140295627868"  -- set image SAU khi parent
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
