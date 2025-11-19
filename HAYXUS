@@ -119,7 +119,7 @@ function HayxusLibrary:CreateWindow(title)
         miniBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         miniBtn.BackgroundTransparency = 0
         miniBtn.BorderSizePixel = 0
-        miniBtn.Image = "rbxassetid://134140295627868"
+        miniBtn.Image = "rbxassetid://98966772841112"
         miniBtn.Active = true
         miniBtn.Draggable = true
         miniBtn.Parent = gui
