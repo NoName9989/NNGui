@@ -1,26 +1,63 @@
 local HayxusLibrary = {}
 HayxusLibrary.__index = HayxusLibrary
 
--- Biến lưu GUI hiện tại để quản lý
-HayxusLibrary.CurrentWindow = HayxusLibrary.CurrentWindow or nil
+-- Tự động đặt GUI vào đúng chỗ như Rayfield
+local function ProtectAndParent(gui)
+    local CoreGui = game:GetService("CoreGui")
+
+    if gethui then
+        gui.Parent = gethui()
+
+        -- Tắt GUI cũ
+        for _, v in ipairs(gethui():GetChildren()) do
+            if v.Name == gui.Name and v ~= gui then
+                v.Enabled = false
+                v.Name = gui.Name .. "-Old"
+            end
+        end
+    
+    elseif syn and syn.protect_gui then
+        syn.protect_gui(gui)
+        gui.Parent = CoreGui
+
+        for _, v in ipairs(CoreGui:GetChildren()) do
+            if v.Name == gui.Name and v ~= gui then
+                v.Enabled = false
+                v.Name = gui.Name .. "-Old"
+            end
+        end
+
+    elseif CoreGui:FindFirstChild("RobloxGui") then
+        gui.Parent = CoreGui.RobloxGui
+
+        for _, v in ipairs(CoreGui.RobloxGui:GetChildren()) do
+            if v.Name == gui.Name and v ~= gui then
+                v.Enabled = false
+                v.Name = gui.Name .. "-Old"
+            end
+        end
+
+    else
+        gui.Parent = CoreGui
+
+        for _, v in ipairs(CoreGui:GetChildren()) do
+            if v.Name == gui.Name and v ~= gui then
+                v.Enabled = false
+                v.Name = gui.Name .. "-Old"
+            end
+        end
+    end
+end
 
 function HayxusLibrary:CreateWindow(title)
     local self = setmetatable({}, HayxusLibrary)
     local player = game.Players.LocalPlayer
 
-    -- Nếu đã có GUI cũ, destroy nó
-    if HayxusLibrary.CurrentWindow then
-        HayxusLibrary.CurrentWindow:Destroy()
-        HayxusLibrary.CurrentWindow = nil
-    end
-
+    -- Tạo ScreenGui
     local gui = Instance.new("ScreenGui")
     gui.Name = title
     gui.ResetOnSpawn = false
-    gui.Parent = player:WaitForChild("PlayerGui")
-
-    -- lưu GUI hiện tại
-    HayxusLibrary.CurrentWindow = gui
+    ProtectAndParent(gui)
 
     -- Frame chính
     local frame = Instance.new("Frame")
@@ -51,7 +88,7 @@ function HayxusLibrary:CreateWindow(title)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = titleBar
 
-    -- Close button
+    -- Nút X
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
     closeBtn.Position = UDim2.new(1, -35, 0, 8)
@@ -61,15 +98,9 @@ function HayxusLibrary:CreateWindow(title)
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.TextSize = 18
     closeBtn.Parent = titleBar
+    closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
 
-    closeBtn.MouseButton1Click:Connect(function()
-        gui:Destroy()
-        if HayxusLibrary.CurrentWindow == gui then
-            HayxusLibrary.CurrentWindow = nil
-        end
-    end)
-
-    -- Minimize button
+    -- Nút Minimize
     local minimizeBtn = Instance.new("TextButton")
     minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
     minimizeBtn.Position = UDim2.new(1, -70, 0, 8)
@@ -80,12 +111,13 @@ function HayxusLibrary:CreateWindow(title)
     minimizeBtn.TextSize = 18
     minimizeBtn.Parent = titleBar
 
-    -- Draggable frame
+    -- Draggable
     local UIS = game:GetService("UserInputService")
-    local dragging, startPos, dragStart
+    local dragging, dragStart, startPos
 
     titleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
@@ -98,16 +130,16 @@ function HayxusLibrary:CreateWindow(title)
     end)
 
     UIS.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        if dragging then
             local delta = input.Position - dragStart
-            frame.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y
-            )
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                       startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 
-    -- Minimized button functionality
+    ------------------------
+    -- BUTTON MINIMIZE DRAG
+    ------------------------
     local minimized = false
     local miniBtn
 
@@ -120,42 +152,37 @@ function HayxusLibrary:CreateWindow(title)
         miniBtn.Size = UDim2.new(0, 60, 0, 60)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
         miniBtn.BackgroundTransparency = 1
-        miniBtn.BorderSizePixel = 0
         miniBtn.Image = "rbxassetid://98966772841112"
         miniBtn.Parent = gui
 
-        -- Bo tròn
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 12)
         corner.Parent = miniBtn
 
-        -- Giữ đúng tỉ lệ
         local aspect = Instance.new("UIAspectRatioConstraint")
         aspect.AspectRatio = 1
         aspect.Parent = miniBtn
 
-        -- Draggable miniBtn
-        local dragMini, dragStartMini, startPosMini
+        local dragging2, dragStart2, startPos2
         miniBtn.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                dragMini = true
-                dragStartMini = input.Position
-                startPosMini = miniBtn.Position
+            if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+                dragging2 = true
+                dragStart2 = input.Position
+                startPos2 = miniBtn.Position
                 input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
-                        dragMini = false
+                        dragging2 = false
                     end
                 end)
             end
         end)
 
         UIS.InputChanged:Connect(function(input)
-            if dragMini and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                local delta = input.Position - dragStartMini
-                miniBtn.Position = UDim2.new(
-                    startPosMini.X.Scale, startPosMini.X.Offset + delta.X,
-                    startPosMini.Y.Scale, startPosMini.Y.Offset + delta.Y
-                )
+            if dragging2 then
+                local delta = input.Position - dragStart2
+                miniBtn.Position = UDim2.new(startPos2.X.Scale, startPos2.X.Offset + delta.X,
+                                            startPos2.Y.Scale, startPos2.Y.Offset + delta.Y)
             end
         end)
 
@@ -166,7 +193,6 @@ function HayxusLibrary:CreateWindow(title)
         end)
     end)
 
-    self.ElementCount = 0
     return self
 end
 
