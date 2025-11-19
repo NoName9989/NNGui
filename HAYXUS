@@ -28,6 +28,7 @@ function HayxusLibrary:CreateWindow(title)
     titleBar.BorderSizePixel = 0
     titleBar.Parent = frame
 
+    -- Title label sát trái
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Size = UDim2.new(0.7, -10, 1, 0)
     titleLabel.Position = UDim2.new(0, 10, 0, 0)
@@ -65,7 +66,7 @@ function HayxusLibrary:CreateWindow(title)
     local minimized = false
     local miniBtn
 
-    -- Drag hỗ trợ mobile
+    -- Drag hỗ trợ mobile/PC
     local function makeDraggable(dragFrame, dragTarget)
         local dragging = false
         local dragInput, startPos, startPosTarget
@@ -106,21 +107,28 @@ function HayxusLibrary:CreateWindow(title)
 
     makeDraggable(titleBar, frame)
 
-    -- Minimize → mini button toàn hình
+    -- Minimize → mini button toàn hình kiểu Apoto
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
         minimized = true
 
         miniBtn = Instance.new("ImageButton")
-        miniBtn.Size = UDim2.new(0, 50, 0, 50)
+        miniBtn.Size = UDim2.new(0, 70, 0, 70)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
         miniBtn.BackgroundTransparency = 1
         miniBtn.BorderSizePixel = 0
-        miniBtn.Image = "rbxassetid://15307540185" -- hình trực tiếp
         miniBtn.Active = true
         miniBtn.Draggable = true
         miniBtn.Parent = gui
+        wait() -- đảm bảo parent xong
+        miniBtn.Image = "rbxassetid://134140295627868"
+
+        local aspect = Instance.new("UIAspectRatioConstraint")
+        aspect.Parent = miniBtn
+        aspect.AspectRatio = 1
+        aspect.AspectType = Enum.AspectType.ScaleWithParentSize
+        aspect.AspectMode = Enum.AspectMode.FitWithinMaxSize
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
