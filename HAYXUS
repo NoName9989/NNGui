@@ -1,10 +1,9 @@
--- HayxusLibrary.lua
 local HayxusLibrary = {}
 HayxusLibrary.__index = HayxusLibrary
 
 function HayxusLibrary:CreateWindow(title)
     local self = setmetatable({}, HayxusLibrary)
-    
+
     local player = game.Players.LocalPlayer
     local gui = Instance.new("ScreenGui")
     gui.Name = title
@@ -12,6 +11,7 @@ function HayxusLibrary:CreateWindow(title)
     gui.Parent = player:WaitForChild("PlayerGui")
     self.ScreenGui = gui
 
+    -- Frame chính
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 400, 0, 300)
     frame.Position = UDim2.new(0.5, -200, 0.5, -150)
@@ -20,18 +20,109 @@ function HayxusLibrary:CreateWindow(title)
     frame.Parent = gui
     self.Frame = frame
 
+    -- Title bar
+    local titleBar = Instance.new("Frame")
+    titleBar.Size = UDim2.new(1, 0, 0, 50)
+    titleBar.Position = UDim2.new(0, 0, 0, 0)
+    titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = frame
+
+    -- TitleLabel sát bên trái
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, 0, 0, 50)
-    titleLabel.Position = UDim2.new(0, 0, 0, 0)
-    titleLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    titleLabel.BorderSizePixel = 0
+    titleLabel.Size = UDim2.new(0.7, -10, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     titleLabel.Text = title
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextSize = 22
-    titleLabel.Parent = frame
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = titleBar
 
-    self.ElementCount = 0 -- quản lý số element để xếp tiếp theo
+    -- Nút Close
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0, 30, 0, 30)
+    closeBtn.Position = UDim2.new(1, -35, 0, 10)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeBtn.Text = "X"
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 18
+    closeBtn.Parent = titleBar
+
+    closeBtn.MouseButton1Click:Connect(function()
+        gui:Destroy()
+    end)
+
+    -- Nút Minimize
+    local minimizeBtn = Instance.new("TextButton")
+    minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+    minimizeBtn.Position = UDim2.new(1, -70, 0, 10)
+    minimizeBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeBtn.Text = "_"
+    minimizeBtn.Font = Enum.Font.GothamBold
+    minimizeBtn.TextSize = 18
+    minimizeBtn.Parent = titleBar
+
+    local minimized = false
+    local miniBtn
+
+    minimizeBtn.MouseButton1Click:Connect(function()
+        if minimized then return end
+
+        -- Thu nhỏ frame
+        frame.Visible = false
+        minimized = true
+
+        -- Tạo nút nhỏ nổi
+        miniBtn = Instance.new("TextButton")
+        miniBtn.Size = UDim2.new(0, 50, 0, 30)
+        miniBtn.Position = UDim2.new(0, 10, 0, 10) -- góc trái trên, có thể đổi
+        miniBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        miniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        miniBtn.Text = title
+        miniBtn.Font = Enum.Font.GothamBold
+        miniBtn.TextSize = 14
+        miniBtn.Parent = gui
+
+        miniBtn.MouseButton1Click:Connect(function()
+            frame.Visible = true
+            miniBtn:Destroy()
+            minimized = false
+        end)
+    end)
+
+    -- Drag GUI
+    local dragging = false
+    local dragInput, mousePos, framePos
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            mousePos = input.Position
+            framePos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    titleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - mousePos
+            frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X,
+                                       framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+        end
+    end)
+
+    self.ElementCount = 0
     return self
 end
 
