@@ -106,21 +106,21 @@ function HayxusLibrary:CreateWindow(title)
 
     makeDraggable(titleBar, frame)
 
-    -- Minimize → mini button hiện asset id luôn
+    -- Minimize → mini button toàn hình
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
         minimized = true
 
         miniBtn = Instance.new("ImageButton")
-        miniBtn.Size = UDim2.new(0, 50, 0, 50) -- ô vuông
+        miniBtn.Size = UDim2.new(0, 50, 0, 50)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
-        miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
-        miniBtn.BackgroundTransparency = 0
+        miniBtn.BackgroundTransparency = 1
+        miniBtn.BorderSizePixel = 0
+        miniBtn.Image = "rbxassetid://134140295627868" -- hình trực tiếp
         miniBtn.Active = true
         miniBtn.Draggable = true
-        miniBtn.Parent = gui  -- gán parent trước khi set image
-        miniBtn.Image = "rbxassetid://134140295627868"  -- set image SAU khi parent
+        miniBtn.Parent = gui
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
