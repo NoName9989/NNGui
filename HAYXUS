@@ -117,7 +117,7 @@ function HayxusLibrary:CreateWindow(title)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
         miniBtn.BackgroundTransparency = 1
         miniBtn.BorderSizePixel = 0
-        miniBtn.Image = "rbxassetid://134140295627868" -- hình trực tiếp
+        miniBtn.Image = "rbxassetid://15307540185" -- hình trực tiếp
         miniBtn.Active = true
         miniBtn.Draggable = true
         miniBtn.Parent = gui
