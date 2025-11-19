@@ -103,7 +103,7 @@ function HayxusLibrary:CreateWindow(title)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
         miniBtn.BackgroundTransparency = 1
         miniBtn.BorderSizePixel = 0
-        miniBtn.Image = "rbxassetid://134140295627868"
+        miniBtn.Image = "rbxassetid://98966772841112"
         miniBtn.Parent = gui
 
         -- Bo tròn
