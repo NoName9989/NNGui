@@ -107,28 +107,26 @@ function HayxusLibrary:CreateWindow(title)
 
     makeDraggable(titleBar, frame)
 
-    -- Minimize → mini button toàn hình kiểu Apoto
+    -- Minimize → mini button nhỏ, bo góc
     minimizeBtn.MouseButton1Click:Connect(function()
         if minimized then return end
         frame.Visible = false
         minimized = true
 
         miniBtn = Instance.new("ImageButton")
-        miniBtn.Size = UDim2.new(0, 70, 0, 70)
+        miniBtn.Size = UDim2.new(0, 40, 0, 40)
         miniBtn.Position = UDim2.new(0, 10, 0, 10)
-        miniBtn.BackgroundTransparency = 1
+        miniBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        miniBtn.BackgroundTransparency = 0
         miniBtn.BorderSizePixel = 0
+        miniBtn.Image = "rbxassetid://134140295627868"
         miniBtn.Active = true
         miniBtn.Draggable = true
         miniBtn.Parent = gui
-        wait() -- đảm bảo parent xong
-        miniBtn.Image = "rbxassetid://98966772841112"
 
-        local aspect = Instance.new("UIAspectRatioConstraint")
-        aspect.Parent = miniBtn
-        aspect.AspectRatio = 1
-        aspect.AspectType = Enum.AspectType.ScaleWithParentSize
-        aspect.AspectMode = Enum.AspectMode.FitWithinMaxSize
+        local uicorner = Instance.new("UICorner")
+        uicorner.CornerRadius = UDim.new(0, 10)
+        uicorner.Parent = miniBtn
 
         miniBtn.MouseButton1Click:Connect(function()
             frame.Visible = true
