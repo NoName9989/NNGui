@@ -90,38 +90,67 @@ function HayxusLibrary:CreateWindow(title)
     end)
 
     -- Minimized button
-    local minimized = false
-    local miniBtn
+local minimized = false
+local miniBtn
 
-    minimizeBtn.MouseButton1Click:Connect(function()
-        if minimized then return end
-        minimized = true
-        frame.Visible = false
+minimizeBtn.MouseButton1Click:Connect(function()
+    if minimized then return end
+    minimized = true
+    frame.Visible = false
 
-        miniBtn = Instance.new("ImageButton")
-        miniBtn.Size = UDim2.new(0, 60, 0, 60)
-        miniBtn.Position = UDim2.new(0, 10, 0, 10)
-        miniBtn.BackgroundTransparency = 1
-        miniBtn.BorderSizePixel = 0
-        miniBtn.Image = "rbxassetid://98966772841112"
-        miniBtn.Parent = gui
+    miniBtn = Instance.new("ImageButton")
+    miniBtn.Size = UDim2.new(0, 60, 0, 60)
+    miniBtn.Position = UDim2.new(0, 10, 0, 10)
+    miniBtn.BackgroundTransparency = 1
+    miniBtn.BorderSizePixel = 0
+    miniBtn.Image = "rbxassetid://98966772841112"
+    miniBtn.Parent = gui
 
-        -- Bo tròn
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 12)
-        corner.Parent = miniBtn
+    -- Bo tròn
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = miniBtn
 
-        -- Giữ đúng tỉ lệ
-        local aspect = Instance.new("UIAspectRatioConstraint")
-        aspect.AspectRatio = 1
-        aspect.Parent = miniBtn
+    -- Giữ đúng tỉ lệ
+    local aspect = Instance.new("UIAspectRatioConstraint")
+    aspect.AspectRatio = 1
+    aspect.Parent = miniBtn
 
-        miniBtn.MouseButton1Click:Connect(function()
-            miniBtn:Destroy()
-            frame.Visible = true
-            minimized = false
-        end)
+    -- Thêm drag cho miniBtn
+    local UIS = game:GetService("UserInputService")
+    local dragging, dragStart, startPos
+
+    miniBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or
+           input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = miniBtn.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
     end)
+
+    UIS.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or
+                         input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            miniBtn.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    miniBtn.MouseButton1Click:Connect(function()
+        miniBtn:Destroy()
+        frame.Visible = true
+        minimized = false
+    end)
+end)
 
     self.ElementCount = 0
     return self
