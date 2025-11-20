@@ -237,18 +237,16 @@ end)
     end
 
     function self:CreateTab(name, iconId)
-    -- tab button
     local tabBtn = Instance.new("TextButton")
-    tabBtn.Name = "TabButton_" .. tostring(name)
-    tabBtn.AutomaticSize = Enum.AutomaticSize.X
-    tabBtn.Size = UDim2.new(0,0,1,0)
+    tabBtn.Name = "TabButton_"..name
     tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-    tabBtn.AutoButtonColor = false
     tabBtn.BorderSizePixel = 0
+    tabBtn.AutoButtonColor = false
+    tabBtn.Size = UDim2.new(0,0,1,0) -- width sẽ tính sau
     tabBtn.Parent = tabBar
     local tbtnCorner = Instance.new("UICorner", tabBtn)
     tbtnCorner.CornerRadius = UDim.new(0,8)
-    addStroke(tabBtn, Color3.fromRGB(220,220,225), 1)
+    addStroke(tabBtn, Color3.fromRGB(220,220,225),1)
 
     -- icon
     local icon = Instance.new("ImageLabel", tabBtn)
@@ -258,11 +256,10 @@ end)
     icon.Image = iconId or ""
     icon.ScaleType = Enum.ScaleType.Fit
 
-    -- LABEL AUTOSIZE FIX
-    local lbl = Instance.new("TextLabel")
+    -- label
+    local lbl = Instance.new("TextLabel", tabBtn)
     lbl.Name = "TabLabel"
     lbl.BackgroundTransparency = 1
-    lbl.AutomaticSize = Enum.AutomaticSize.X
     lbl.Size = UDim2.new(0,0,1,0)
     lbl.Position = UDim2.new(0,36,0,0)
     lbl.Text = name
@@ -270,14 +267,17 @@ end)
     lbl.TextSize = 14
     lbl.TextColor3 = Color3.fromRGB(60,60,70)
     lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.Parent = tabBtn
+    lbl.AutomaticSize = Enum.AutomaticSize.X
 
     tabBtn._lbl = lbl
 
-    -- create content
+    -- set width tabBtn = icon + label + padding
+    tabBtn.Size = UDim2.new(0, 36 + lbl.TextBounds.X + 10, 1, 0)
+
+    -- layout content giống bạn
     local content = Instance.new("ScrollingFrame")
-    content.Name = "TabContent_"..tostring(name)
-    content.Size = UDim2.new(1, -18, 1, -18)
+    content.Name = "TabContent_"..name
+    content.Size = UDim2.new(1,-18,1,-18)
     content.Position = UDim2.new(0,9,0,9)
     content.BackgroundTransparency = 1
     content.ScrollBarThickness = 6
@@ -285,7 +285,7 @@ end)
     content.Parent = contentContainer
     content.Visible = false
 
-    -- layout inside content
+    -- layout
     local contentLayout = Instance.new("UIListLayout", content)
     contentLayout.Padding = UDim.new(0,8)
     contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -293,21 +293,17 @@ end)
     contentPadding.PaddingTop = UDim.new(0,10)
     contentPadding.PaddingLeft = UDim.new(0,10)
 
-    -- handle hover / click
+    -- hover/click
     tabBtn.MouseEnter:Connect(function()
-        if not content.Visible then
-            tabBtn.BackgroundColor3 = Color3.fromRGB(230,230,238)
-        end
+        if not content.Visible then tabBtn.BackgroundColor3 = Color3.fromRGB(230,230,238) end
     end)
     tabBtn.MouseLeave:Connect(function()
-        if not content.Visible then
-            tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-        end
+        if not content.Visible then tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246) end
     end)
 
     local index = #self.Tabs + 1
     tabBtn.MouseButton1Click:Connect(function()
-        for i, t in ipairs(self.Tabs) do
+        for i,t in ipairs(self.Tabs) do
             t.Content.Visible = false
             setActiveButton(self.TabButtons[i], false)
         end
@@ -316,12 +312,12 @@ end)
         self.CurrentTabIndex = index
     end)
 
-    table.insert(self.Tabs, {Name = name, Content = content})
-    table.insert(self.TabButtons, tabBtn)
+    table.insert(self.Tabs,{Name=name,Content=content})
+    table.insert(self.TabButtons,tabBtn)
 
     if #self.Tabs == 1 then
         content.Visible = true
-        setActiveButton(tabBtn, true)
+        setActiveButton(tabBtn,true)
         self.CurrentTabIndex = 1
     end
 
