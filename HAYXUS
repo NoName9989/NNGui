@@ -236,98 +236,97 @@ end)
         end
     end
 
-    -- CreateTab: name (string), iconId (rbxassetid://...)
     function self:CreateTab(name, iconId)
-        -- tab button (container)
-        local tabBtn = Instance.new("TextButton")
-        tabBtn.Name = "TabButton_" .. tostring(name)
-        tabBtn.AutomaticSize = Enum.AutomaticSize.X
-        tabBtn.Size = UDim2.new(0,0,1,0)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-        tabBtn.AutoButtonColor = false
-        tabBtn.BorderSizePixel = 0
-        tabBtn.Parent = tabBar
-        local tbtnCorner = Instance.new("UICorner", tabBtn)
-        tbtnCorner.CornerRadius = UDim.new(0,8)
-        addStroke(tabBtn, Color3.fromRGB(220,220,225), 1)
+    -- tab button
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Name = "TabButton_" .. tostring(name)
+    tabBtn.AutomaticSize = Enum.AutomaticSize.X
+    tabBtn.Size = UDim2.new(0,0,1,0)
+    tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
+    tabBtn.AutoButtonColor = false
+    tabBtn.BorderSizePixel = 0
+    tabBtn.Parent = tabBar
+    local tbtnCorner = Instance.new("UICorner", tabBtn)
+    tbtnCorner.CornerRadius = UDim.new(0,8)
+    addStroke(tabBtn, Color3.fromRGB(220,220,225), 1)
 
-        -- icon
-        local icon = Instance.new("ImageLabel", tabBtn)
-        icon.Size = UDim2.new(0,20,0,20)
-        icon.Position = UDim2.new(0,10,0.5,-10)
-        icon.BackgroundTransparency = 1
-        icon.Image = iconId or ""
-        icon.ScaleType = Enum.ScaleType.Fit
+    -- icon
+    local icon = Instance.new("ImageLabel", tabBtn)
+    icon.Size = UDim2.new(0,20,0,20)
+    icon.Position = UDim2.new(0,10,0.5,-10)
+    icon.BackgroundTransparency = 1
+    icon.Image = iconId or ""
+    icon.ScaleType = Enum.ScaleType.Fit
 
-        -- label
-        local lbl = makeLabel(tabBtn, {
-            Size = UDim2.new(1,-36,1,0),
-            Position = UDim2.new(0,36,0,0),
-            Text = name,
-            Font = Enum.Font.GothamBold,
-            TextSize = 14,
-            TextColor3 = Color3.fromRGB(60,60,70),
-            TextXAlignment = Enum.TextXAlignment.Left
-        })
-        tabBtn._lbl = lbl
+    -- LABEL AUTOSIZE FIX
+    local lbl = Instance.new("TextLabel")
+    lbl.Name = "TabLabel"
+    lbl.BackgroundTransparency = 1
+    lbl.AutomaticSize = Enum.AutomaticSize.X
+    lbl.Size = UDim2.new(0,0,1,0)
+    lbl.Position = UDim2.new(0,36,0,0)
+    lbl.Text = name
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 14
+    lbl.TextColor3 = Color3.fromRGB(60,60,70)
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = tabBtn
 
-        -- create content (scrolling)
-        local content = Instance.new("ScrollingFrame")
-        content.Name = "TabContent_"..tostring(name)
-        content.Size = UDim2.new(1, -18, 1, -18)
-        content.Position = UDim2.new(0,9,0,9)
-        content.BackgroundTransparency = 1
-        content.ScrollBarThickness = 6
-        content.CanvasSize = UDim2.new(0,0,0,0)
-        content.Parent = contentContainer
-        content.Visible = false
+    tabBtn._lbl = lbl
 
-        -- layout inside content
-        local contentLayout = Instance.new("UIListLayout", content)
-        contentLayout.Padding = UDim.new(0,8)
-        contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        local contentPadding = Instance.new("UIPadding", content)
-        contentPadding.PaddingTop = UDim.new(0,10)
-        contentPadding.PaddingLeft = UDim.new(0,10)
+    -- create content
+    local content = Instance.new("ScrollingFrame")
+    content.Name = "TabContent_"..tostring(name)
+    content.Size = UDim2.new(1, -18, 1, -18)
+    content.Position = UDim2.new(0,9,0,9)
+    content.BackgroundTransparency = 1
+    content.ScrollBarThickness = 6
+    content.CanvasSize = UDim2.new(0,0,0,0)
+    content.Parent = contentContainer
+    content.Visible = false
 
-        -- handle tab click / hover
-        tabBtn.MouseEnter:Connect(function()
-            if not content.Visible then
-                tabBtn.BackgroundColor3 = Color3.fromRGB(230,230,238)
-            end
-        end)
-        tabBtn.MouseLeave:Connect(function()
-            if not content.Visible then
-                tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-            end
-        end)
+    -- layout inside content
+    local contentLayout = Instance.new("UIListLayout", content)
+    contentLayout.Padding = UDim.new(0,8)
+    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    local contentPadding = Instance.new("UIPadding", content)
+    contentPadding.PaddingTop = UDim.new(0,10)
+    contentPadding.PaddingLeft = UDim.new(0,10)
 
-        local index = #self.Tabs + 1
-        tabBtn.MouseButton1Click:Connect(function()
-            -- hide previous
-            for i, t in ipairs(self.Tabs) do
-                t.Content.Visible = false
-                setActiveButton(self.TabButtons[i], false)
-            end
-            -- show current
-            content.Visible = true
-            setActiveButton(tabBtn, true)
-            self.CurrentTabIndex = index
-        end)
-
-        -- insert
-        table.insert(self.Tabs, {Name = name, Content = content})
-        table.insert(self.TabButtons, tabBtn)
-
-        -- if first tab, activate
-        if #self.Tabs == 1 then
-            content.Visible = true
-            setActiveButton(tabBtn, true)
-            self.CurrentTabIndex = 1
+    -- handle hover / click
+    tabBtn.MouseEnter:Connect(function()
+        if not content.Visible then
+            tabBtn.BackgroundColor3 = Color3.fromRGB(230,230,238)
         end
+    end)
+    tabBtn.MouseLeave:Connect(function()
+        if not content.Visible then
+            tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
+        end
+    end)
 
-        return content
+    local index = #self.Tabs + 1
+    tabBtn.MouseButton1Click:Connect(function()
+        for i, t in ipairs(self.Tabs) do
+            t.Content.Visible = false
+            setActiveButton(self.TabButtons[i], false)
+        end
+        content.Visible = true
+        setActiveButton(tabBtn, true)
+        self.CurrentTabIndex = index
+    end)
+
+    table.insert(self.Tabs, {Name = name, Content = content})
+    table.insert(self.TabButtons, tabBtn)
+
+    if #self.Tabs == 1 then
+        content.Visible = true
+        setActiveButton(tabBtn, true)
+        self.CurrentTabIndex = 1
     end
+
+    return content
+end
 
     -- Restore previously selected tab (if any)
     -- (call after creating tabs externally)
