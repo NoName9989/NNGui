@@ -145,6 +145,8 @@ function HayxusLibrary:CreateWindow(title)
     tabBarOuter.Parent = frame
 
     local tabBar = Instance.new("ScrollingFrame", tabBarOuter)
+    tabBar.ScrollingDirection = Enum.ScrollingDirection.X
+tabBar.AutomaticCanvasSize = Enum.AutomaticSize.X
 tabBar.Size = UDim2.new(1,0,1,0)
 tabBar.Position = UDim2.new(0,0,0,0)
 tabBar.BackgroundTransparency = 1
@@ -239,7 +241,8 @@ end)
         -- tab button (container)
         local tabBtn = Instance.new("TextButton")
         tabBtn.Name = "TabButton_" .. tostring(name)
-        tabBtn.Size = UDim2.new(0,120,1,0)
+        tabBtn.AutomaticSize = Enum.AutomaticSize.X
+        tabBtn.Size = UDim2.new(0,0,1,0)
         tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
         tabBtn.AutoButtonColor = false
         tabBtn.BorderSizePixel = 0
