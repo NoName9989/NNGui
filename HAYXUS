@@ -144,20 +144,29 @@ function HayxusLibrary:CreateWindow(title)
     tabBarOuter.BackgroundTransparency = 1
     tabBarOuter.Parent = frame
 
-    local tabBar = Instance.new("Frame", tabBarOuter)
-    tabBar.Size = UDim2.new(1,0,1,0)
-    tabBar.Position = UDim2.new(0,0,0,0)
-    tabBar.BackgroundTransparency = 1
+    local tabBar = Instance.new("ScrollingFrame", tabBarOuter)
+tabBar.Size = UDim2.new(1,0,1,0)
+tabBar.Position = UDim2.new(0,0,0,0)
+tabBar.BackgroundTransparency = 1
+tabBar.ScrollBarThickness = 6
+tabBar.HorizontalScrollBarInset = Enum.ScrollBarInset.Always
 
-    local tabLayout = Instance.new("UIListLayout", tabBar)
-    tabLayout.FillDirection = Enum.FillDirection.Horizontal
-    tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-    tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    tabLayout.Padding = UDim.new(0,8)
+    -- layout trong tabBar
+local tabLayout = Instance.new("UIListLayout", tabBar)
+tabLayout.FillDirection = Enum.FillDirection.Horizontal
+tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabLayout.Padding = UDim.new(0,8)
 
-    local tabPadding = Instance.new("UIPadding", tabBar)
-    tabPadding.PaddingLeft = UDim.new(0,6)
+-- padding cho tabBar
+local tabPadding = Instance.new("UIPadding", tabBar)
+tabPadding.PaddingLeft = UDim.new(0,6)
+
+-- tự động cập nhật CanvasSize
+tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    tabBar.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X + 12, 0, 0)
+end)
 
     -- content area below tabs
     local contentOuter = Instance.new("Frame")
