@@ -2,19 +2,30 @@
 local HayxusLibrary = {}
 HayxusLibrary.__index = HayxusLibrary
 
--- Protect & parent (gethui / syn / CoreGui)
 local function ProtectAndParent(gui)
     local CoreGui = game:GetService("CoreGui")
-    if type(gethui) == "function" then
-        gui.Parent = gethui()
-    elseif syn and type(syn.protect_gui) == "function" then
-        pcall(syn.protect_gui, gui)
-        gui.Parent = CoreGui
+    local ParentObj
+
+    if gethui then
+        ParentObj = gethui()
+    elseif syn and syn.protect_gui then
+        syn.protect_gui(gui)
+        ParentObj = CoreGui
     elseif CoreGui:FindFirstChild("RobloxGui") then
-        gui.Parent = CoreGui.RobloxGui
+        ParentObj = CoreGui.RobloxGui
     else
-        gui.Parent = CoreGui
+        ParentObj = CoreGui
     end
+
+    -- 🌟 CƠ CHẾ RAYFIELD: TẮT GUI CŨ + ĐỔI TÊN THÀNH -Old
+    for _, v in ipairs(ParentObj:GetChildren()) do
+        if v.Name == gui.Name and v ~= gui then
+            v.Enabled = false
+            v.Name = gui.Name .. "-Old"
+        end
+    end
+
+    gui.Parent = ParentObj
 end
 
 -- Small helper to create UI stroke
