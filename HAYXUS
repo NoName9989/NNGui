@@ -1,4 +1,4 @@
--- HayxusLibrary (modern tab UI + miniBtn remember + createTab)
+-- HayxusLibrary Mobile Optimized
 local HayxusLibrary = {}
 HayxusLibrary.__index = HayxusLibrary
 
@@ -17,32 +17,28 @@ local function ProtectAndParent(gui)
         ParentObj = CoreGui
     end
 
-    -- 🌟 CƠ CHẾ RAYFIELD: TẮT GUI CŨ + ĐỔI TÊN THÀNH -Old
+    -- Disable old GUIs
     for _, v in ipairs(ParentObj:GetChildren()) do
         if v.Name == gui.Name and v ~= gui then
             v.Enabled = false
-            v.Name = gui.Name .. "-Old"
+            v.Name = gui.Name.."-Old"
         end
     end
 
     gui.Parent = ParentObj
 end
 
--- Small helper to create UI stroke
-local function addStroke(instance, color, thickness)
+local function addStroke(inst, color, thickness)
     local stroke = Instance.new("UIStroke")
     stroke.Color = color or Color3.fromRGB(0,0,0)
     stroke.Thickness = thickness or 1
-    stroke.Parent = instance
+    stroke.Parent = inst
     return stroke
 end
 
--- Create a nice text label helper
 local function makeLabel(parent, props)
     local t = Instance.new("TextLabel")
     t.BackgroundTransparency = 1
-    t.TextWrapped = false
-    t.RichText = false
     for k,v in pairs(props or {}) do t[k] = v end
     t.Parent = parent
     return t
@@ -51,45 +47,37 @@ end
 function HayxusLibrary:CreateWindow(title)
     local self = setmetatable({}, HayxusLibrary)
 
-    -- persist positions / state per-instance
+    local UIS = game:GetService("UserInputService")
+
     self.MiniBtnPosition = self.MiniBtnPosition or UDim2.new(0,10,0,10)
     self.CurrentTabIndex = self.CurrentTabIndex or 1
     self.Tabs = {}
     self.TabButtons = {}
 
-    local player = game:GetService("Players").LocalPlayer
-    local UIS = game:GetService("UserInputService")
-
-    -- create gui
+    -- GUI
     local gui = Instance.new("ScreenGui")
     gui.Name = title
     gui.ResetOnSpawn = false
     ProtectAndParent(gui)
 
-    -- main frame
+    -- Main frame
     local frame = Instance.new("Frame")
     frame.Name = "HayxusFrame"
-    frame.Size = UDim2.new(0,440,0,320)
-    frame.Position = UDim2.new(0.5,-220,0.5,-160)
+    frame.Size = UDim2.new(0,440,0,360)
+    frame.Position = UDim2.new(0.5,-220,0.5,-180)
     frame.BackgroundColor3 = Color3.fromRGB(248,248,250)
-    frame.BackgroundTransparency = 0
     frame.BorderSizePixel = 0
     frame.Parent = gui
-    self.Frame = frame
-
-    -- rounded background
     local bgCorner = Instance.new("UICorner", frame)
     bgCorner.CornerRadius = UDim.new(0,12)
-    addStroke(frame, Color3.fromRGB(220,220,225), 1)
+    addStroke(frame, Color3.fromRGB(220,220,225))
 
-    -- Titlebar (top)
-    local titleBar = Instance.new("Frame")
+    -- TitleBar
+    local titleBar = Instance.new("Frame", frame)
     titleBar.Name = "TitleBar"
     titleBar.Size = UDim2.new(1,0,0,48)
     titleBar.Position = UDim2.new(0,0,0,0)
-    titleBar.BackgroundTransparency = 0
     titleBar.BackgroundColor3 = Color3.fromRGB(255,255,255)
-    titleBar.Parent = frame
     local tcorner = Instance.new("UICorner", titleBar)
     tcorner.CornerRadius = UDim.new(0,12)
 
@@ -104,13 +92,12 @@ function HayxusLibrary:CreateWindow(title)
         TextYAlignment = Enum.TextYAlignment.Center
     })
 
-    -- right controls container
+    -- Controls
     local controls = Instance.new("Frame", titleBar)
     controls.Size = UDim2.new(0,120,1,0)
     controls.Position = UDim2.new(1,-128,0,0)
     controls.BackgroundTransparency = 1
 
-    -- minimize button (icon style)
     local minimizeBtn = Instance.new("TextButton", controls)
     minimizeBtn.Size = UDim2.new(0,36,0,28)
     minimizeBtn.Position = UDim2.new(1,-92,0,10)
@@ -124,7 +111,6 @@ function HayxusLibrary:CreateWindow(title)
     minCorner.CornerRadius = UDim.new(0,6)
     addStroke(minimizeBtn, Color3.fromRGB(220,220,225))
 
-    -- close button
     local closeBtn = Instance.new("TextButton", controls)
     closeBtn.Size = UDim2.new(0,36,0,28)
     closeBtn.Position = UDim2.new(1,-48,0,10)
@@ -137,91 +123,79 @@ function HayxusLibrary:CreateWindow(title)
     local closeCorner = Instance.new("UICorner", closeBtn)
     closeCorner.CornerRadius = UDim.new(0,6)
 
-    -- Thanh TAB nằm ngay dưới TITLE BAR
-local tabBarOuter = Instance.new("Frame")
-tabBarOuter.Name = "TabHostBar"
-tabBarOuter.Size = UDim2.new(1, -24, 0, 44) 
-tabBarOuter.Position = UDim2.new(0, 12, 0, 56) -- dưới TitleBar
-tabBarOuter.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-tabBarOuter.BorderSizePixel = 0
-tabBarOuter.Parent = frame
+    -- TabBar
+    local tabBarOuter = Instance.new("Frame", frame)
+    tabBarOuter.Name = "TabHostBar"
+    tabBarOuter.Size = UDim2.new(1, -24, 0, 50)
+    tabBarOuter.Position = UDim2.new(0,12,0,56)
+    tabBarOuter.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    tabBarOuter.BorderSizePixel = 0
+    local tOuterCorner = Instance.new("UICorner", tabBarOuter)
+    tOuterCorner.CornerRadius = UDim.new(0,8)
+    addStroke(tabBarOuter, Color3.fromRGB(230,230,235))
 
-local tabOuterCorner = Instance.new("UICorner", tabBarOuter)
-tabOuterCorner.CornerRadius = UDim.new(0, 8)
-addStroke(tabBarOuter, Color3.fromRGB(230,230,235), 1)
+    local tabBar = Instance.new("ScrollingFrame", tabBarOuter)
+    tabBar.Name = "TabBar"
+    tabBar.Size = UDim2.new(1,-12,1,-12)
+    tabBar.Position = UDim2.new(0,6,0,6)
+    tabBar.BackgroundTransparency = 1
+    tabBar.ScrollBarThickness = 0
+    tabBar.ScrollingDirection = Enum.ScrollingDirection.X
 
--- thanh tàng hình chứa tab
-local tabBar = Instance.new("ScrollingFrame")
-tabBar.Name = "TabBar"
-tabBar.Parent = tabBarOuter
-tabBar.Size = UDim2.new(1, -12, 1, -12)
-tabBar.Position = UDim2.new(0, 6, 0, 6)
-tabBar.BackgroundTransparency = 1
-tabBar.ScrollBarThickness = 0
-tabBar.ScrollingDirection = Enum.ScrollingDirection.X
-tabBar.AutomaticCanvasSize = Enum.AutomaticSize.X
+    local tabLayout = Instance.new("UIListLayout", tabBar)
+    tabLayout.FillDirection = Enum.FillDirection.Horizontal
+    tabLayout.Padding = UDim.new(0,8)
+    tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-local tabLayout = Instance.new("UIListLayout", tabBar)
-tabLayout.FillDirection = Enum.FillDirection.Horizontal
-tabLayout.Padding = UDim.new(0, 8)
-tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    local tabPadding = Instance.new("UIPadding", tabBar)
+    tabPadding.PaddingLeft = UDim.new(0,6)
 
--- padding cho tabBar
-local tabPadding = Instance.new("UIPadding", tabBar)
-tabPadding.PaddingLeft = UDim.new(0,6)
+    tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        tabBar.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X + 12, 0, 0)
+    end)
 
--- tự động cập nhật CanvasSize
-tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    tabBar.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X + 12, 0, 0)
-end)
-
-    -- content area below tabs
-    local contentOuter = Instance.new("Frame")
-    contentOuter.Size = UDim2.new(1,-24,1, -130)
+    -- Content
+    local contentOuter = Instance.new("Frame", frame)
+    contentOuter.Size = UDim2.new(1,-24,1,-130)
     contentOuter.Position = UDim2.new(0,12,0,108)
     contentOuter.BackgroundTransparency = 1
-    contentOuter.Parent = frame
 
-    -- border for content
     local contentBg = Instance.new("Frame", contentOuter)
     contentBg.Size = UDim2.new(1,0,1,0)
-    contentBg.Position = UDim2.new(0,0,0,0)
     contentBg.BackgroundColor3 = Color3.fromRGB(255,255,255)
-    contentBg.BackgroundTransparency = 0
     local contentCorner = Instance.new("UICorner", contentBg)
     contentCorner.CornerRadius = UDim.new(0,10)
-    addStroke(contentBg, Color3.fromRGB(230,230,235), 1)
+    addStroke(contentBg, Color3.fromRGB(230,230,235))
 
-    -- container inside content for each tab
     local contentContainer = Instance.new("Frame", contentBg)
     contentContainer.Size = UDim2.new(1,0,1,0)
-    contentContainer.Position = UDim2.new(0,0,0,0)
     contentContainer.BackgroundTransparency = 1
 
-    -- draggable for main frame (titleBar)
+    -- Draggable
     do
-        local dragging, dragStart, startPos = false, nil, nil
+        local dragging, startPos, startInput = false, nil, nil
         titleBar.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 dragging = true
-                dragStart = input.Position
+                startInput = input.Position
                 startPos = frame.Position
                 input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then dragging = false end
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
                 end)
             end
         end)
         UIS.InputChanged:Connect(function(input)
-            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                local delta = input.Position - dragStart
+            if dragging and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+                local delta = input.Position - startInput
                 frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
                                            startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             end
         end)
     end
 
-    -- store references in self
     self.Gui = gui
     self.Frame = frame
     self.TabBar = tabBar
@@ -230,9 +204,8 @@ end)
     self.TabButtons = {}
     self.CurrentTabIndex = self.CurrentTabIndex or 1
 
-    -- internal helper to style active/inactive button
     local function setActiveButton(btn, active)
-        if not btn or not btn:IsA("Frame") and not btn:IsA("TextButton") then return end
+        if not btn then return end
         if active then
             btn.BackgroundColor3 = Color3.fromRGB(145,195,255)
             if btn._lbl then btn._lbl.TextColor3 = Color3.fromRGB(14,28,48) end
@@ -243,172 +216,137 @@ end)
     end
 
     function self:CreateTab(name, iconId)
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Name = "TabButton_"..name
-    tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-    tabBtn.BorderSizePixel = 0
-    tabBtn.AutoButtonColor = false
-    tabBtn.Text = "" -- tắt chữ mặc định "Button"
-    tabBtn.Size = UDim2.new(0,0,1,0) -- width sẽ tính sau
-    tabBtn.Parent = tabBar
+        local tabBtn = Instance.new("TextButton")
+        tabBtn.Name = "TabButton_"..name
+        tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
+        tabBtn.AutoButtonColor = false
+        tabBtn.Text = ""
+        tabBtn.Size = UDim2.new(0,0,1,0)
+        tabBtn.Parent = tabBar
+        local tcorner = Instance.new("UICorner", tabBtn)
+        tcorner.CornerRadius = UDim.new(0,10)
+        addStroke(tabBtn, Color3.fromRGB(220,220,225))
 
-    -- bo góc + stroke
-    local tbtnCorner = Instance.new("UICorner", tabBtn)
-    tbtnCorner.CornerRadius = UDim.new(0,8)
-    addStroke(tabBtn, Color3.fromRGB(220,220,225),1)
+        local icon = Instance.new("ImageLabel", tabBtn)
+        icon.Size = UDim2.new(0,24,0,24)
+        icon.Position = UDim2.new(0,10,0.5,-12)
+        icon.BackgroundTransparency = 1
+        icon.Image = iconId or ""
+        icon.ScaleType = Enum.ScaleType.Fit
 
-    -- icon
-    local icon = Instance.new("ImageLabel", tabBtn)
-    icon.Size = UDim2.new(0,20,0,20)
-    icon.Position = UDim2.new(0,10,0.5,-10)
-    icon.BackgroundTransparency = 1
-    icon.Image = iconId or ""
-    icon.ScaleType = Enum.ScaleType.Fit
+        local lbl = Instance.new("TextLabel", tabBtn)
+        lbl.Size = UDim2.new(0,0,1,0)
+        lbl.Position = UDim2.new(0,36,0,0)
+        lbl.Text = name
+        lbl.Font = Enum.Font.GothamBold
+        lbl.TextSize = 16
+        lbl.TextColor3 = Color3.fromRGB(60,60,70)
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.AutomaticSize = Enum.AutomaticSize.X
+        lbl.BackgroundTransparency = 1
 
-    -- label
-    local lbl = Instance.new("TextLabel", tabBtn)
-    lbl.Name = "TabLabel"
-    lbl.BackgroundTransparency = 1
-    lbl.Size = UDim2.new(0,0,1,0)
-    lbl.Position = UDim2.new(0,36,0,0)
-    lbl.Text = name
-    lbl.Font = Enum.Font.GothamBold
-    lbl.TextSize = 14
-    lbl.TextColor3 = Color3.fromRGB(60,60,70)
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.AutomaticSize = Enum.AutomaticSize.X
+        tabBtn._lbl = lbl
+        tabBtn.Size = UDim2.new(0,36+lbl.TextBounds.X+12,1,0)
 
-    tabBtn._lbl = lbl
+        local content = Instance.new("ScrollingFrame", contentContainer)
+        content.Name = "TabContent_"..name
+        content.Size = UDim2.new(1,-18,1,-18)
+        content.Position = UDim2.new(0,9,0,9)
+        content.BackgroundTransparency = 1
+        content.ScrollBarThickness = 6
+        content.CanvasSize = UDim2.new(0,0,0,0)
+        content.Visible = false
 
-    -- set width tabBtn = icon + label + padding
-    tabBtn.Size = UDim2.new(0, 36 + lbl.TextBounds.X + 12, 1, 0) -- thêm padding 12px cho đẹp
+        local layout = Instance.new("UIListLayout", content)
+        layout.Padding = UDim.new(0,8)
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
+        local pad = Instance.new("UIPadding", content)
+        pad.PaddingTop = UDim.new(0,10)
+        pad.PaddingLeft = UDim.new(0,10)
 
-    -- content
-    local content = Instance.new("ScrollingFrame")
-    content.Name = "TabContent_"..name
-    content.Size = UDim2.new(1,-18,1,-18)
-    content.Position = UDim2.new(0,9,0,9)
-    content.BackgroundTransparency = 1
-    content.ScrollBarThickness = 6
-    content.CanvasSize = UDim2.new(0,0,0,0)
-    content.Parent = contentContainer
-    content.Visible = false
+        tabBtn.MouseButton1Click:Connect(function()
+            for i,t in ipairs(self.Tabs) do
+                t.Content.Visible = false
+                setActiveButton(self.TabButtons[i], false)
+            end
+            content.Visible = true
+            setActiveButton(tabBtn,true)
+            self.CurrentTabIndex = #self.Tabs + 1
+        end)
 
-    -- layout content
-    local contentLayout = Instance.new("UIListLayout", content)
-    contentLayout.Padding = UDim.new(0,8)
-    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    local contentPadding = Instance.new("UIPadding", content)
-    contentPadding.PaddingTop = UDim.new(0,10)
-    contentPadding.PaddingLeft = UDim.new(0,10)
+        table.insert(self.Tabs,{Name=name,Content=content})
+        table.insert(self.TabButtons,tabBtn)
 
-    -- hover effect
-    tabBtn.MouseEnter:Connect(function()
-        if not content.Visible then tabBtn.BackgroundColor3 = Color3.fromRGB(230,230,238) end
-    end)
-    tabBtn.MouseLeave:Connect(function()
-        if not content.Visible then tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246) end
-    end)
-
-    local index = #self.Tabs + 1
-    tabBtn.MouseButton1Click:Connect(function()
-        for i,t in ipairs(self.Tabs) do
-            t.Content.Visible = false
-            setActiveButton(self.TabButtons[i], false)
+        if #self.Tabs == 1 then
+            content.Visible = true
+            setActiveButton(tabBtn,true)
         end
-        content.Visible = true
-        setActiveButton(tabBtn, true)
-        self.CurrentTabIndex = index
-    end)
 
-    table.insert(self.Tabs,{Name=name,Content=content})
-    table.insert(self.TabButtons,tabBtn)
-
-    -- tự động hiển thị tab đầu tiên
-    if #self.Tabs == 1 then
-        content.Visible = true
-        setActiveButton(tabBtn,true)
-        self.CurrentTabIndex = 1
+        return content
     end
 
-    return content
-end
-
-    -- Restore previously selected tab (if any)
-    -- (call after creating tabs externally)
     function self:RestoreTab()
-        local idx = tonumber(self.CurrentTabIndex) or 1
-        idx = math.clamp(idx, 1, #self.Tabs)
-        for i, t in ipairs(self.Tabs) do
-            t.Content.Visible = (i == idx)
-            setActiveButton(self.TabButtons[i], i == idx)
+        local idx = math.clamp(tonumber(self.CurrentTabIndex) or 1,1,#self.Tabs)
+        for i,t in ipairs(self.Tabs) do
+            t.Content.Visible = (i==idx)
+            setActiveButton(self.TabButtons[i], i==idx)
         end
     end
 
-    -- minimize / mini button (remember position)
+    -- Mini button
     do
-        local minimized = false
-        local miniBtn = nil
+        local minimized=false
+        local miniBtn=nil
         minimizeBtn.MouseButton1Click:Connect(function()
             if minimized then return end
-            minimized = true
-            frame.Visible = false
+            minimized=true
+            frame.Visible=false
+            miniBtn=Instance.new("ImageButton", gui)
+            miniBtn.Name="HayxusMiniBtn"
+            miniBtn.Size=UDim2.new(0,56,0,56)
+            miniBtn.Position=self.MiniBtnPosition
+            miniBtn.Image="rbxassetid://98966772841112"
+            miniBtn.BackgroundColor3=Color3.fromRGB(255,255,255)
+            miniBtn.BackgroundTransparency=0
+            local mcorner=Instance.new("UICorner", miniBtn); mcorner.CornerRadius=UDim.new(0,12)
+            addStroke(miniBtn, Color3.fromRGB(220,220,225),1)
+            local maspect=Instance.new("UIAspectRatioConstraint", miniBtn); maspect.AspectRatio=1
 
-            miniBtn = Instance.new("ImageButton")
-            miniBtn.Name = "HayxusMiniBtn"
-            miniBtn.Size = UDim2.new(0,56,0,56)
-            miniBtn.Position = self.MiniBtnPosition or UDim2.new(0,10,0,10)
-            miniBtn.Image = "rbxassetid://98966772841112"
-            miniBtn.BackgroundTransparency = 0
-            miniBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
-            miniBtn.Parent = gui
-            local mcorner = Instance.new("UICorner", miniBtn); mcorner.CornerRadius = UDim.new(0,12)
-            addStroke(miniBtn, Color3.fromRGB(220,220,225), 1)
-            local maspect = Instance.new("UIAspectRatioConstraint", miniBtn); maspect.AspectRatio = 1
-
-            -- drag mini
-            local dragMini, startPosMini, startInput = false, nil, nil
+            -- drag
+            local dragMini, startInput, startPosMini=false,nil,nil
             miniBtn.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    dragMini = true
-                    startInput = input.Position
-                    startPosMini = miniBtn.Position
+                if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+                    dragMini=true
+                    startInput=input.Position
+                    startPosMini=miniBtn.Position
                     input.Changed:Connect(function()
-                        if input.UserInputState == Enum.UserInputState.End then
-                            dragMini = false
-                            -- save final position
-                            self.MiniBtnPosition = miniBtn.Position
+                        if input.UserInputState==Enum.UserInputState.End then
+                            dragMini=false
+                            self.MiniBtnPosition=miniBtn.Position
                         end
                     end)
                 end
             end)
             UIS.InputChanged:Connect(function(input)
-                if dragMini and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                    local delta = input.Position - startInput
-                    miniBtn.Position = UDim2.new(startPosMini.X.Scale, startPosMini.X.Offset + delta.X,
-                                                  startPosMini.Y.Scale, startPosMini.Y.Offset + delta.Y)
-                    self.MiniBtnPosition = miniBtn.Position
+                if dragMini and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+                    local delta=input.Position-startInput
+                    miniBtn.Position=UDim2.new(startPosMini.X.Scale,startPosMini.X.Offset+delta.X,
+                                               startPosMini.Y.Scale,startPosMini.Y.Offset+delta.Y)
+                    self.MiniBtnPosition=miniBtn.Position
                 end
             end)
 
             miniBtn.MouseButton1Click:Connect(function()
-                if miniBtn then
-                    miniBtn:Destroy()
-                    miniBtn = nil
-                end
-                frame.Visible = true
-                minimized = false
-                -- restore active tab visibility
+                miniBtn:Destroy()
+                frame.Visible=true
+                minimized=false
                 self:RestoreTab()
             end)
         end)
     end
 
-    -- close: destroy only this gui
     closeBtn.MouseButton1Click:Connect(function()
-        if gui and gui.Destroy then
-            gui:Destroy()
-        end
+        if gui then gui:Destroy() end
     end)
 
     return self
