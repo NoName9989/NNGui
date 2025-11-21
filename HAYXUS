@@ -248,8 +248,11 @@ end)
     tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
     tabBtn.BorderSizePixel = 0
     tabBtn.AutoButtonColor = false
+    tabBtn.Text = "" -- tắt chữ mặc định "Button"
     tabBtn.Size = UDim2.new(0,0,1,0) -- width sẽ tính sau
     tabBtn.Parent = tabBar
+
+    -- bo góc + stroke
     local tbtnCorner = Instance.new("UICorner", tabBtn)
     tbtnCorner.CornerRadius = UDim.new(0,8)
     addStroke(tabBtn, Color3.fromRGB(220,220,225),1)
@@ -278,9 +281,9 @@ end)
     tabBtn._lbl = lbl
 
     -- set width tabBtn = icon + label + padding
-    tabBtn.Size = UDim2.new(0, 36 + lbl.TextBounds.X + 10, 1, 0)
+    tabBtn.Size = UDim2.new(0, 36 + lbl.TextBounds.X + 12, 1, 0) -- thêm padding 12px cho đẹp
 
-    -- layout content giống bạn
+    -- content
     local content = Instance.new("ScrollingFrame")
     content.Name = "TabContent_"..name
     content.Size = UDim2.new(1,-18,1,-18)
@@ -291,7 +294,7 @@ end)
     content.Parent = contentContainer
     content.Visible = false
 
-    -- layout
+    -- layout content
     local contentLayout = Instance.new("UIListLayout", content)
     contentLayout.Padding = UDim.new(0,8)
     contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -299,7 +302,7 @@ end)
     contentPadding.PaddingTop = UDim.new(0,10)
     contentPadding.PaddingLeft = UDim.new(0,10)
 
-    -- hover/click
+    -- hover effect
     tabBtn.MouseEnter:Connect(function()
         if not content.Visible then tabBtn.BackgroundColor3 = Color3.fromRGB(230,230,238) end
     end)
@@ -321,6 +324,7 @@ end)
     table.insert(self.Tabs,{Name=name,Content=content})
     table.insert(self.TabButtons,tabBtn)
 
+    -- tự động hiển thị tab đầu tiên
     if #self.Tabs == 1 then
         content.Visible = true
         setActiveButton(tabBtn,true)
