@@ -264,15 +264,17 @@ function HayxusLibrary:CreateWindow(title)
         pad.PaddingTop = UDim.new(0,10)
         pad.PaddingLeft = UDim.new(0,10)
 
-        tabBtn.MouseButton1Click:Connect(function()
-            for i,t in ipairs(self.Tabs) do
-                t.Content.Visible = false
-                setActiveButton(self.TabButtons[i], false)
-            end
-            content.Visible = true
-            setActiveButton(tabBtn,true)
-            self.CurrentTabIndex = #self.Tabs + 1
-        end)
+        tabBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        for i,t in ipairs(self.Tabs) do
+            t.Content.Visible = false
+            setActiveButton(self.TabButtons[i], false)
+        end
+        content.Visible = true
+        setActiveButton(tabBtn, true)
+        self.CurrentTabIndex = index
+    end
+end)
 
         table.insert(self.Tabs,{Name=name,Content=content})
         table.insert(self.TabButtons,tabBtn)
