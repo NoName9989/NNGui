@@ -1,11 +1,10 @@
--- HayxusLibrary Mobile Optimized
+-- HayxusLibrary Mobile Optimized (Full)
 local HayxusLibrary = {}
 HayxusLibrary.__index = HayxusLibrary
 
 local function ProtectAndParent(gui)
     local CoreGui = game:GetService("CoreGui")
     local ParentObj
-
     if gethui then
         ParentObj = gethui()
     elseif syn and syn.protect_gui then
@@ -16,7 +15,6 @@ local function ProtectAndParent(gui)
     else
         ParentObj = CoreGui
     end
-
     -- Disable old GUIs
     for _, v in ipairs(ParentObj:GetChildren()) do
         if v.Name == gui.Name and v ~= gui then
@@ -24,7 +22,6 @@ local function ProtectAndParent(gui)
             v.Name = gui.Name.."-Old"
         end
     end
-
     gui.Parent = ParentObj
 end
 
@@ -46,21 +43,19 @@ end
 
 function HayxusLibrary:CreateWindow(title)
     local self = setmetatable({}, HayxusLibrary)
-
     local UIS = game:GetService("UserInputService")
-
     self.MiniBtnPosition = self.MiniBtnPosition or UDim2.new(0,10,0,10)
     self.CurrentTabIndex = self.CurrentTabIndex or 1
     self.Tabs = {}
     self.TabButtons = {}
 
-    -- GUI
+    -- ScreenGui
     local gui = Instance.new("ScreenGui")
     gui.Name = title
     gui.ResetOnSpawn = false
     ProtectAndParent(gui)
 
-    -- Main frame
+    -- Main Frame
     local frame = Instance.new("Frame")
     frame.Name = "HayxusFrame"
     frame.Size = UDim2.new(0,440,0,360)
@@ -81,15 +76,15 @@ function HayxusLibrary:CreateWindow(title)
     local tcorner = Instance.new("UICorner", titleBar)
     tcorner.CornerRadius = UDim.new(0,12)
 
-    local titleLabel = makeLabel(titleBar, {
-        Size = UDim2.new(0.7,-20,1,0),
-        Position = UDim2.new(0,16,0,0),
-        Text = title,
-        Font = Enum.Font.GothamBold,
-        TextSize = 18,
-        TextColor3 = Color3.fromRGB(18,18,20),
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Center
+    local titleLabel = makeLabel(titleBar,{
+        Size=UDim2.new(0.7,-20,1,0),
+        Position=UDim2.new(0,16,0,0),
+        Text=title,
+        Font=Enum.Font.GothamBold,
+        TextSize=18,
+        TextColor3=Color3.fromRGB(18,18,20),
+        TextXAlignment=Enum.TextXAlignment.Left,
+        TextYAlignment=Enum.TextYAlignment.Center
     })
 
     -- Controls
@@ -125,162 +120,181 @@ function HayxusLibrary:CreateWindow(title)
 
     -- TabBar
     local tabBarOuter = Instance.new("Frame", frame)
-    tabBarOuter.Name = "TabHostBar"
-    tabBarOuter.Size = UDim2.new(1, -24, 0, 50)
-    tabBarOuter.Position = UDim2.new(0,12,0,56)
-    tabBarOuter.BackgroundColor3 = Color3.fromRGB(255,255,255)
-    tabBarOuter.BorderSizePixel = 0
-    local tOuterCorner = Instance.new("UICorner", tabBarOuter)
-    tOuterCorner.CornerRadius = UDim.new(0,8)
-    addStroke(tabBarOuter, Color3.fromRGB(230,230,235))
+    tabBarOuter.Name="TabHostBar"
+    tabBarOuter.Size=UDim2.new(1,-24,0,50)
+    tabBarOuter.Position=UDim2.new(0,12,0,56)
+    tabBarOuter.BackgroundColor3=Color3.fromRGB(255,255,255)
+    tabBarOuter.BorderSizePixel=0
+    local tOuterCorner=Instance.new("UICorner", tabBarOuter)
+    tOuterCorner.CornerRadius=UDim.new(0,8)
+    addStroke(tabBarOuter,Color3.fromRGB(230,230,235))
 
-    local tabBar = Instance.new("ScrollingFrame", tabBarOuter)
-    tabBar.Name = "TabBar"
-    tabBar.Size = UDim2.new(1,-12,1,-12)
-    tabBar.Position = UDim2.new(0,6,0,6)
-    tabBar.BackgroundTransparency = 1
-    tabBar.ScrollBarThickness = 0
-    tabBar.ScrollingDirection = Enum.ScrollingDirection.X
+    local tabBar = Instance.new("ScrollingFrame",tabBarOuter)
+    tabBar.Name="TabBar"
+    tabBar.Size=UDim2.new(1,-12,1,-12)
+    tabBar.Position=UDim2.new(0,6,0,6)
+    tabBar.BackgroundTransparency=1
+    tabBar.ScrollingDirection=Enum.ScrollingDirection.X
+    tabBar.ScrollBarThickness=6
+    tabBar.ScrollingEnabled=true
 
-    local tabLayout = Instance.new("UIListLayout", tabBar)
-    tabLayout.FillDirection = Enum.FillDirection.Horizontal
-    tabLayout.Padding = UDim.new(0,8)
-    tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-    tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    local tabLayout = Instance.new("UIListLayout",tabBar)
+    tabLayout.FillDirection=Enum.FillDirection.Horizontal
+    tabLayout.Padding=UDim.new(0,8)
+    tabLayout.VerticalAlignment=Enum.VerticalAlignment.Center
+    tabLayout.SortOrder=Enum.SortOrder.LayoutOrder
 
-    local tabPadding = Instance.new("UIPadding", tabBar)
-    tabPadding.PaddingLeft = UDim.new(0,6)
+    local tabPadding = Instance.new("UIPadding",tabBar)
+    tabPadding.PaddingLeft=UDim.new(0,6)
 
     tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        tabBar.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X + 12, 0, 0)
+        tabBar.CanvasSize=UDim2.new(0,tabLayout.AbsoluteContentSize.X+12,0,0)
     end)
 
     -- Content
-    local contentOuter = Instance.new("Frame", frame)
-    contentOuter.Size = UDim2.new(1,-24,1,-130)
-    contentOuter.Position = UDim2.new(0,12,0,108)
-    contentOuter.BackgroundTransparency = 1
+    local contentOuter = Instance.new("Frame",frame)
+    contentOuter.Size=UDim2.new(1,-24,1,-130)
+    contentOuter.Position=UDim2.new(0,12,0,108)
+    contentOuter.BackgroundTransparency=1
 
-    local contentBg = Instance.new("Frame", contentOuter)
-    contentBg.Size = UDim2.new(1,0,1,0)
-    contentBg.BackgroundColor3 = Color3.fromRGB(255,255,255)
-    local contentCorner = Instance.new("UICorner", contentBg)
-    contentCorner.CornerRadius = UDim.new(0,10)
-    addStroke(contentBg, Color3.fromRGB(230,230,235))
+    local contentBg = Instance.new("Frame",contentOuter)
+    contentBg.Size=UDim2.new(1,0,1,0)
+    contentBg.BackgroundColor3=Color3.fromRGB(255,255,255)
+    local contentCorner = Instance.new("UICorner",contentBg)
+    contentCorner.CornerRadius=UDim.new(0,10)
+    addStroke(contentBg,Color3.fromRGB(230,230,235))
 
-    local contentContainer = Instance.new("Frame", contentBg)
-    contentContainer.Size = UDim2.new(1,0,1,0)
-    contentContainer.BackgroundTransparency = 1
+    local contentContainer = Instance.new("Frame",contentBg)
+    contentContainer.Size=UDim2.new(1,0,1,0)
+    contentContainer.BackgroundTransparency=1
 
-    -- Draggable
+    -- Draggable frame
     do
-        local dragging, startPos, startInput = false, nil, nil
+        local dragging=false
+        local startPos=nil
+        local startInput=nil
         titleBar.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                dragging = true
-                startInput = input.Position
-                startPos = frame.Position
+            if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+                dragging=true
+                startInput=input.Position
+                startPos=frame.Position
                 input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        dragging = false
-                    end
+                    if input.UserInputState==Enum.UserInputState.End then dragging=false end
                 end)
             end
         end)
         UIS.InputChanged:Connect(function(input)
             if dragging and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
-                local delta = input.Position - startInput
-                frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                           startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+                local delta=input.Position-startInput
+                frame.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)
             end
         end)
     end
 
-    self.Gui = gui
-    self.Frame = frame
-    self.TabBar = tabBar
-    self.ContentContainer = contentContainer
-    self.Tabs = {}
-    self.TabButtons = {}
-    self.CurrentTabIndex = self.CurrentTabIndex or 1
+    self.Gui=gui
+    self.Frame=frame
+    self.TabBar=tabBar
+    self.ContentContainer=contentContainer
+    self.Tabs={}
+    self.TabButtons={}
+    self.CurrentTabIndex=self.CurrentTabIndex or 1
 
-    local function setActiveButton(btn, active)
+    local function setActiveButton(btn,active)
         if not btn then return end
         if active then
-            btn.BackgroundColor3 = Color3.fromRGB(145,195,255)
-            if btn._lbl then btn._lbl.TextColor3 = Color3.fromRGB(14,28,48) end
+            btn.BackgroundColor3=Color3.fromRGB(145,195,255)
+            if btn._lbl then btn._lbl.TextColor3=Color3.fromRGB(14,28,48) end
         else
-            btn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-            if btn._lbl then btn._lbl.TextColor3 = Color3.fromRGB(60,60,70) end
+            btn.BackgroundColor3=Color3.fromRGB(240,240,246)
+            if btn._lbl then btn._lbl.TextColor3=Color3.fromRGB(60,60,70) end
         end
     end
 
-    function self:CreateTab(name, iconId)
-        local tabBtn = Instance.new("TextButton")
-        tabBtn.Name = "TabButton_"..name
-        tabBtn.BackgroundColor3 = Color3.fromRGB(240,240,246)
-        tabBtn.AutoButtonColor = false
-        tabBtn.Text = ""
-        tabBtn.Size = UDim2.new(0,0,1,0)
-        tabBtn.Parent = tabBar
-        local tcorner = Instance.new("UICorner", tabBtn)
-        tcorner.CornerRadius = UDim.new(0,10)
-        addStroke(tabBtn, Color3.fromRGB(220,220,225))
+    function self:CreateTab(name,iconId)
+        local tabBtn=Instance.new("TextButton")
+        tabBtn.Name="TabButton_"..name
+        tabBtn.BackgroundColor3=Color3.fromRGB(240,240,246)
+        tabBtn.AutoButtonColor=false
+        tabBtn.Text=""
+        tabBtn.Size=UDim2.new(0,0,1,0)
+        tabBtn.Parent=tabBar
+        local tcorner=Instance.new("UICorner",tabBtn)
+        tcorner.CornerRadius=UDim.new(0,10)
+        addStroke(tabBtn,Color3.fromRGB(220,220,225))
 
-        local icon = Instance.new("ImageLabel", tabBtn)
-        icon.Size = UDim2.new(0,24,0,24)
-        icon.Position = UDim2.new(0,10,0.5,-12)
-        icon.BackgroundTransparency = 1
-        icon.Image = iconId or ""
-        icon.ScaleType = Enum.ScaleType.Fit
+        local icon=Instance.new("ImageLabel",tabBtn)
+        icon.Size=UDim2.new(0,24,0,24)
+        icon.Position=UDim2.new(0,10,0.5,-12)
+        icon.BackgroundTransparency=1
+        icon.Image=iconId or ""
+        icon.ScaleType=Enum.ScaleType.Fit
 
-        local lbl = Instance.new("TextLabel", tabBtn)
-        lbl.Size = UDim2.new(0,0,1,0)
-        lbl.Position = UDim2.new(0,36,0,0)
-        lbl.Text = name
-        lbl.Font = Enum.Font.GothamBold
-        lbl.TextSize = 16
-        lbl.TextColor3 = Color3.fromRGB(60,60,70)
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.AutomaticSize = Enum.AutomaticSize.X
-        lbl.BackgroundTransparency = 1
+        local lbl=Instance.new("TextLabel",tabBtn)
+        lbl.Size=UDim2.new(0,0,1,0)
+        lbl.Position=UDim2.new(0,36,0,0)
+        lbl.Text=name
+        lbl.Font=Enum.Font.GothamBold
+        lbl.TextSize=16
+        lbl.TextColor3=Color3.fromRGB(60,60,70)
+        lbl.TextXAlignment=Enum.TextXAlignment.Left
+        lbl.AutomaticSize=Enum.AutomaticSize.X
+        lbl.BackgroundTransparency=1
 
-        tabBtn._lbl = lbl
-        tabBtn.Size = UDim2.new(0,36+lbl.TextBounds.X+12,1,0)
+        tabBtn._lbl=lbl
+        tabBtn.Size=UDim2.new(0,36+lbl.TextBounds.X+12,1,0)
 
-        local content = Instance.new("ScrollingFrame", contentContainer)
-        content.Name = "TabContent_"..name
-        content.Size = UDim2.new(1,-18,1,-18)
-        content.Position = UDim2.new(0,9,0,9)
-        content.BackgroundTransparency = 1
-        content.ScrollBarThickness = 6
-        content.CanvasSize = UDim2.new(0,0,0,0)
-        content.Visible = false
+        local content=Instance.new("ScrollingFrame",contentContainer)
+        content.Name="TabContent_"..name
+        content.Size=UDim2.new(1,-18,1,-18)
+        content.Position=UDim2.new(0,9,0,9)
+        content.BackgroundTransparency=1
+        content.ScrollBarThickness=6
+        content.CanvasSize=UDim2.new(0,0,0,0)
+        content.Visible=false
+        content.ScrollingEnabled=true
 
-        local layout = Instance.new("UIListLayout", content)
-        layout.Padding = UDim.new(0,8)
-        layout.SortOrder = Enum.SortOrder.LayoutOrder
-        local pad = Instance.new("UIPadding", content)
-        pad.PaddingTop = UDim.new(0,10)
-        pad.PaddingLeft = UDim.new(0,10)
+        local layout=Instance.new("UIListLayout",content)
+        layout.Padding=UDim.new(0,8)
+        layout.SortOrder=Enum.SortOrder.LayoutOrder
+        local pad=Instance.new("UIPadding",content)
+        pad.PaddingTop=UDim.new(0,10)
+        pad.PaddingLeft=UDim.new(0,10)
+
+        -- Tap vs Drag fix for mobile
+        local index=#self.Tabs+1
+        local touchStartPos=nil
+        local isDragging=false
 
         tabBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        for i,t in ipairs(self.Tabs) do
-            t.Content.Visible = false
-            setActiveButton(self.TabButtons[i], false)
-        end
-        content.Visible = true
-        setActiveButton(tabBtn, true)
-        self.CurrentTabIndex = index
-    end
-end)
+            if input.UserInputType==Enum.UserInputType.Touch then
+                touchStartPos=input.Position
+                isDragging=false
+            end
+        end)
+        tabBtn.InputChanged:Connect(function(input)
+            if input.UserInputType==Enum.UserInputType.Touch and touchStartPos then
+                if (input.Position-touchStartPos).Magnitude>10 then
+                    isDragging=true
+                end
+            end
+        end)
+        tabBtn.InputEnded:Connect(function(input)
+            if input.UserInputType==Enum.UserInputType.Touch and not isDragging then
+                for i,t in ipairs(self.Tabs) do
+                    t.Content.Visible=false
+                    setActiveButton(self.TabButtons[i],false)
+                end
+                content.Visible=true
+                setActiveButton(tabBtn,true)
+                self.CurrentTabIndex=index
+            end
+        end)
 
         table.insert(self.Tabs,{Name=name,Content=content})
         table.insert(self.TabButtons,tabBtn)
 
-        if #self.Tabs == 1 then
-            content.Visible = true
+        if #self.Tabs==1 then
+            content.Visible=true
             setActiveButton(tabBtn,true)
         end
 
@@ -288,14 +302,14 @@ end)
     end
 
     function self:RestoreTab()
-        local idx = math.clamp(tonumber(self.CurrentTabIndex) or 1,1,#self.Tabs)
+        local idx=math.clamp(tonumber(self.CurrentTabIndex) or 1,1,#self.Tabs)
         for i,t in ipairs(self.Tabs) do
-            t.Content.Visible = (i==idx)
-            setActiveButton(self.TabButtons[i], i==idx)
+            t.Content.Visible=(i==idx)
+            setActiveButton(self.TabButtons[i],i==idx)
         end
     end
 
-    -- Mini button
+    -- Mini Button
     do
         local minimized=false
         local miniBtn=nil
@@ -303,21 +317,23 @@ end)
             if minimized then return end
             minimized=true
             frame.Visible=false
-            miniBtn=Instance.new("ImageButton", gui)
+            miniBtn=Instance.new("ImageButton",gui)
             miniBtn.Name="HayxusMiniBtn"
             miniBtn.Size=UDim2.new(0,56,0,56)
             miniBtn.Position=self.MiniBtnPosition
             miniBtn.Image="rbxassetid://98966772841112"
             miniBtn.BackgroundColor3=Color3.fromRGB(255,255,255)
             miniBtn.BackgroundTransparency=0
-            local mcorner=Instance.new("UICorner", miniBtn); mcorner.CornerRadius=UDim.new(0,12)
-            addStroke(miniBtn, Color3.fromRGB(220,220,225),1)
-            local maspect=Instance.new("UIAspectRatioConstraint", miniBtn); maspect.AspectRatio=1
+            local mcorner=Instance.new("UICorner",miniBtn); mcorner.CornerRadius=UDim.new(0,12)
+            addStroke(miniBtn,Color3.fromRGB(220,220,225),1)
+            local maspect=Instance.new("UIAspectRatioConstraint",miniBtn); maspect.AspectRatio=1
 
-            -- drag
-            local dragMini, startInput, startPosMini=false,nil,nil
+            -- drag mini
+            local dragMini=false
+            local startInput=nil
+            local startPosMini=nil
             miniBtn.InputBegan:Connect(function(input)
-                if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+                if input.UserInputType==Enum.UserInputType.Touch or input.UserInputType==Enum.UserInputType.MouseButton1 then
                     dragMini=true
                     startInput=input.Position
                     startPosMini=miniBtn.Position
@@ -330,10 +346,9 @@ end)
                 end
             end)
             UIS.InputChanged:Connect(function(input)
-                if dragMini and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+                if dragMini and (input.UserInputType==Enum.UserInputType.Touch or input.UserInputType==Enum.UserInputType.MouseMovement) then
                     local delta=input.Position-startInput
-                    miniBtn.Position=UDim2.new(startPosMini.X.Scale,startPosMini.X.Offset+delta.X,
-                                               startPosMini.Y.Scale,startPosMini.Y.Offset+delta.Y)
+                    miniBtn.Position=UDim2.new(startPosMini.X.Scale,startPosMini.X.Offset+delta.X,startPosMini.Y.Scale,startPosMini.Y.Offset+delta.Y)
                     self.MiniBtnPosition=miniBtn.Position
                 end
             end)
